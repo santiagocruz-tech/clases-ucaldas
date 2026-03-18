@@ -1,4 +1,4 @@
-# Estructuras de Datos — Guía para aprendices de ingeniería (Java)
+# Estructuras de Datos (Java) — Universidad de Caldas (Ingeniería)
 
 **Enfoque:** comprender primero **cómo funcionan internamente** las estructuras de datos y luego aprender a usar las implementaciones de Java.
 
@@ -146,47 +146,7 @@ Este es el principio detrás de `ArrayList`.
 # Lista dinámica con redimensionamiento
 
 ```java
-class ListaDinamica {
 
-    private int[] datos;
-
-    private int tamaño;
-
-    public ListaDinamica(){
-
-        datos = new int[10];
-
-        tamaño = 0;
-
-    }
-
-    public void agregar(int valor){
-
-        if(tamaño == datos.length){
-
-            redimensionar();
-
-        }
-
-        datos[tamaño++] = valor;
-
-    }
-
-    private void redimensionar(){
-
-        int[] nuevo = new int[datos.length * 2];
-
-        for(int i=0;i<datos.length;i++){
-
-            nuevo[i] = datos[i];
-
-        }
-
-        datos = nuevo;
-
-    }
-
-}
 ```
 
 ---
