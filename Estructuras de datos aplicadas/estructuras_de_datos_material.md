@@ -17,6 +17,19 @@ Cada sección incluye enfoques **iterativos**, **recursivos** y de **backtrackin
 
 # Contenido del curso
 
+## 0. Prerequisitos y presaberes
+
+> 📄 [material/00_prerequisitos.md](material/00_prerequisitos.md)
+
+- Checklist de conocimientos previos necesarios
+- Repaso rápido de Java (variables, ciclos, arreglos, métodos, clases)
+- Pruebas de escritorio: qué son, cómo hacerlas, consejos
+- 6 ejemplos completos de pruebas de escritorio (ciclos, condicionales, arreglos, matrices, métodos, objetos)
+- 10 ejercicios de lógica en Java con soluciones y pruebas de escritorio
+- 8 ejercicios adicionales para practicar por cuenta propia
+
+---
+
 ## 1. Fundamentos de estructuras de datos
 
 > 📄 [material/01_fundamentos.md](material/01_fundamentos.md)
