@@ -128,8 +128,11 @@ class _MapPageState extends State<MapPage> {
         },
         onDelete: (index) {
           setState(() => _savedPlaces.removeAt(index));
-          Navigator.pop(ctx); // Cerrar y reabrir para refrescar
-          _showSavedPlaces();
+          Navigator.pop(ctx); // Cerrar el sheet actual
+          // Esperar a que se cierre antes de reabrir para evitar apilar sheets
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) _showSavedPlaces();
+          });
         },
       ),
     );

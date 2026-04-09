@@ -1,0 +1,615 @@
+/* ============================================================
+   CSS GRID - LAYOUT BIDIMENSIONAL (NIVEL 3)
+   Archivo de estilos completamente documentado
+   ============================================================ */
+
+/* ----------------------------------------
+   RESET Y ESTILOS BASE
+   ---------------------------------------- */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box; /* Incluye padding y border en el tamaño total */
+}
+
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background-color: #0f172a; /* Fondo oscuro */
+  color: #e2e8f0;
+  line-height: 1.6;
+  padding: 24px;
+}
+
+/* ----------------------------------------
+   SECCIONES DE DEMOSTRACIÓN
+   Cada sección muestra un concepto de Grid
+   ---------------------------------------- */
+.demo-section {
+  max-width: 1100px;
+  margin: 0 auto 48px auto;
+  background: #1e293b;
+  border-radius: 12px;
+  padding: 32px;
+  border: 1px solid #334155;
+}
+
+.demo-section h2 {
+  color: #38bdf8;       /* Azul claro para títulos */
+  margin-bottom: 8px;
+  font-size: 1.4rem;
+}
+
+.demo-section code {
+  background: #0f172a;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.9em;
+  color: #7dd3fc;
+}
+
+.descripcion {
+  color: #94a3b8;
+  margin-bottom: 20px;
+  font-size: 0.95rem;
+}
+
+/* Bloques de código de referencia */
+pre {
+  background: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 20px;
+  overflow-x: auto;
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+pre code {
+  background: none;
+  padding: 0;
+  color: #a5f3fc;
+}
+
+/* ============================================================
+   SECCIÓN 1: LAYOUT CLÁSICO CON GRID-TEMPLATE-AREAS
+   ============================================================
+   
+   grid-template-areas permite "dibujar" el layout con texto.
+   Cada string representa una fila, y cada palabra una celda.
+   Palabras repetidas = el elemento ocupa varias columnas.
+   
+   Visualización del grid:
+   
+   Columna:  200px    1fr      1fr     200px
+            ┌────────┬────────┬────────┬────────┐
+   Fila 1:  │       header    header           │  ← auto
+            ├────────┼────────┴────────┼────────┤
+   Fila 2:  │sidebar │     main       │ aside  │  ← 1fr
+            ├────────┼────────┬────────┼────────┤
+   Fila 3:  │       footer    footer           │  ← auto
+            └────────┴────────┴────────┴────────┘
+   ============================================================ */
+
+.layout-clasico {
+  display: grid;
+
+  /* 4 columnas: sidebar(200px) + 2 centrales(1fr) + aside(200px) */
+  grid-template-columns: 200px 1fr 1fr 200px;
+
+  /* 3 filas: header(auto) + contenido(1fr) + footer(auto) */
+  grid-template-rows: auto 1fr auto;
+
+  /* Mapa visual de áreas - cada línea es una fila */
+  grid-template-areas:
+    "header  header  header  header"
+    "sidebar main    main    aside"
+    "footer  footer  footer  footer";
+
+  /* Espacio entre todas las celdas */
+  gap: 12px;
+
+  /* Altura mínima para que se vea el layout */
+  min-height: 400px;
+}
+
+/* Asignación de cada elemento a su zona nombrada + estilos visuales */
+.lc-header {
+  grid-area: header;
+  background: linear-gradient(135deg, #1e40af, #3b82f6);
+  border-radius: 8px;
+  padding: 16px 24px;
+}
+
+.lc-sidebar { grid-area: sidebar; }
+.lc-aside   { grid-area: aside; }
+
+.lc-header nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.lc-header .logo {
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.lc-header ul {
+  display: flex;
+  list-style: none;
+  gap: 16px;
+}
+
+.lc-header a {
+  color: #e2e8f0;
+  text-decoration: none;
+}
+
+.lc-header a:hover,
+.lc-header a[aria-current="page"] {
+  color: #bfdbfe;
+  text-decoration: underline;
+}
+
+.lc-sidebar,
+.lc-aside {
+  background: #1a2744;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.lc-sidebar h3,
+.lc-aside h3 {
+  color: #60a5fa;
+  margin-bottom: 12px;
+  font-size: 1rem;
+}
+
+.lc-sidebar ul {
+  list-style: none;
+}
+
+.lc-sidebar li {
+  margin-bottom: 8px;
+}
+
+.lc-sidebar a {
+  color: #94a3b8;
+  text-decoration: none;
+}
+
+.lc-sidebar a:hover {
+  color: #e2e8f0;
+}
+
+.lc-main {
+  grid-area: main;
+  background: #162032;
+  border-radius: 8px;
+  padding: 24px;
+}
+
+.lc-main h3 {
+  color: #34d399;
+  margin-bottom: 12px;
+}
+
+.lc-main p {
+  margin-bottom: 10px;
+  color: #cbd5e1;
+}
+
+.lc-footer {
+  grid-area: footer;
+  background: #0f172a;
+  border-radius: 8px;
+  padding: 16px;
+  text-align: center;
+  color: #94a3b8;  /* Mejorado para contraste accesible */
+}
+
+/* ============================================================
+   SECCIÓN 2: POSICIONAMIENTO POR LÍNEAS DE GRID
+   ============================================================
+   
+   Las líneas del grid se numeran desde 1.
+   Para un grid de 4 columnas hay 5 líneas verticales:
+   
+   Línea:  1     2     3     4     5
+           │     │     │     │     │
+           ├─────┼─────┼─────┼─────┤  ← Línea de fila 1
+           │  A  │  A  │  B  │  B  │
+           ├─────┼─────┼─────┼─────┤  ← Línea de fila 2
+           │  C  │  D  │  D  │  E  │
+           ├─────┼─────┼─────┼─────┤  ← Línea de fila 3
+           │  C  │  F  │  F  │  E  │
+           ├─────┼─────┼─────┼─────┤  ← Línea de fila 4
+   
+   grid-column: 1 / 3  → desde línea 1 hasta línea 3 (2 celdas)
+   grid-row: 2 / 4     → desde línea 2 hasta línea 4 (2 celdas)
+   ============================================================ */
+
+.grid-lineas {
+  display: grid;
+
+  /* repeat(4, 1fr) = 4 columnas iguales de 1 fracción cada una */
+  grid-template-columns: repeat(4, 1fr);
+
+  /* 3 filas de 120px cada una */
+  grid-template-rows: repeat(3, 120px);
+
+  gap: 8px;
+}
+
+/* Estilos base de cada item */
+.gl-item {
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #fff;
+}
+
+.gl-item small {
+  font-weight: 400;
+  font-size: 0.7rem;
+  opacity: 0.8;
+  margin-top: 4px;
+}
+
+/* A: columnas 1-3, fila 1 (ocupa 2 columnas) */
+.gl-a {
+  grid-column: 1 / 3;   /* Desde línea 1 hasta línea 3 */
+  grid-row: 1 / 2;      /* Solo fila 1 */
+  background: #2563eb;
+}
+
+/* B: columnas 3-5, fila 1 */
+.gl-b {
+  grid-column: 3 / 5;
+  grid-row: 1 / 2;
+  background: #7c3aed;
+}
+
+/* C: columna 1, filas 2-4 (ocupa 2 filas = span vertical) */
+.gl-c {
+  grid-column: 1 / 2;
+  grid-row: 2 / 4;      /* Desde línea 2 hasta línea 4 */
+  background: #059669;
+}
+
+/* D: columnas 2-4, fila 2 */
+.gl-d {
+  grid-column: 2 / 4;
+  grid-row: 2 / 3;
+  background: #d97706;
+}
+
+/* E: columna 4, filas 2-4 (span vertical) */
+.gl-e {
+  grid-column: 4 / 5;
+  grid-row: 2 / 4;
+  background: #dc2626;
+}
+
+/* F: columnas 2-4, fila 3 */
+.gl-f {
+  grid-column: 2 / 4;
+  grid-row: 3 / 4;
+  background: #0891b2;
+}
+
+/* ============================================================
+   SECCIÓN 3: GALERÍA RESPONSIVA CON AUTO-FIT + MINMAX
+   ============================================================
+   
+   Esta es una de las técnicas más poderosas de CSS Grid.
+   
+   repeat(auto-fit, minmax(220px, 1fr)) significa:
+   - auto-fit: crea tantas columnas como quepan en el contenedor
+   - minmax(220px, 1fr): cada columna mide mínimo 220px,
+     máximo 1fr (se reparte el espacio sobrante)
+   
+   Resultado: layout responsivo SIN media queries.
+   
+   Ancho 1000px → 4 columnas de ~250px
+   Ancho 700px  → 3 columnas de ~233px
+   Ancho 500px  → 2 columnas de ~250px
+   Ancho 300px  → 1 columna de 300px
+   ============================================================ */
+
+.galeria-responsiva {
+  display: grid;
+
+  /* La magia: columnas auto-responsivas */
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+
+  gap: 20px;
+}
+
+/* Tarjetas de la galería */
+.tarjeta {
+  background: #1a2744;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #334155;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.tarjeta:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.tarjeta-img {
+  background: linear-gradient(135deg, #1e3a5f, #0f172a);
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+}
+
+.tarjeta h3 {
+  padding: 12px 16px 4px;
+  color: #f1f5f9;
+  font-size: 1.05rem;
+}
+
+.tarjeta p {
+  padding: 0 16px 16px;
+  color: #94a3b8;
+  font-size: 0.85rem;
+}
+
+/* ============================================================
+   SECCIÓN 4: ALINEACIÓN EN EL GRID
+   ============================================================
+   
+   Hay dos niveles de alineación en Grid:
+   
+   A) Alineación de ITEMS dentro de sus celdas:
+      - justify-items → eje horizontal (inline)
+      - align-items   → eje vertical (block)
+      - place-items   → shorthand de ambos
+   
+   B) Alineación del GRID dentro del contenedor:
+      - justify-content → eje horizontal
+      - align-content   → eje vertical
+      - place-content   → shorthand de ambos
+   
+   Valores posibles: start | end | center | stretch
+   (stretch es el valor por defecto)
+   ============================================================ */
+
+.grid-alineacion-demo {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.alineacion-ejemplo h4 {
+  text-align: center;
+  margin-bottom: 8px;
+  color: #94a3b8;
+  font-size: 0.85rem;
+}
+
+/* Mini-grids para demostrar cada tipo de alineación */
+.mini-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(2, 80px);
+  gap: 6px;
+  background: #0f172a;
+  border-radius: 8px;
+  padding: 8px;
+  border: 1px dashed #475569; /* Borde punteado para ver los límites */
+}
+
+.mini-item {
+  background: #3b82f6;
+  color: #ffffff;
+  font-weight: 700;
+  display: grid;
+  place-items: center;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+/* --- Variantes de alineación --- */
+
+/* start: items se pegan a la esquina superior-izquierda de su celda */
+.align-start {
+  place-items: start;
+}
+.align-start .mini-item {
+  width: 50px;
+  height: 40px;
+  background: #ef4444;
+}
+
+/* center: items se centran en su celda */
+.align-center {
+  place-items: center;
+}
+.align-center .mini-item {
+  width: 50px;
+  height: 40px;
+  background: #8b5cf6;
+}
+
+/* end: items se pegan a la esquina inferior-derecha */
+.align-end {
+  place-items: end;
+}
+.align-end .mini-item {
+  width: 50px;
+  height: 40px;
+  background: #f59e0b;
+}
+
+/* stretch (default): items llenan toda la celda */
+.align-stretch {
+  place-items: stretch;
+}
+.align-stretch .mini-item {
+  background: #10b981;
+}
+
+/* ============================================================
+   SECCIÓN 5: GRID IMPLÍCITO
+   ============================================================
+   
+   Grid EXPLÍCITO: las filas/columnas que defines tú.
+   Grid IMPLÍCITO: las filas/columnas que el navegador crea
+   automáticamente cuando hay más elementos que celdas definidas.
+   
+   grid-auto-rows: controla el tamaño de filas implícitas
+   grid-auto-columns: controla el tamaño de columnas implícitas
+   grid-auto-flow: controla la dirección de auto-colocación
+     - row (default): llena por filas
+     - column: llena por columnas
+     - dense: intenta rellenar huecos (reordena visualmente)
+   
+   ⚠️ dense puede cambiar el orden visual vs. el orden del DOM,
+   lo cual puede afectar la accesibilidad (navegación por teclado).
+   ============================================================ */
+
+.grid-implicito {
+  display: grid;
+
+  /* Solo definimos 3 columnas (grid explícito) */
+  grid-template-columns: repeat(3, 1fr);
+
+  /* Las filas se crean automáticamente (grid implícito) */
+  /* minmax: mínimo 80px, crece si el contenido lo necesita */
+  grid-auto-rows: minmax(80px, auto);
+
+  /* dense: rellena huecos cuando hay items de distinto tamaño */
+  grid-auto-flow: dense;
+
+  gap: 8px;
+}
+
+.gi-item {
+  background: #334155;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  color: #e2e8f0;
+  border: 2px solid #475569;
+}
+
+/* Elementos anchos: ocupan 2 columnas con "span 2" */
+.gi-wide {
+  grid-column: span 2;  /* Equivale a: grid-column: auto / span 2 */
+  background: #1d4ed8;
+  border-color: #3b82f6;
+}
+
+/* Elementos altos: ocupan 2 filas con "span 2" */
+.gi-tall {
+  grid-row: span 2;     /* Equivale a: grid-row: auto / span 2 */
+  background: #7e22ce;
+  border-color: #a855f7;
+}
+
+/* ============================================================
+   SECCIÓN 6: TABLA RESUMEN
+   ============================================================ */
+
+.tabla-resumen {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
+  gap: 20px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+caption {
+  text-align: left;
+  font-weight: 700;
+  color: #38bdf8;
+  margin-bottom: 8px;
+  font-size: 0.95rem;
+}
+
+th, td {
+  padding: 8px 12px;
+  text-align: left;
+  border-bottom: 1px solid #334155;
+}
+
+th {
+  background: #0f172a;
+  color: #cbd5e1;  /* Mejorado para contraste accesible */
+  font-weight: 600;
+}
+
+td code {
+  background: #0f172a;
+  padding: 1px 5px;
+  border-radius: 3px;
+  color: #7dd3fc;
+  font-size: 0.8rem;
+}
+
+/* ============================================================
+   DISEÑO RESPONSIVO
+   ============================================================
+   Adaptamos el layout clásico para pantallas pequeñas.
+   En móvil, todo se apila en una sola columna.
+   ============================================================ */
+
+@media (max-width: 768px) {
+  body {
+    padding: 12px;
+  }
+
+  .demo-section {
+    padding: 20px;
+  }
+
+  /* El layout clásico pasa a 1 columna en móvil */
+  .layout-clasico {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    grid-template-areas:
+      "header"
+      "sidebar"
+      "main"
+      "aside"
+      "footer";
+    min-height: auto;
+  }
+
+  /* Grid de líneas: 2 columnas en vez de 4 */
+  .grid-lineas {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: auto;
+  }
+
+  .gl-a, .gl-b { grid-column: 1 / -1; grid-row: auto; }
+  .gl-c, .gl-d, .gl-e, .gl-f {
+    grid-column: auto;
+    grid-row: auto;
+  }
+
+  /* Tabla resumen en 1 columna */
+  .tabla-resumen {
+    grid-template-columns: 1fr;
+  }
+}

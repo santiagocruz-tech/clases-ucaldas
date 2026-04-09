@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSS Grid - Layout Bidimensional (Nivel 3)</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- 
+    ============================================================
+    EJEMPLO COMPLETO DE CSS GRID - LAYOUT BIDIMENSIONAL
+    ============================================================
+    
+    CSS Grid es un sistema de layout bidimensional que permite
+    controlar FILAS y COLUMNAS simultáneamente (a diferencia de
+    Flexbox que es unidimensional).
+
+    Conceptos clave demostrados en este ejemplo:
+    
+    1. grid-template-columns / grid-template-rows
+    2. grid-template-areas (nombrar zonas del grid)
+    3. grid-column / grid-row (posicionar elementos)
+    4. gap (espaciado entre celdas)
+    5. fr (unidad fraccionaria)
+    6. repeat(), minmax(), auto-fit, auto-fill
+    7. justify-items, align-items (alineación de celdas)
+    8. justify-content, align-content (alineación del grid)
+    9. Grid implícito vs explícito
+    10. Diseño responsivo con Grid
+    ============================================================
+  -->
+
+  <!-- ========================================
+       SECCIÓN 1: LAYOUT CLÁSICO CON GRID AREAS
+       ========================================
+       Usamos grid-template-areas para definir
+       zonas con nombre. Es la forma más visual
+       e intuitiva de crear layouts complejos.
+  -->
+  <section class="demo-section">
+    <h2>1. Layout clásico con <code>grid-template-areas</code></h2>
+    <p class="descripcion">
+      Definimos zonas con nombre: header, sidebar, main, aside y footer.
+      Cada elemento se asigna a su zona con <code>grid-area</code>.
+    </p>
+
+    <div class="layout-clasico">
+      <!-- Cada elemento se posiciona según su grid-area -->
+      <header class="lc-header">
+        <nav>
+          <span class="logo">🌐 MiSitio</span>
+          <ul>
+            <li><a href="#" aria-current="page">Inicio</a></li>
+            <li><a href="#">Servicios</a></li>
+            <li><a href="#">Contacto</a></li>
+          </ul>
+        </nav>
+      </header>
+
+      <aside class="lc-sidebar" aria-label="Menú de navegación lateral">
+        <h3>Menú lateral</h3>
+        <ul>
+          <li><a href="#">Dashboard</a></li>
+          <li><a href="#">Perfil</a></li>
+          <li><a href="#">Configuración</a></li>
+          <li><a href="#">Reportes</a></li>
+        </ul>
+      </aside>
+
+      <main class="lc-main">
+        <h3>Contenido principal</h3>
+        <p>
+          Esta zona ocupa el espacio central del grid.
+          Se definió con <code>grid-template-areas</code>
+          usando la palabra "main".
+        </p>
+        <p>
+          El grid tiene 4 columnas: la primera de 200px (sidebar),
+          las dos centrales de 1fr cada una (main), y la última
+          de 200px (aside).
+        </p>
+      </main>
+
+      <aside class="lc-aside" aria-label="Panel de información complementaria">
+        <h3>Panel derecho</h3>
+        <p>Widgets, publicidad o información complementaria.</p>
+      </aside>
+
+      <footer class="lc-footer">
+        <p>&copy; 2026 - Ejemplo CSS Grid Bidimensional</p>
+      </footer>
+    </div>
+
+    <!-- Código CSS relevante (referencia visual) -->
+    <pre><code>/* Definición del grid con áreas nombradas */
+.layout-clasico {
+  display: grid;
+  grid-template-columns: 200px 1fr 1fr 200px;
+  grid-template-rows: auto 1fr auto;
+  grid-template-areas:
+    "header  header  header  header"
+    "sidebar main    main    aside"
+    "footer  footer  footer  footer";
+  gap: 12px;
+  min-height: 400px;
+}
+
+/* Asignación de cada elemento a su zona */
+.lc-header  { grid-area: header; }
+.lc-sidebar { grid-area: sidebar; }
+.lc-main    { grid-area: main; }
+.lc-aside   { grid-area: aside; }
+.lc-footer  { grid-area: footer; }</code></pre>
+  </section>
+
+  <!-- ========================================
+       SECCIÓN 2: POSICIONAMIENTO POR LÍNEAS
+       ========================================
+       En lugar de áreas, posicionamos elementos
+       usando números de línea del grid.
+       Las líneas se numeran desde 1.
+  -->
+  <section class="demo-section">
+    <h2>2. Posicionamiento por líneas (<code>grid-column</code> / <code>grid-row</code>)</h2>
+    <p class="descripcion">
+      Cada celda se posiciona indicando en qué línea empieza y termina.
+      Líneas de columna: 1│2│3│4│5. Líneas de fila: 1│2│3│4.
+    </p>
+
+    <div class="grid-lineas">
+      <!--
+        grid-column: inicio / fin
+        grid-row: inicio / fin
+        También se puede usar "span N" para abarcar N celdas
+      -->
+      <div class="gl-item gl-a">
+        A<br><small>col 1/3, row 1/2</small>
+      </div>
+      <div class="gl-item gl-b">
+        B<br><small>col 3/5, row 1/2</small>
+      </div>
+      <div class="gl-item gl-c">
+        C<br><small>col 1/2, row 2/4</small>
+      </div>
+      <div class="gl-item gl-d">
+        D<br><small>col 2/4, row 2/3</small>
+      </div>
+      <div class="gl-item gl-e">
+        E<br><small>col 4/5, row 2/4</small>
+      </div>
+      <div class="gl-item gl-f">
+        F<br><small>col 2/4, row 3/4</small>
+      </div>
+    </div>
+
+    <pre><code>/* Grid de 4 columnas x 3 filas */
+.grid-lineas {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(3, 120px);
+  gap: 8px;
+}
+
+/* Elemento A: ocupa columnas 1-3, fila 1 */
+.gl-a { grid-column: 1 / 3; grid-row: 1 / 2; }
+
+/* Elemento C: ocupa columna 1, filas 2-4 (span vertical) */
+.gl-c { grid-column: 1 / 2; grid-row: 2 / 4; }
+
+/* Elemento E: ocupa columna 4, filas 2-4 */
+.gl-e { grid-column: 4 / 5; grid-row: 2 / 4; }</code></pre>
+  </section>
+
+  <!-- ========================================
+       SECCIÓN 3: GALERÍA RESPONSIVA
+       ========================================
+       Usamos auto-fit + minmax() para crear
+       un grid que se adapta automáticamente
+       al ancho disponible sin media queries.
+  -->
+  <section class="demo-section">
+    <h2>3. Galería responsiva con <code>auto-fit</code> + <code>minmax()</code></h2>
+    <p class="descripcion">
+      El grid crea tantas columnas como quepan (mínimo 220px cada una).
+      Al reducir la ventana, las tarjetas se reorganizan automáticamente.
+    </p>
+
+    <div class="galeria-responsiva">
+      <article class="tarjeta">
+        <div class="tarjeta-img" aria-hidden="true">🏔️</div>
+        <h3>Montañas</h3>
+        <p>Paisajes de alta montaña con nieve y cielos despejados.</p>
+      </article>
+      <article class="tarjeta">
+        <div class="tarjeta-img" aria-hidden="true">🌊</div>
+        <h3>Océano</h3>
+        <p>Vistas panorámicas del mar abierto y costas rocosas.</p>
+      </article>
+      <article class="tarjeta">
+        <div class="tarjeta-img" aria-hidden="true">🌲</div>
+        <h3>Bosque</h3>
+        <p>Senderos entre árboles centenarios y vegetación densa.</p>
+      </article>
+      <article class="tarjeta">
+        <div class="tarjeta-img" aria-hidden="true">🏜️</div>
+        <h3>Desierto</h3>
+        <p>Dunas doradas bajo un sol implacable y cielos infinitos.</p>
+      </article>
+      <article class="tarjeta">
+        <div class="tarjeta-img" aria-hidden="true">🌸</div>
+        <h3>Jardín</h3>
+        <p>Flores de temporada en jardines cuidadosamente diseñados.</p>
+      </article>
+      <article class="tarjeta">
+        <div class="tarjeta-img" aria-hidden="true">🌅</div>
+        <h3>Atardecer</h3>
+        <p>Los mejores atardeceres capturados alrededor del mundo.</p>
+      </article>
+    </div>
+
+    <pre><code>/* Galería auto-responsiva SIN media queries */
+.galeria-responsiva {
+  display: grid;
+
+  /* auto-fit: crea tantas columnas como quepan */
+  /* minmax(220px, 1fr): mínimo 220px, máximo 1fr */
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+
+  gap: 20px;
+}</code></pre>
+  </section>
+
+  <!-- ========================================
+       SECCIÓN 4: ALINEACIÓN EN EL GRID
+       ========================================
+       Demostración de las propiedades de
+       alineación tanto de celdas como del
+       grid completo.
+  -->
+  <section class="demo-section">
+    <h2>4. Alineación: <code>justify-items</code>, <code>align-items</code>, <code>place-items</code></h2>
+    <p class="descripcion">
+      Controlamos cómo se alinean los elementos DENTRO de sus celdas.
+      <code>justify-items</code> = eje horizontal, <code>align-items</code> = eje vertical.
+    </p>
+
+    <div class="grid-alineacion-demo">
+      <div class="alineacion-ejemplo" id="align-start">
+        <h4><code>place-items: start</code></h4>
+        <div class="mini-grid align-start">
+          <div class="mini-item">1</div>
+          <div class="mini-item">2</div>
+          <div class="mini-item">3</div>
+          <div class="mini-item">4</div>
+        </div>
+      </div>
+
+      <div class="alineacion-ejemplo" id="align-center">
+        <h4><code>place-items: center</code></h4>
+        <div class="mini-grid align-center">
+          <div class="mini-item">1</div>
+          <div class="mini-item">2</div>
+          <div class="mini-item">3</div>
+          <div class="mini-item">4</div>
+        </div>
+      </div>
+
+      <div class="alineacion-ejemplo" id="align-end">
+        <h4><code>place-items: end</code></h4>
+        <div class="mini-grid align-end">
+          <div class="mini-item">1</div>
+          <div class="mini-item">2</div>
+          <div class="mini-item">3</div>
+          <div class="mini-item">4</div>
+        </div>
+      </div>
+
+      <div class="alineacion-ejemplo" id="align-stretch">
+        <h4><code>place-items: stretch</code></h4>
+        <div class="mini-grid align-stretch">
+          <div class="mini-item">1</div>
+          <div class="mini-item">2</div>
+          <div class="mini-item">3</div>
+          <div class="mini-item">4</div>
+        </div>
+      </div>
+    </div>
+
+    <pre><code>/* Alineación de elementos dentro de sus celdas */
+
+/* start: elementos pegados arriba-izquierda */
+.align-start   { place-items: start; }
+
+/* center: elementos centrados en su celda */
+.align-center  { place-items: center; }
+
+/* end: elementos pegados abajo-derecha */
+.align-end     { place-items: end; }
+
+/* stretch (default): elementos llenan toda la celda */
+.align-stretch { place-items: stretch; }
+
+/* place-items es shorthand de: align-items + justify-items */</code></pre>
+  </section>
+
+  <!-- ========================================
+       SECCIÓN 5: GRID IMPLÍCITO
+       ========================================
+       Cuando hay más elementos que celdas
+       definidas, el grid crea filas/columnas
+       automáticamente (grid implícito).
+  -->
+  <section class="demo-section">
+    <h2>5. Grid implícito: <code>grid-auto-rows</code> y <code>grid-auto-flow</code></h2>
+    <p class="descripcion">
+      Solo definimos 3 columnas. Las filas se crean automáticamente
+      con <code>grid-auto-rows: minmax(80px, auto)</code>.
+      Con <code>grid-auto-flow: dense</code> se rellenan huecos.
+    </p>
+
+    <div class="grid-implicito">
+      <div class="gi-item gi-wide">1 (ancho)</div>
+      <div class="gi-item">2</div>
+      <div class="gi-item gi-tall">3 (alto)</div>
+      <div class="gi-item">4</div>
+      <div class="gi-item gi-wide">5 (ancho)</div>
+      <div class="gi-item">6</div>
+      <div class="gi-item">7</div>
+      <div class="gi-item gi-tall">8 (alto)</div>
+      <div class="gi-item">9</div>
+      <div class="gi-item">10</div>
+    </div>
+
+    <pre><code>/* Solo definimos columnas; las filas son implícitas */
+.grid-implicito {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+
+  /* Filas implícitas: mínimo 80px, crecen si hay contenido */
+  grid-auto-rows: minmax(80px, auto);
+
+  /* dense: rellena huecos cuando hay elementos de distinto tamaño */
+  grid-auto-flow: dense;
+
+  gap: 8px;
+}
+
+/* Elementos que ocupan más espacio */
+.gi-wide { grid-column: span 2; }  /* 2 columnas */
+.gi-tall { grid-row: span 2; }     /* 2 filas */</code></pre>
+  </section>
+
+  <!-- ========================================
+       SECCIÓN 6: RESUMEN DE PROPIEDADES
+       ========================================
+  -->
+  <section class="demo-section resumen">
+    <h2>📋 Resumen de propiedades CSS Grid</h2>
+    <div class="tabla-resumen">
+      <table>
+        <caption>Propiedades del contenedor (padre)</caption>
+        <thead>
+          <tr>
+            <th scope="col">Propiedad</th>
+            <th scope="col">Descripción</th>
+            <th scope="col">Ejemplo</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>display: grid</code></td>
+            <td>Activa el contexto grid</td>
+            <td><code>display: grid;</code></td>
+          </tr>
+          <tr>
+            <td><code>grid-template-columns</code></td>
+            <td>Define columnas explícitas</td>
+            <td><code>repeat(3, 1fr)</code></td>
+          </tr>
+          <tr>
+            <td><code>grid-template-rows</code></td>
+            <td>Define filas explícitas</td>
+            <td><code>100px auto 1fr</code></td>
+          </tr>
+          <tr>
+            <td><code>grid-template-areas</code></td>
+            <td>Nombra zonas del grid</td>
+            <td><code>"header header" "side main"</code></td>
+          </tr>
+          <tr>
+            <td><code>gap</code></td>
+            <td>Espacio entre celdas</td>
+            <td><code>16px</code> o <code>10px 20px</code></td>
+          </tr>
+          <tr>
+            <td><code>justify-items</code></td>
+            <td>Alinea celdas en eje X</td>
+            <td><code>start | center | end | stretch</code></td>
+          </tr>
+          <tr>
+            <td><code>align-items</code></td>
+            <td>Alinea celdas en eje Y</td>
+            <td><code>start | center | end | stretch</code></td>
+          </tr>
+          <tr>
+            <td><code>grid-auto-rows</code></td>
+            <td>Tamaño de filas implícitas</td>
+            <td><code>minmax(80px, auto)</code></td>
+          </tr>
+          <tr>
+            <td><code>grid-auto-flow</code></td>
+            <td>Dirección de auto-colocación</td>
+            <td><code>row | column | dense</code></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <table>
+        <caption>Propiedades de los items (hijos)</caption>
+        <thead>
+          <tr>
+            <th scope="col">Propiedad</th>
+            <th scope="col">Descripción</th>
+            <th scope="col">Ejemplo</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>grid-column</code></td>
+            <td>Posición en columnas</td>
+            <td><code>1 / 3</code> o <code>span 2</code></td>
+          </tr>
+          <tr>
+            <td><code>grid-row</code></td>
+            <td>Posición en filas</td>
+            <td><code>2 / 4</code> o <code>span 2</code></td>
+          </tr>
+          <tr>
+            <td><code>grid-area</code></td>
+            <td>Asigna a un área nombrada</td>
+            <td><code>header</code></td>
+          </tr>
+          <tr>
+            <td><code>justify-self</code></td>
+            <td>Alinea este item en eje X</td>
+            <td><code>center</code></td>
+          </tr>
+          <tr>
+            <td><code>align-self</code></td>
+            <td>Alinea este item en eje Y</td>
+            <td><code>end</code></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+</body>
+</html>

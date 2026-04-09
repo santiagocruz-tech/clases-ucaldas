@@ -59,10 +59,11 @@ class LocationService {
         return const LocationResult(error: 'Permiso denegado permanentemente.');
       }
 
-      // Paso 3: Obtener posición con alta precisión
+      // Paso 3: Obtener posición con alta precisión (timeout para evitar cuelgues en web)
       final pos = await Geolocator.getCurrentPosition(
         locationSettings: const LocationSettings(
           accuracy: LocationAccuracy.high,
+          timeLimit: Duration(seconds: 10),
         ),
       );
 

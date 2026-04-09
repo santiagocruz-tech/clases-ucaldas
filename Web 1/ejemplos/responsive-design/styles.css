@@ -1,0 +1,787 @@
+/* ============================================================
+   RESPONSIVE DESIGN - EJEMPLO COMPLETO DOCUMENTADO
+   ============================================================
+   
+   Enfoque: MOBILE FIRST
+   
+   Esto significa:
+   - El CSS base (sin media queries) es para MÓVIL
+   - Usamos @media (min-width: X) para agregar estilos
+     a pantallas MÁS GRANDES
+   
+   Breakpoints usados:
+   - 576px  → Tablet pequeña / Móvil grande
+   - 768px  → Tablet
+   - 1024px → Escritorio
+   - 1200px → Escritorio grande
+   ============================================================ */
+
+/* ----------------------------------------
+   RESET Y BASE
+   ---------------------------------------- */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  /* 
+    El font-size del html es la referencia para "rem".
+    16px es el default del navegador.
+    No lo cambies a px fijo; dejá que el usuario lo controle.
+  */
+  font-size: 100%; /* = 16px por defecto */
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background-color: #0f172a;
+  color: #e2e8f0;
+  line-height: 1.6;
+}
+
+/* ----------------------------------------
+   CONTENEDOR FLUIDO
+   ----------------------------------------
+   El contenedor limita el ancho máximo y centra
+   el contenido. El padding lateral evita que el
+   texto toque los bordes en móvil.
+*/
+.container {
+  width: 100%;              /* Ocupa todo el ancho disponible */
+  max-width: 1100px;        /* Pero nunca más de 1100px */
+  margin: 0 auto;           /* Centrado horizontal */
+  padding-left: 16px;       /* Respiro lateral en móvil */
+  padding-right: 16px;
+}
+
+/* En tablet: más respiro lateral */
+@media (min-width: 576px) {
+  .container {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+}
+
+/* ----------------------------------------
+   HEADER / NAVEGACIÓN RESPONSIVA
+   ----------------------------------------
+   Móvil: logo y links apilados (columna)
+   Escritorio: logo y links en fila
+*/
+.header {
+  background: linear-gradient(135deg, #1e293b, #0f172a);
+  border-bottom: 1px solid #334155;
+  padding: 16px 0;
+  position: sticky;       /* Se queda fijo al hacer scroll */
+  top: 0;
+  z-index: 100;
+}
+
+.nav {
+  display: flex;
+  flex-direction: column;  /* MÓVIL: apilado */
+  align-items: center;
+  gap: 12px;
+}
+
+.nav-logo {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #f1f5f9;
+  text-decoration: none;
+}
+
+.nav-links {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;          /* Se envuelven si no caben */
+  justify-content: center;
+  gap: 8px 16px;            /* gap vertical | horizontal */
+}
+
+.nav-links a {
+  color: #94a3b8;
+  text-decoration: none;
+  font-size: 0.85rem;
+  transition: color 0.2s;
+}
+
+.nav-links a:hover {
+  color: #38bdf8;
+}
+
+/* TABLET+: navegación en fila */
+@media (min-width: 768px) {
+  .nav {
+    flex-direction: row;       /* Fila horizontal */
+    justify-content: space-between;
+  }
+
+  .nav-links {
+    gap: 24px;
+  }
+
+  .nav-links a {
+    font-size: 0.9rem;
+  }
+}
+
+/* ----------------------------------------
+   HERO SECTION
+   ----------------------------------------
+   Usa vh para altura y clamp() para tipografía.
+*/
+.hero {
+  /* 
+    min-height con vh: la sección ocupa al menos
+    40% de la altura de la ventana.
+    En móvil usamos menos para no desperdiciar espacio.
+  */
+  min-height: 30vh;
+  display: flex;
+  align-items: center;
+  text-align: center;
+  padding: 40px 0;
+  background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+}
+
+/* TABLET+: más altura */
+@media (min-width: 768px) {
+  .hero {
+    min-height: 40vh;
+    padding: 60px 0;
+  }
+}
+
+.hero h1 {
+  /* 
+    clamp(mínimo, preferido, máximo)
+    El texto escala fluidamente con el viewport.
+    2rem en móvil → crece → 3.5rem en escritorio grande
+  */
+  font-size: clamp(2rem, 5vw + 0.5rem, 3.5rem);
+  color: #f1f5f9;
+  margin-bottom: 12px;
+}
+
+.hero-subtitulo {
+  font-size: clamp(0.95rem, 1.5vw + 0.5rem, 1.2rem);
+  color: #94a3b8;
+  max-width: 600px;
+  margin: 0 auto 20px;
+}
+
+/* ----------------------------------------
+   INDICADOR DE BREAKPOINT
+   ----------------------------------------
+   Muestra visualmente qué breakpoint está activo.
+   Usa ::after con content para cambiar el texto
+   según el media query.
+*/
+.hero-indicador {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 0.85rem;
+}
+
+.indicador-texto {
+  color: #64748b;
+}
+
+/* El texto cambia según el breakpoint activo */
+.indicador-valor::after {
+  content: "📱 Móvil (< 576px)";
+  color: #f87171;
+  font-weight: 600;
+}
+
+@media (min-width: 576px) {
+  .indicador-valor::after {
+    content: "📋 Tablet (576px - 767px)";
+    color: #fbbf24;
+  }
+}
+
+@media (min-width: 768px) {
+  .indicador-valor::after {
+    content: "💻 Escritorio (768px - 1023px)";
+    color: #34d399;
+  }
+}
+
+@media (min-width: 1024px) {
+  .indicador-valor::after {
+    content: "🖥️ Pantalla grande (1024px+)";
+    color: #38bdf8;
+  }
+}
+
+/* ----------------------------------------
+   SECCIONES DE DEMOSTRACIÓN
+   ---------------------------------------- */
+.demo-section {
+  background: #1e293b;
+  border-radius: 12px;
+  padding: 20px;            /* MÓVIL: padding compacto */
+  border: 1px solid #334155;
+  margin-bottom: 32px;
+}
+
+/* TABLET+: más padding */
+@media (min-width: 576px) {
+  .demo-section {
+    padding: 32px;
+    margin-bottom: 40px;
+  }
+}
+
+.demo-section h2 {
+  color: #38bdf8;
+  margin-bottom: 8px;
+  font-size: clamp(1.1rem, 2vw + 0.5rem, 1.4rem);
+}
+
+.demo-section code {
+  background: #0f172a;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.85em;
+  color: #7dd3fc;
+}
+
+.descripcion {
+  color: #94a3b8;
+  margin-bottom: 20px;
+  font-size: 0.9rem;
+}
+
+pre {
+  background: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 20px;
+  overflow-x: auto;
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
+pre code {
+  background: none;
+  padding: 0;
+  color: #a5f3fc;
+}
+
+/* ----------------------------------------
+   SECCIÓN 1: BREAKPOINTS DEMO
+   ----------------------------------------
+   Las cajas se "encienden" cuando su media
+   query correspondiente está activa.
+*/
+.breakpoints-demo {
+  display: grid;
+  grid-template-columns: 1fr;   /* MÓVIL: 1 columna */
+  gap: 10px;
+}
+
+@media (min-width: 576px) {
+  .breakpoints-demo {
+    grid-template-columns: repeat(2, 1fr);  /* TABLET: 2 columnas */
+  }
+}
+
+@media (min-width: 1024px) {
+  .breakpoints-demo {
+    grid-template-columns: repeat(4, 1fr);  /* ESCRITORIO: 4 columnas */
+  }
+}
+
+.bp-box {
+  padding: 16px;
+  border-radius: 8px;
+  text-align: center;
+  border: 2px solid #334155;
+  background: #0f172a;
+  opacity: 0.4;              /* Apagado por defecto */
+  transition: all 0.3s ease;
+}
+
+.bp-label {
+  display: block;
+  font-weight: 700;
+  font-size: 0.95rem;
+  margin-bottom: 4px;
+}
+
+.bp-range {
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+/* Encender la caja del breakpoint activo */
+
+/* Móvil: siempre encendido por defecto */
+.bp-mobile {
+  opacity: 1;
+  border-color: #f87171;
+  background: #1c1917;
+}
+
+/* Apagar móvil y encender tablet a 576px+ */
+@media (min-width: 576px) {
+  .bp-mobile {
+    opacity: 0.4;
+    border-color: #334155;
+    background: #0f172a;
+  }
+  .bp-tablet {
+    opacity: 1;
+    border-color: #fbbf24;
+    background: #1c1917;
+  }
+}
+
+/* Apagar tablet y encender escritorio a 768px+ */
+@media (min-width: 768px) {
+  .bp-tablet {
+    opacity: 0.4;
+    border-color: #334155;
+    background: #0f172a;
+  }
+  .bp-desktop {
+    opacity: 1;
+    border-color: #34d399;
+    background: #1c1917;
+  }
+}
+
+/* Apagar escritorio y encender pantalla grande a 1024px+ */
+@media (min-width: 1024px) {
+  .bp-desktop {
+    opacity: 0.4;
+    border-color: #334155;
+    background: #0f172a;
+  }
+  .bp-wide {
+    opacity: 1;
+    border-color: #38bdf8;
+    background: #1c1917;
+  }
+}
+
+/* ----------------------------------------
+   SECCIÓN 2: UNIDADES RELATIVAS
+   ---------------------------------------- */
+.unidades-grid {
+  display: grid;
+  grid-template-columns: 1fr;          /* MÓVIL: 1 columna */
+  gap: 12px;
+}
+
+@media (min-width: 576px) {
+  .unidades-grid {
+    grid-template-columns: repeat(2, 1fr);  /* TABLET: 2 columnas */
+  }
+}
+
+.unidad-card {
+  background: #0f172a;
+  border-radius: 8px;
+  padding: 16px;
+  border: 1px solid #334155;
+}
+
+.unidad-card h3 {
+  color: #38bdf8;
+  margin-bottom: 4px;
+}
+
+.unidad-card p {
+  color: #94a3b8;
+  font-size: 0.8rem;
+  margin-bottom: 10px;
+}
+
+.unidad-demo {
+  margin-top: 8px;
+}
+
+/* Barra de porcentaje */
+.barra-padre {
+  background: #334155;
+  border-radius: 4px;
+  height: 32px;
+  overflow: hidden;
+}
+
+.barra-hijo {
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+  height: 100%;
+  display: flex;
+  align-items: center;
+  padding-left: 10px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #fff;
+  border-radius: 4px;
+}
+
+/* Textos rem */
+.texto-rem-small {
+  display: block;
+  font-size: 1rem;
+  color: #cbd5e1;
+  margin-bottom: 4px;
+}
+
+.texto-rem-big {
+  display: block;
+  font-size: 1.5rem;
+  color: #38bdf8;
+}
+
+/* Textos em */
+.em-padre {
+  font-size: 1.125rem;  /* ~18px */
+  color: #cbd5e1;
+}
+
+.em-hijo {
+  font-size: 1.5em;    /* 1.5 × el font-size del padre */
+  color: #fbbf24;
+  margin-top: 4px;
+}
+
+/* Barra viewport */
+.barra-vw {
+  width: 50vw;          /* 50% del ancho de la ventana */
+  max-width: 100%;      /* No desbordar el contenedor */
+  background: linear-gradient(90deg, #059669, #34d399);
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+/* ----------------------------------------
+   SECCIÓN 3: TIPOGRAFÍA RESPONSIVA
+   ---------------------------------------- */
+.tipografia-demo {
+  background: #0f172a;
+  border-radius: 8px;
+  padding: 20px;
+  border: 1px solid #334155;
+}
+
+.tipo-clamp-h1 {
+  /* Escala de 1.5rem (24px) a 3rem (48px) */
+  font-size: clamp(1.5rem, 4vw + 0.5rem, 3rem);
+  font-weight: 700;
+  color: #f1f5f9;
+  margin-bottom: 8px;
+}
+
+.tipo-clamp-h2 {
+  /* Escala de 1.2rem (19px) a 2rem (32px) */
+  font-size: clamp(1.2rem, 2.5vw + 0.5rem, 2rem);
+  font-weight: 600;
+  color: #38bdf8;
+  margin-bottom: 12px;
+}
+
+.tipo-clamp-body {
+  /* Escala de 0.9rem (14px) a 1.15rem (18px) */
+  font-size: clamp(0.9rem, 1vw + 0.5rem, 1.15rem);
+  color: #cbd5e1;
+  line-height: 1.7;
+}
+
+/* ----------------------------------------
+   SECCIÓN 4: IMÁGENES RESPONSIVAS
+   ---------------------------------------- */
+.imagenes-demo {
+  display: grid;
+  grid-template-columns: 1fr;          /* MÓVIL: 1 columna */
+  gap: 16px;
+}
+
+@media (min-width: 768px) {
+  .imagenes-demo {
+    grid-template-columns: repeat(3, 1fr);  /* ESCRITORIO: 3 columnas */
+  }
+}
+
+.img-ejemplo {
+  text-align: center;
+}
+
+.img-placeholder {
+  background: linear-gradient(135deg, #1e3a5f, #0f172a);
+  border: 2px dashed #334155;
+  border-radius: 8px;
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 150px;
+}
+
+.img-placeholder span {
+  font-size: 2.5rem;
+  margin-bottom: 8px;
+}
+
+.img-placeholder p {
+  color: #cbd5e1;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.img-placeholder small {
+  color: #64748b;
+  font-size: 0.75rem;
+  margin-top: 4px;
+}
+
+/* object-fit: cover → altura fija, la imagen rellena */
+.img-cover {
+  height: 180px;
+  overflow: hidden;
+}
+
+/* aspect-ratio: proporción fija */
+.img-aspect {
+  aspect-ratio: 16 / 9;
+  height: auto;
+  padding: 16px;
+}
+
+.img-caption {
+  color: #64748b;
+  font-size: 0.8rem;
+  margin-top: 8px;
+}
+
+/* ============================================================
+   SECCIÓN 5: LAYOUT RESPONSIVO COMPLETO
+   ============================================================
+   
+   Este es el ejemplo más importante. Muestra cómo un layout
+   real cambia de estructura según el dispositivo.
+   
+   MÓVIL (base):
+   ┌──────────────┐
+   │    Header    │
+   ├──────────────┤
+   │   Sidebar    │
+   ├──────────────┤
+   │   Content    │
+   ├──────────────┤
+   │    Aside     │
+   ├──────────────┤
+   │    Footer    │
+   └──────────────┘
+   
+   TABLET (576px+):
+   ┌──────────────────────┐
+   │       Header         │
+   ├────────┬─────────────┤
+   │Sidebar │   Content   │
+   │        ├─────────────┤
+   │        │    Aside    │
+   ├────────┴─────────────┤
+   │       Footer         │
+   └──────────────────────┘
+   
+   ESCRITORIO (1024px+):
+   ┌────────────────────────────────┐
+   │            Header              │
+   ├────────┬───────────────┬───────┤
+   │Sidebar │    Content    │ Aside │
+   ├────────┴───────────────┴───────┤
+   │            Footer              │
+   └────────────────────────────────┘
+   ============================================================ */
+
+.layout-responsivo {
+  display: grid;
+  grid-template-columns: 1fr;   /* MÓVIL: 1 columna, todo apilado */
+  gap: 10px;
+  min-height: 300px;
+}
+
+/* TABLET: 2 columnas con sidebar fijo */
+@media (min-width: 576px) {
+  .layout-responsivo {
+    grid-template-columns: 180px 1fr;
+    grid-template-areas:
+      "header  header"
+      "sidebar content"
+      "sidebar aside"
+      "footer  footer";
+  }
+}
+
+/* ESCRITORIO: 3 columnas */
+@media (min-width: 1024px) {
+  .layout-responsivo {
+    grid-template-columns: 180px 1fr 160px;
+    grid-template-areas:
+      "header  header  header"
+      "sidebar content aside"
+      "footer  footer  footer";
+  }
+}
+
+/* Asignación de áreas + estilos visuales */
+.lr-header {
+  grid-area: header;
+  background: linear-gradient(135deg, #1e40af, #3b82f6);
+  border-radius: 6px;
+  padding: 14px 16px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.lr-sidebar {
+  grid-area: sidebar;
+  background: #1a2744;
+  border-radius: 6px;
+  padding: 14px;
+}
+
+.lr-content {
+  grid-area: content;
+  background: #162032;
+  border-radius: 6px;
+  padding: 16px;
+}
+
+.lr-aside {
+  grid-area: aside;
+  background: #1a2744;
+  border-radius: 6px;
+  padding: 14px;
+}
+
+.lr-footer {
+  grid-area: footer;
+  background: #0f172a;
+  border-radius: 6px;
+  padding: 12px;
+  text-align: center;
+  color: #cbd5e1;
+  font-size: 0.85rem;
+}
+
+.lr-sidebar h3 {
+  color: #60a5fa;
+  font-size: 0.9rem;
+  margin-bottom: 8px;
+}
+
+.lr-sidebar ul {
+  list-style: none;
+  font-size: 0.85rem;
+  color: #94a3b8;
+}
+
+.lr-sidebar li {
+  padding: 4px 0;
+}
+
+.lr-content h3 {
+  color: #34d399;
+  font-size: 0.95rem;
+  margin-bottom: 8px;
+}
+
+.lr-content p {
+  color: #cbd5e1;
+  font-size: 0.85rem;
+}
+
+.lr-aside h3 {
+  color: #fbbf24;
+  font-size: 0.9rem;
+  margin-bottom: 6px;
+}
+
+.lr-aside p {
+  color: #94a3b8;
+  font-size: 0.8rem;
+}
+
+/* ----------------------------------------
+   SECCIÓN 6: RESUMEN / CHEATSHEET
+   ---------------------------------------- */
+.resumen-grid {
+  display: grid;
+  grid-template-columns: 1fr;          /* MÓVIL: 1 columna */
+  gap: 12px;
+}
+
+@media (min-width: 576px) {
+  .resumen-grid {
+    grid-template-columns: repeat(2, 1fr);  /* TABLET: 2 columnas */
+  }
+}
+
+@media (min-width: 1024px) {
+  .resumen-grid {
+    grid-template-columns: repeat(3, 1fr);  /* ESCRITORIO: 3 columnas */
+  }
+}
+
+.resumen-card {
+  background: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.resumen-card h3 {
+  color: #38bdf8;
+  font-size: 0.95rem;
+  margin-bottom: 6px;
+}
+
+.resumen-card code {
+  display: block;
+  background: #1e293b;
+  padding: 6px 10px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  color: #a5f3fc;
+  margin-bottom: 8px;
+  word-break: break-all;
+}
+
+.resumen-card p {
+  color: #94a3b8;
+  font-size: 0.8rem;
+}
+
+/* ----------------------------------------
+   FOOTER
+   ---------------------------------------- */
+.footer {
+  text-align: center;
+  padding: 24px 0;
+  color: #cbd5e1;
+  font-size: 0.85rem;
+  border-top: 1px solid #1e293b;
+  margin-top: 20px;
+}

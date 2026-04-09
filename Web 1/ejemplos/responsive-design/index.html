@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+
+  <!-- 
+    ============================================================
+    META VIEWPORT - LA BASE DEL RESPONSIVE DESIGN
+    ============================================================
+    Sin esta etiqueta, los móviles renderizan la página como si
+    fuera un escritorio (típicamente a 980px) y luego la escalan.
+    
+    width=device-width → el ancho del viewport = ancho real del dispositivo
+    initial-scale=1.0  → zoom inicial al 100%
+    ============================================================
+  -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Responsive Design - Ejemplo Completo Documentado</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- 
+    ============================================================
+    EJEMPLO COMPLETO DE RESPONSIVE DESIGN
+    ============================================================
+    
+    Responsive Design = que la página se adapte a cualquier
+    tamaño de pantalla (móvil, tablet, escritorio).
+    
+    Técnicas demostradas:
+    
+    1. Media Queries (@media) - reglas CSS condicionales
+    2. Unidades relativas (%, em, rem, vw, vh)
+    3. Imágenes fluidas (max-width: 100%)
+    4. Mobile First vs Desktop First
+    5. Tipografía responsiva (clamp())
+    6. Contenedores fluidos
+    7. Breakpoints comunes
+    ============================================================
+  -->
+
+  <!-- ========================================
+       HEADER / NAVEGACIÓN RESPONSIVA
+       ========================================
+       En escritorio: logo + links en fila.
+       En móvil: se apilan verticalmente.
+  -->
+  <header class="header">
+    <div class="container">
+      <nav class="nav" aria-label="Navegación principal">
+        <a href="#" class="nav-logo">🌐 MiSitio</a>
+        <ul class="nav-links">
+          <li><a href="#media-queries">Media Queries</a></li>
+          <li><a href="#unidades">Unidades</a></li>
+          <li><a href="#tipografia">Tipografía</a></li>
+          <li><a href="#imagenes">Imágenes</a></li>
+          <li><a href="#layout">Layout</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ========================================
+       HERO SECTION
+       ========================================
+       Usa unidades viewport (vh) y tipografía
+       responsiva con clamp().
+  -->
+  <section class="hero">
+    <div class="container">
+      <h1>Responsive Design</h1>
+      <p class="hero-subtitulo">
+        Diseño que se adapta a cualquier pantalla.
+        Redimensioná esta ventana para ver los cambios en acción.
+      </p>
+      <div class="hero-indicador">
+        <!-- Este elemento muestra el breakpoint actual con CSS -->
+        <span class="indicador-texto">Breakpoint actual:</span>
+        <span class="indicador-valor"></span>
+      </div>
+    </div>
+  </section>
+
+  <main class="container">
+
+    <!-- ========================================
+         SECCIÓN 1: MEDIA QUERIES
+         ========================================
+         Las media queries son reglas condicionales
+         que aplican CSS según el tamaño de pantalla.
+         
+         Enfoque MOBILE FIRST:
+         - CSS base = estilos para móvil
+         - @media (min-width: X) = estilos para pantallas más grandes
+         
+         Enfoque DESKTOP FIRST:
+         - CSS base = estilos para escritorio
+         - @media (max-width: X) = estilos para pantallas más pequeñas
+         
+         ✅ Se recomienda Mobile First porque:
+         - Carga menos CSS en dispositivos lentos
+         - Fuerza a priorizar el contenido esencial
+    -->
+    <section class="demo-section" id="media-queries">
+      <h2>1. Media Queries <code>@media</code></h2>
+      <p class="descripcion">
+        Reglas CSS que se activan según el ancho de pantalla.
+        Este ejemplo usa <strong>Mobile First</strong>: el CSS base es para móvil
+        y los <code>@media (min-width)</code> agregan estilos para pantallas más grandes.
+      </p>
+
+      <div class="breakpoints-demo">
+        <!--
+          Estas cajas cambian de color según el breakpoint activo.
+          Cada una se "enciende" cuando su media query se cumple.
+        -->
+        <div class="bp-box bp-mobile">
+          <span class="bp-label">📱 Móvil</span>
+          <span class="bp-range">&lt; 576px</span>
+        </div>
+        <div class="bp-box bp-tablet">
+          <span class="bp-label">📋 Tablet</span>
+          <span class="bp-range">576px - 768px</span>
+        </div>
+        <div class="bp-box bp-desktop">
+          <span class="bp-label">💻 Escritorio</span>
+          <span class="bp-range">768px - 1024px</span>
+        </div>
+        <div class="bp-box bp-wide">
+          <span class="bp-label">🖥️ Pantalla grande</span>
+          <span class="bp-range">&gt; 1024px</span>
+        </div>
+      </div>
+
+      <pre><code>/* ===== MOBILE FIRST ===== */
+
+/* Base: estilos para MÓVIL (sin media query) */
+.elemento {
+  font-size: 14px;
+  padding: 12px;
+}
+
+/* Tablet: 576px en adelante */
+@media (min-width: 576px) {
+  .elemento {
+    font-size: 16px;
+    padding: 16px;
+  }
+}
+
+/* Escritorio: 768px en adelante */
+@media (min-width: 768px) {
+  .elemento {
+    font-size: 18px;
+    padding: 24px;
+  }
+}
+
+/* Pantalla grande: 1024px en adelante */
+@media (min-width: 1024px) {
+  .elemento {
+    font-size: 20px;
+    padding: 32px;
+  }
+}
+
+/* Breakpoints comunes:
+   576px  → Móvil grande / Tablet pequeña
+   768px  → Tablet
+   1024px → Escritorio
+   1200px → Escritorio grande
+*/</code></pre>
+    </section>
+
+    <!-- ========================================
+         SECCIÓN 2: UNIDADES RELATIVAS
+         ========================================
+         Las unidades relativas son clave para
+         que los tamaños se adapten al contexto.
+    -->
+    <section class="demo-section" id="unidades">
+      <h2>2. Unidades relativas</h2>
+      <p class="descripcion">
+        Las unidades fijas (<code>px</code>) no se adaptan.
+        Las relativas (<code>%, em, rem, vw, vh</code>) sí lo hacen.
+      </p>
+
+      <div class="unidades-grid">
+        <div class="unidad-card">
+          <h3><code>%</code></h3>
+          <p>Relativo al elemento padre</p>
+          <div class="unidad-demo">
+            <div class="barra-padre">
+              <div class="barra-hijo" style="width: 75%;">75%</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="unidad-card">
+          <h3><code>rem</code></h3>
+          <p>Relativo al font-size del <code>&lt;html&gt;</code> (16px por defecto)</p>
+          <div class="unidad-demo">
+            <span class="texto-rem-small">1rem = 16px</span>
+            <span class="texto-rem-big">1.5rem = 24px</span>
+          </div>
+        </div>
+
+        <div class="unidad-card">
+          <h3><code>em</code></h3>
+          <p>Relativo al font-size del elemento padre</p>
+          <div class="unidad-demo">
+            <div class="em-padre">
+              Padre: 18px
+              <div class="em-hijo">Hijo: 1.5em = 27px</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="unidad-card">
+          <h3><code>vw / vh</code></h3>
+          <p>Relativo al viewport (1vw = 1% del ancho de ventana)</p>
+          <div class="unidad-demo">
+            <div class="barra-vw">50vw de ancho</div>
+          </div>
+        </div>
+      </div>
+
+      <pre><code>/* Unidades relativas más usadas */
+
+/* % → relativo al padre */
+.hijo { width: 75%; }
+
+/* rem → relativo al html (consistente en toda la página) */
+.titulo { font-size: 2rem; }     /* 2 × 16px = 32px */
+.texto  { font-size: 1rem; }     /* 1 × 16px = 16px */
+.small  { font-size: 0.875rem; } /* 0.875 × 16px = 14px */
+
+/* em → relativo al padre (puede acumularse, cuidado) */
+.padre { font-size: 18px; }
+.hijo  { font-size: 1.5em; }  /* 1.5 × 18px = 27px */
+
+/* vw/vh → relativo al viewport */
+.hero { height: 50vh; }   /* 50% de la altura de la ventana */
+.ancho { width: 80vw; }   /* 80% del ancho de la ventana */
+
+/* ✅ Recomendación:
+   - rem para font-size (predecible)
+   - % para anchos de contenedores
+   - vw/vh para secciones hero o full-screen
+*/</code></pre>
+    </section>
+
+    <!-- ========================================
+         SECCIÓN 3: TIPOGRAFÍA RESPONSIVA
+         ========================================
+         clamp() permite definir un tamaño mínimo,
+         uno preferido (fluido) y uno máximo.
+    -->
+    <section class="demo-section" id="tipografia">
+      <h2>3. Tipografía responsiva con <code>clamp()</code></h2>
+      <p class="descripcion">
+        <code>clamp(mínimo, preferido, máximo)</code> crea texto que escala
+        fluidamente con el viewport, sin saltos bruscos.
+      </p>
+
+      <div class="tipografia-demo">
+        <p class="tipo-clamp-h1">Título principal</p>
+        <p class="tipo-clamp-h2">Subtítulo de sección</p>
+        <p class="tipo-clamp-body">
+          Este párrafo usa <code>clamp()</code> para su tamaño de fuente.
+          Redimensioná la ventana y observá cómo el texto crece y decrece
+          fluidamente entre el mínimo y el máximo.
+        </p>
+      </div>
+
+      <pre><code>/* clamp(mínimo, preferido, máximo) */
+
+/* Título: mínimo 1.5rem, crece con el viewport, máximo 3rem */
+h1 {
+  font-size: clamp(1.5rem, 4vw + 0.5rem, 3rem);
+}
+
+/* Subtítulo */
+h2 {
+  font-size: clamp(1.2rem, 2.5vw + 0.5rem, 2rem);
+}
+
+/* Texto de cuerpo */
+p {
+  font-size: clamp(0.9rem, 1vw + 0.5rem, 1.15rem);
+}
+
+/* Cómo funciona clamp():
+   1. Si "preferido" < "mínimo" → usa mínimo
+   2. Si "preferido" > "máximo" → usa máximo
+   3. Si está entre ambos → usa preferido (fluido)
+   
+   El truco: usar vw en el valor preferido para que
+   escale con el ancho de la ventana.
+   
+   4vw + 0.5rem = escala con viewport + base fija
+*/</code></pre>
+    </section>
+
+    <!-- ========================================
+         SECCIÓN 4: IMÁGENES RESPONSIVAS
+         ========================================
+         Las imágenes deben adaptarse al contenedor
+         sin desbordarse ni distorsionarse.
+    -->
+    <section class="demo-section" id="imagenes">
+      <h2>4. Imágenes y media responsivos</h2>
+      <p class="descripcion">
+        La regla de oro: <code>max-width: 100%</code> + <code>height: auto</code>.
+        La imagen nunca será más ancha que su contenedor.
+      </p>
+
+      <div class="imagenes-demo">
+        <!-- Imagen fluida básica -->
+        <div class="img-ejemplo">
+          <div class="img-placeholder" aria-label="Imagen de ejemplo que se adapta al contenedor">
+            <span>📷</span>
+            <p>Imagen fluida</p>
+            <small>max-width: 100%; height: auto;</small>
+          </div>
+          <p class="img-caption">Se encoge con el contenedor, nunca se desborda</p>
+        </div>
+
+        <!-- object-fit -->
+        <div class="img-ejemplo">
+          <div class="img-placeholder img-cover" aria-label="Imagen con object-fit cover">
+            <span>🖼️</span>
+            <p>object-fit: cover</p>
+            <small>Rellena el espacio, recorta si es necesario</small>
+          </div>
+          <p class="img-caption">Mantiene proporción, recorta los bordes</p>
+        </div>
+
+        <!-- aspect-ratio -->
+        <div class="img-ejemplo">
+          <div class="img-placeholder img-aspect" aria-label="Imagen con aspect-ratio 16/9">
+            <span>🎬</span>
+            <p>aspect-ratio: 16/9</p>
+            <small>Mantiene proporción 16:9 siempre</small>
+          </div>
+          <p class="img-caption">Proporción fija sin importar el ancho</p>
+        </div>
+      </div>
+
+      <pre><code>/* Imagen fluida básica */
+img {
+  max-width: 100%;  /* Nunca más ancha que su contenedor */
+  height: auto;     /* Mantiene la proporción */
+  display: block;
+}
+
+/* object-fit: controla cómo la imagen llena su caja */
+.cover {
+  width: 100%;
+  height: 200px;           /* Altura fija */
+  object-fit: cover;       /* Rellena, recorta si hace falta */
+  object-position: center; /* Centra el recorte */
+}
+
+/* aspect-ratio: mantiene proporción sin trucos */
+.video-container {
+  width: 100%;
+  aspect-ratio: 16 / 9;  /* Siempre 16:9 */
+}
+
+/* &lt;picture&gt; para servir distintas imágenes según pantalla */
+&lt;picture&gt;
+  &lt;source media="(min-width: 768px)" srcset="grande.jpg"&gt;
+  &lt;source media="(min-width: 480px)" srcset="mediana.jpg"&gt;
+  &lt;img src="pequeña.jpg" alt="Descripción"&gt;
+&lt;/picture&gt;</code></pre>
+    </section>
+
+    <!-- ========================================
+         SECCIÓN 5: LAYOUT RESPONSIVO COMPLETO
+         ========================================
+         Un layout real que cambia de estructura
+         según el tamaño de pantalla.
+         
+         Móvil:     1 columna (todo apilado)
+         Tablet:    2 columnas
+         Escritorio: sidebar + contenido + aside
+    -->
+    <section class="demo-section" id="layout">
+      <h2>5. Layout responsivo completo</h2>
+      <p class="descripcion">
+        Un layout real que cambia de estructura según el dispositivo.
+        Móvil → 1 columna. Tablet → 2 columnas. Escritorio → 3 zonas.
+      </p>
+
+      <div class="layout-responsivo">
+        <div class="lr-header">Header</div>
+        <div class="lr-sidebar">
+          <h3>Sidebar</h3>
+          <ul>
+            <li>Enlace 1</li>
+            <li>Enlace 2</li>
+            <li>Enlace 3</li>
+          </ul>
+        </div>
+        <div class="lr-content">
+          <h3>Contenido principal</h3>
+          <p>
+            En móvil todo se apila en una columna.
+            En tablet el sidebar y contenido van lado a lado.
+            En escritorio se agrega el aside a la derecha.
+          </p>
+        </div>
+        <div class="lr-aside">
+          <h3>Aside</h3>
+          <p>Info extra</p>
+        </div>
+        <div class="lr-footer">Footer</div>
+      </div>
+
+      <pre><code>/* ===== MOBILE FIRST: base = 1 columna ===== */
+.layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+/* ===== TABLET: 576px+ → 2 columnas ===== */
+@media (min-width: 576px) {
+  .layout {
+    grid-template-columns: 200px 1fr;
+    grid-template-areas:
+      "header  header"
+      "sidebar content"
+      "sidebar aside"
+      "footer  footer";
+  }
+}
+
+/* ===== ESCRITORIO: 1024px+ → 3 columnas ===== */
+@media (min-width: 1024px) {
+  .layout {
+    grid-template-columns: 200px 1fr 180px;
+    grid-template-areas:
+      "header  header  header"
+      "sidebar content aside"
+      "footer  footer  footer";
+  }
+}</code></pre>
+    </section>
+
+    <!-- ========================================
+         SECCIÓN 6: RESUMEN / CHEATSHEET
+         ========================================
+    -->
+    <section class="demo-section resumen">
+      <h2>📋 Cheatsheet de Responsive Design</h2>
+
+      <div class="resumen-grid">
+        <div class="resumen-card">
+          <h3>Meta viewport</h3>
+          <code>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</code>
+          <p>Obligatorio. Sin esto, el móvil no respeta tus media queries.</p>
+        </div>
+        <div class="resumen-card">
+          <h3>Mobile First</h3>
+          <code>@media (min-width: 768px) { }</code>
+          <p>CSS base = móvil. Media queries agregan estilos para pantallas más grandes.</p>
+        </div>
+        <div class="resumen-card">
+          <h3>Unidades fluidas</h3>
+          <code>width: 90%; font-size: 1.2rem;</code>
+          <p>Usar %, rem, vw en vez de px fijos para que todo escale.</p>
+        </div>
+        <div class="resumen-card">
+          <h3>clamp()</h3>
+          <code>font-size: clamp(1rem, 2vw + 0.5rem, 2rem);</code>
+          <p>Tipografía fluida sin media queries. Mínimo, preferido, máximo.</p>
+        </div>
+        <div class="resumen-card">
+          <h3>Imágenes fluidas</h3>
+          <code>img { max-width: 100%; height: auto; }</code>
+          <p>La imagen nunca desborda su contenedor.</p>
+        </div>
+        <div class="resumen-card">
+          <h3>Breakpoints comunes</h3>
+          <code>576px | 768px | 1024px | 1200px</code>
+          <p>No son reglas fijas. Adaptá los breakpoints a tu diseño.</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <p>&copy; 2026 - Ejemplo Responsive Design Documentado</p>
+    </div>
+  </footer>
+
+</body>
+</html>

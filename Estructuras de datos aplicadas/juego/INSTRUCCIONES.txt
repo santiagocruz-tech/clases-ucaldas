@@ -1,0 +1,44 @@
+╔══════════════════════════════════════════════════════════════╗
+║           EL CALABOZO DEL INVENTARIO - INSTRUCCIONES        ║
+╚══════════════════════════════════════════════════════════════╝
+
+OBJETIVO
+========
+Implementar las estructuras de datos para que el juego funcione
+y puedas escapar del calabozo.
+
+ARCHIVOS QUE DEBES MODIFICAR
+=============================
+1. ListaDinamica.java  → Implementar lista basada en arreglos
+2. ListaEnlazada.java  → Implementar lista enlazada con nodos
+
+ARCHIVOS QUE NO DEBES MODIFICAR
+================================
+- IListaDinamica.java   (interfaz)
+- IListaEnlazada.java   (interfaz)
+- Nodo.java             (clase nodo)
+- JuegoInventario.java  (el juego)
+
+CÓMO COMPILAR Y EJECUTAR
+=========================
+Desde la carpeta raíz del proyecto:
+
+  javac juego/*.java
+  java juego.JuegoInventario
+
+REGLAS
+======
+- NO puedes usar ArrayList, LinkedList ni nada de java.util
+  (excepto Scanner que ya está en el juego).
+- Debes implementar TODO desde cero usando arreglos y nodos.
+- El juego verifica tu implementación al iniciar. Si algo falla,
+  te dirá exactamente qué método tiene problemas.
+
+PISTAS PARA EL JUEGO
+=====================
+- Explora las habitaciones recogiendo objetos.
+- Usa los objetos en el lugar correcto para avanzar.
+- Escribe "mochila" para ver tus objetos.
+- Escribe "historial" para ver tus acciones.
+
+¡Buena suerte!
