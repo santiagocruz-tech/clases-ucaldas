@@ -174,15 +174,13 @@ System.out.println(suma);
 
 Tabla de prueba de escritorio:
 
-```
-Paso │ i │ i <= 4 │ suma │ Salida
-─────┼───┼────────┼──────┼───────
-  1  │ 1 │  true  │  1   │
-  2  │ 2 │  true  │  3   │
-  3  │ 3 │  true  │  6   │
-  4  │ 4 │  true  │  10  │
-  5  │ 5 │  false │  10  │  10
-```
+| Paso | i | i <= 4 | suma | Salida |
+|------|---|--------|------|--------|
+| 1 | 1 | true | 1 | |
+| 2 | 2 | true | 3 | |
+| 3 | 3 | true | 6 | |
+| 4 | 4 | true | 10 | |
+| 5 | 5 | false | 10 | 10 |
 
 Explicación paso a paso:
 
@@ -213,16 +211,14 @@ System.out.println("Mayor: " + mayor);
 
 Tabla:
 
-```
-Paso │ i │ datos[i] │ datos[i] > mayor │ mayor │ Salida
-─────┼───┼──────────┼──────────────────┼───────┼──────────
-init │   │          │                  │   5   │
-  1  │ 1 │    12    │   12 > 5 = true  │  12   │
-  2  │ 2 │     3    │   3 > 12 = false │  12   │
-  3  │ 3 │     8    │   8 > 12 = false │  12   │
-  4  │ 4 │     1    │   1 > 12 = false │  12   │
-fin  │   │          │                  │  12   │ Mayor: 12
-```
+| Paso | i | datos[i] | datos[i] > mayor | mayor | Salida |
+|------|---|----------|------------------|-------|--------|
+| init | | | | 5 | |
+| 1 | 1 | 12 | 12 > 5 = true | 12 | |
+| 2 | 2 | 3 | 3 > 12 = false | 12 | |
+| 3 | 3 | 8 | 8 > 12 = false | 12 | |
+| 4 | 4 | 1 | 1 > 12 = false | 12 | |
+| fin | | | | 12 | Mayor: 12 |
 
 ---
 
@@ -247,14 +243,12 @@ Este es el algoritmo de Euclides para el Máximo Común Divisor.
 
 Tabla:
 
-```
-Paso │  a  │  b  │ b != 0 │ temp │ a % b │ Salida
-─────┼─────┼─────┼────────┼──────┼───────┼────────
-init │  20 │   8 │        │      │       │
-  1  │   8 │   4 │  true  │   8  │  20%8=4│
-  2  │   4 │   0 │  true  │   4  │  8%4=0 │
-  3  │   4 │   0 │  false │      │       │ MCD: 4
-```
+| Paso | a | b | b != 0 | temp | a % b | Salida |
+|------|---|---|--------|------|-------|--------|
+| init | 20 | 8 | | | | |
+| 1 | 8 | 4 | true | 8 | 20%8=4 | |
+| 2 | 4 | 0 | true | 4 | 8%4=0 | |
+| 3 | 4 | 0 | false | | | MCD: 4 |
 
 Paso a paso:
 
@@ -288,18 +282,16 @@ System.out.println("Suma: " + suma);
 
 Tabla:
 
-```
-Paso │ fila │ col │ matriz[fila][col] │ suma │ Salida
-─────┼──────┼─────┼───────────────────┼──────┼────────
-init │      │     │                   │   0  │
-  1  │  0   │  0  │        1          │   1  │
-  2  │  0   │  1  │        2          │   3  │
-  3  │  0   │  2  │        3          │   6  │
-  4  │  1   │  0  │        4          │  10  │
-  5  │  1   │  1  │        5          │  15  │
-  6  │  1   │  2  │        6          │  21  │
-fin  │      │     │                   │  21  │ Suma: 21
-```
+| Paso | fila | col | matriz[fila][col] | suma | Salida |
+|------|------|-----|-------------------|------|--------|
+| init | | | | 0 | |
+| 1 | 0 | 0 | 1 | 1 | |
+| 2 | 0 | 1 | 2 | 3 | |
+| 3 | 0 | 2 | 3 | 6 | |
+| 4 | 1 | 0 | 4 | 10 | |
+| 5 | 1 | 1 | 5 | 15 | |
+| 6 | 1 | 2 | 6 | 21 | |
+| fin | | | | 21 | Suma: 21 |
 
 ---
 
@@ -323,18 +315,16 @@ System.out.println(x);
 
 Tabla (dentro de la llamada `factorial(5)`):
 
-```
-Paso │  i  │ i <= 5 │ resultado │ Salida
-─────┼─────┼────────┼───────────┼────────
-init │     │        │     1     │
-  1  │  1  │  true  │     1     │
-  2  │  2  │  true  │     2     │
-  3  │  3  │  true  │     6     │
-  4  │  4  │  true  │    24     │
-  5  │  5  │  true  │   120     │
-  6  │  6  │  false │   120     │
-fin  │     │        │ retorna 120│ 120
-```
+| Paso | i | i <= 5 | resultado | Salida |
+|------|---|--------|-----------|--------|
+| init | | | 1 | |
+| 1 | 1 | true | 1 | |
+| 2 | 2 | true | 2 | |
+| 3 | 3 | true | 6 | |
+| 4 | 4 | true | 24 | |
+| 5 | 5 | true | 120 | |
+| 6 | 6 | false | 120 | |
+| fin | | | retorna 120 | 120 |
 
 ---
 
@@ -362,16 +352,14 @@ System.out.println(c.valor);
 
 Tabla:
 
-```
-Paso │ Operación       │ c.valor │ Salida
-─────┼─────────────────┼─────────┼────────
-init │ new Contador()  │    0    │
-  1  │ incrementar()   │    1    │
-  2  │ incrementar()   │    2    │
-  3  │ incrementar()   │    3    │
-  4  │ decrementar()   │    2    │
-  5  │ println         │    2    │   2
-```
+| Paso | Operación | c.valor | Salida |
+|------|-----------|---------|--------|
+| init | new Contador() | 0 | |
+| 1 | incrementar() | 1 | |
+| 2 | incrementar() | 2 | |
+| 3 | incrementar() | 3 | |
+| 4 | decrementar() | 2 | |
+| 5 | println | 2 | 2 |
 
 ---
 
@@ -410,16 +398,14 @@ Haz la prueba de escritorio. ¿Cuál es la salida?
 <details>
 <summary>Solución</summary>
 
-```
-Paso │  a  │  b
-─────┼─────┼────
-init │  5  │  3
-  1  │  8  │  3    (a = 5+3)
-  2  │  8  │  5    (b = 8-3)
-  3  │  3  │  5    (a = 8-5)
+| Paso | a | b | Nota |
+|------|---|---|------|
+| init | 5 | 3 | |
+| 1 | 8 | 3 | a = 5+3 |
+| 2 | 8 | 5 | b = 8-3 |
+| 3 | 3 | 5 | a = 8-5 |
 
 Salida: a=3 b=5 (se intercambiaron)
-```
 
 </details>
 
@@ -444,20 +430,18 @@ Haz la prueba de escritorio con la tabla completa.
 <details>
 <summary>Solución</summary>
 
-```
-Paso │  i  │  j  │  x
-─────┼─────┼─────┼────
-init │     │     │ 10
-  1  │  0  │  0  │  9
-  2  │  0  │  1  │  8
-  3  │  1  │  0  │  7
-  4  │  1  │  1  │  6
-  5  │  2  │  0  │  5
-  6  │  2  │  1  │  4
+| Paso | i | j | x |
+|------|---|---|---|
+| init | | | 10 |
+| 1 | 0 | 0 | 9 |
+| 2 | 0 | 1 | 8 |
+| 3 | 1 | 0 | 7 |
+| 4 | 1 | 1 | 6 |
+| 5 | 2 | 0 | 5 |
+| 6 | 2 | 1 | 4 |
 
 Salida: 4
 El ciclo externo se ejecuta 3 veces, el interno 2 → total 6 restas.
-```
 
 </details>
 
@@ -485,16 +469,14 @@ while(izq < der){
 <details>
 <summary>Solución</summary>
 
-```
-Paso │ izq │ der │ izq<der │ arr
-─────┼─────┼─────┼─────────┼─────────────────
-init │  0  │  4  │         │ [1, 2, 3, 4, 5]
-  1  │  1  │  3  │  true   │ [5, 2, 3, 4, 1]
-  2  │  2  │  2  │  true   │ [5, 4, 3, 2, 1]
-  3  │  3  │  1  │  false  │ [5, 4, 3, 2, 1]
+| Paso | izq | der | izq < der | arr |
+|------|-----|-----|-----------|-----|
+| init | 0 | 4 | | [1, 2, 3, 4, 5] |
+| 1 | 1 | 3 | true | [5, 2, 3, 4, 1] |
+| 2 | 2 | 2 | true | [5, 4, 3, 2, 1] |
+| 3 | 3 | 1 | false | [5, 4, 3, 2, 1] |
 
 Resultado: [5, 4, 3, 2, 1]
-```
 
 </details>
 
@@ -526,23 +508,21 @@ static int contarVocales(String texto){
 <details>
 <summary>Solución</summary>
 
-```
-Paso │  i  │   c   │ ¿Es vocal? │ contador
-─────┼─────┼───────┼────────────┼─────────
-init │     │       │            │    0
-  1  │  0  │  'H'  │    No      │    0
-  2  │  1  │  'o'  │    Sí      │    1
-  3  │  2  │  'l'  │    No      │    1
-  4  │  3  │  'a'  │    Sí      │    2
-  5  │  4  │  ' '  │    No      │    2
-  6  │  5  │  'M'  │    No      │    2
-  7  │  6  │  'u'  │    Sí      │    3
-  8  │  7  │  'n'  │    No      │    3
-  9  │  8  │  'd'  │    No      │    3
- 10  │  9  │  'o'  │    Sí      │    4
+| Paso | i | c | ¿Es vocal? | contador |
+|------|---|---|------------|----------|
+| init | | | | 0 |
+| 1 | 0 | 'H' | No | 0 |
+| 2 | 1 | 'o' | Sí | 1 |
+| 3 | 2 | 'l' | No | 1 |
+| 4 | 3 | 'a' | Sí | 2 |
+| 5 | 4 | ' ' | No | 2 |
+| 6 | 5 | 'M' | No | 2 |
+| 7 | 6 | 'u' | Sí | 3 |
+| 8 | 7 | 'n' | No | 3 |
+| 9 | 8 | 'd' | No | 3 |
+| 10 | 9 | 'o' | Sí | 4 |
 
 Retorna: 4
-```
 
 </details>
 
@@ -571,27 +551,24 @@ static int buscar(int[] arr, int objetivo){
 
 Llamada 1: `buscar({10, 25, 3, 47, 8}, 47)`
 
-```
-Paso │  i  │ arr[i] │ arr[i]==47
-─────┼─────┼────────┼──────────
-  1  │  0  │   10   │  false
-  2  │  1  │   25   │  false
-  3  │  2  │    3   │  false
-  4  │  3  │   47   │  true → retorna 3
-```
+| Paso | i | arr[i] | arr[i]==47 |
+|------|---|--------|------------|
+| 1 | 0 | 10 | false |
+| 2 | 1 | 25 | false |
+| 3 | 2 | 3 | false |
+| 4 | 3 | 47 | true → retorna 3 |
 
 Llamada 2: `buscar({10, 25, 3, 47, 8}, 99)`
 
-```
-Paso │  i  │ arr[i] │ arr[i]==99
-─────┼─────┼────────┼──────────
-  1  │  0  │   10   │  false
-  2  │  1  │   25   │  false
-  3  │  2  │    3   │  false
-  4  │  3  │   47   │  false
-  5  │  4  │    8   │  false
+| Paso | i | arr[i] | arr[i]==99 |
+|------|---|--------|------------|
+| 1 | 0 | 10 | false |
+| 2 | 1 | 25 | false |
+| 3 | 2 | 3 | false |
+| 4 | 3 | 47 | false |
+| 5 | 4 | 8 | false |
+
 Sale del ciclo → retorna -1
-```
 
 </details>
 
@@ -622,21 +599,18 @@ static boolean esPrimo(int n){
 
 Llamada 1: `esPrimo(7)`
 
-```
-Paso │  i  │ i*i │ i*i<=7 │ 7%i==0
-─────┼─────┼─────┼────────┼───────
-  1  │  2  │  4  │  true  │ 7%2=1 → false
-  2  │  3  │  9  │  false │
+| Paso | i | i*i | i*i<=7 | 7%i==0 |
+|------|---|-----|--------|--------|
+| 1 | 2 | 4 | true | 7%2=1 → false |
+| 2 | 3 | 9 | false | |
+
 Sale del ciclo → retorna true (7 es primo)
-```
 
 Llamada 2: `esPrimo(12)`
 
-```
-Paso │  i  │ i*i │ i*i<=12 │ 12%i==0
-─────┼─────┼─────┼─────────┼────────
-  1  │  2  │  4  │  true   │ 12%2=0 → true → retorna false
-```
+| Paso | i | i*i | i*i<=12 | 12%i==0 |
+|------|---|-----|---------|---------|
+| 1 | 2 | 4 | true | 12%2=0 → true → retorna false |
 
 12 no es primo (divisible por 2).
 
@@ -666,21 +640,19 @@ static void fibonacci(int n){
 <details>
 <summary>Solución</summary>
 
-```
-Paso │  i  │  a  │  b  │ temp │ Salida
-─────┼─────┼─────┼─────┼──────┼────────
-init │     │  0  │  1  │      │
-  1  │  0  │  1  │  1  │   1  │ 0
-  2  │  1  │  1  │  2  │   2  │ 1
-  3  │  2  │  2  │  3  │   3  │ 1
-  4  │  3  │  3  │  5  │   5  │ 2
-  5  │  4  │  5  │  8  │   8  │ 3
-  6  │  5  │  8  │ 13  │  13  │ 5
-  7  │  6  │ 13  │ 21  │  21  │ 8
-  8  │  7  │ 21  │ 34  │  34  │ 13
+| Paso | i | a | b | temp | Salida |
+|------|---|---|---|------|--------|
+| init | | 0 | 1 | | |
+| 1 | 0 | 1 | 1 | 1 | 0 |
+| 2 | 1 | 1 | 2 | 2 | 1 |
+| 3 | 2 | 2 | 3 | 3 | 1 |
+| 4 | 3 | 3 | 5 | 5 | 2 |
+| 5 | 4 | 5 | 8 | 8 | 3 |
+| 6 | 5 | 8 | 13 | 13 | 5 |
+| 7 | 6 | 13 | 21 | 21 | 8 |
+| 8 | 7 | 21 | 34 | 34 | 13 |
 
 Salida: 0 1 1 2 3 5 8 13
-```
 
 </details>
 
@@ -704,16 +676,14 @@ static void ordenarTres(int a, int b, int c){
 <details>
 <summary>Solución</summary>
 
-```
-Paso │  a  │  b  │  c  │ Condición
-─────┼─────┼─────┼─────┼──────────────
-init │  30 │  10 │  20 │
-  1  │  10 │  30 │  20 │ 30>10 true → intercambiar a,b
-  2  │  10 │  20 │  30 │ 30>20 true → intercambiar b,c
-  3  │  10 │  20 │  30 │ 10>20 false → no cambia
+| Paso | a | b | c | Condición |
+|------|---|---|---|-----------|
+| init | 30 | 10 | 20 | |
+| 1 | 10 | 30 | 20 | 30>10 true → intercambiar a,b |
+| 2 | 10 | 20 | 30 | 30>20 true → intercambiar b,c |
+| 3 | 10 | 20 | 30 | 10>20 false → no cambia |
 
 Salida: 10 20 30
-```
 
 Este es un mini Bubble Sort para 3 elementos.
 
@@ -787,24 +757,20 @@ static boolean esPalindromo(String texto){
 
 Llamada 1: `esPalindromo("anilina")`
 
-```
-Paso │ izq │ der │ charAt(izq) │ charAt(der) │ iguales
-─────┼─────┼─────┼─────────────┼─────────────┼────────
-  1  │  0  │  6  │     'a'     │     'a'     │  sí
-  2  │  1  │  5  │     'n'     │     'n'     │  sí
-  3  │  2  │  4  │     'i'     │     'i'     │  sí
-  4  │  3  │  3  │  izq < der = false → sale del ciclo
+| Paso | izq | der | charAt(izq) | charAt(der) | iguales |
+|------|-----|-----|-------------|-------------|---------|
+| 1 | 0 | 6 | 'a' | 'a' | sí |
+| 2 | 1 | 5 | 'n' | 'n' | sí |
+| 3 | 2 | 4 | 'i' | 'i' | sí |
+| 4 | 3 | 3 | izq < der = false → sale del ciclo | | |
 
 Retorna: true (es palíndromo)
-```
 
 Llamada 2: `esPalindromo("hola")`
 
-```
-Paso │ izq │ der │ charAt(izq) │ charAt(der) │ iguales
-─────┼─────┼─────┼─────────────┼─────────────┼────────
-  1  │  0  │  3  │     'h'     │     'a'     │  no → retorna false
-```
+| Paso | izq | der | charAt(izq) | charAt(der) | iguales |
+|------|-----|-----|-------------|-------------|---------|
+| 1 | 0 | 3 | 'h' | 'a' | no → retorna false |
 
 </details>
 

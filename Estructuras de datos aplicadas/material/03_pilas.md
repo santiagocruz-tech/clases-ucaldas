@@ -379,36 +379,24 @@ boolean parentesisBalanceados(String expresion){
 
 Traza con `"{[()]}"`
 
-```
-Carácter    Acción          Estado de la pila
-────────    ──────          ─────────────────
-{           push('{')       | { |
-[           push('[')       | [ |
-                            | { |
-(           push('(')       | ( |
-                            | [ |
-                            | { |
-)           pop() → '('    | [ |
-            ')' coincide    | { |
-]           pop() → '['    | { |
-            ']' coincide
-}           pop() → '{'    (vacía)
-            '}' coincide
+| Carácter | Acción | Estado de la pila |
+|----------|--------|-------------------|
+| `{` | push('{') | { |
+| `[` | push('[') | [, { |
+| `(` | push('(') | (, [, { |
+| `)` | pop() → '(' coincide con ')' | [, { |
+| `]` | pop() → '[' coincide con ']' | { |
+| `}` | pop() → '{' coincide con '}' | (vacía) |
 
 Pila vacía al final → BALANCEADO ✓
-```
 
 Traza con `"([)]"`:
 
-```
-Carácter    Acción          Estado de la pila
-────────    ──────          ─────────────────
-(           push('(')       | ( |
-[           push('[')       | [ |
-                            | ( |
-)           pop() → '['    
-            ')' NO coincide con '[' → NO BALANCEADO ✗
-```
+| Carácter | Acción | Estado de la pila |
+|----------|--------|-------------------|
+| `(` | push('(') | ( |
+| `[` | push('[') | [, ( |
+| `)` | pop() → '[' NO coincide con ')' | NO BALANCEADO ✗ |
 
 **Recursivo:**
 
@@ -495,39 +483,31 @@ int evaluarPostfija(String expresion){
 
 Traza con `"3 4 + 2 *"`:
 
-```
-Token    Acción              Estado de la pila
-─────    ──────              ─────────────────
-3        push(3)             | 3 |
-4        push(4)             | 4 |
-                             | 3 |
-+        pop 4, pop 3        
-         push(3+4=7)         | 7 |
-2        push(2)             | 2 |
-                             | 7 |
-*        pop 2, pop 7
-         push(7*2=14)        | 14 |
+| Token | Acción | Estado de la pila |
+|-------|--------|-------------------|
+| 3 | push(3) | 3 |
+| 4 | push(4) | 4, 3 |
+| + | pop 4, pop 3, push(3+4=7) | 7 |
+| 2 | push(2) | 2, 7 |
+| * | pop 2, pop 7, push(7*2=14) | 14 |
 
 Resultado: 14
-```
 
 Traza con `"5 1 2 + 4 * + 3 -"` que equivale a `5 + (1 + 2) * 4 - 3 = 14`:
 
-```
-Token    Pila después
-─────    ────────────
-5        | 5 |
-1        | 1 | 5 |
-2        | 2 | 1 | 5 |
-+        | 3 | 5 |          (1+2=3)
-4        | 4 | 3 | 5 |
-*        | 12 | 5 |         (3*4=12)
-+        | 17 |             (5+12=17)
-3        | 3 | 17 |
--        | 14 |             (17-3=14)
+| Token | Pila después | Nota |
+|-------|-------------|------|
+| 5 | 5 | |
+| 1 | 1, 5 | |
+| 2 | 2, 1, 5 | |
+| + | 3, 5 | 1+2=3 |
+| 4 | 4, 3, 5 | |
+| * | 12, 5 | 3*4=12 |
+| + | 17 | 5+12=17 |
+| 3 | 3, 17 | |
+| - | 14 | 17-3=14 |
 
 Resultado: 14
-```
 
 ---
 
@@ -634,15 +614,15 @@ class Navegador {
 
 Traza:
 
-```
-visitar("google.com")     → actual: google.com
-visitar("youtube.com")    → actual: youtube.com,    atrás: [google.com]
-visitar("github.com")     → actual: github.com,     atrás: [youtube.com, google.com]
-irAtras()                 → actual: youtube.com,     atrás: [google.com],     adelante: [github.com]
-irAtras()                 → actual: google.com,      atrás: [],               adelante: [youtube.com, github.com]
-irAdelante()              → actual: youtube.com,     atrás: [google.com],     adelante: [github.com]
-visitar("reddit.com")     → actual: reddit.com,      atrás: [youtube.com, google.com], adelante: [] (limpiado)
-```
+| Acción | actual | atrás | adelante |
+|--------|--------|-------|----------|
+| visitar("google.com") | google.com | [] | [] |
+| visitar("youtube.com") | youtube.com | [google.com] | [] |
+| visitar("github.com") | github.com | [youtube.com, google.com] | [] |
+| irAtras() | youtube.com | [google.com] | [github.com] |
+| irAtras() | google.com | [] | [youtube.com, github.com] |
+| irAdelante() | youtube.com | [google.com] | [github.com] |
+| visitar("reddit.com") | reddit.com | [youtube.com, google.com] | [] (limpiado) |
 
 ---
 
@@ -677,24 +657,18 @@ int[] diasDeEspera(int[] temperaturas){
 
 Traza:
 
-```
-i=0  temp=73  pila vacía → push(0)                    pila: [0]
-i=1  temp=74  74>73 → pop(0), resultado[0]=1-0=1      pila: []
-              push(1)                                   pila: [1]
-i=2  temp=75  75>74 → pop(1), resultado[1]=2-1=1      pila: []
-              push(2)                                   pila: [2]
-i=3  temp=71  71<75 → push(3)                          pila: [2,3]
-i=4  temp=69  69<71 → push(4)                          pila: [2,3,4]
-i=5  temp=72  72>69 → pop(4), resultado[4]=5-4=1      
-              72>71 → pop(3), resultado[3]=5-3=2       pila: [2]
-              72<75 → push(5)                           pila: [2,5]
-i=6  temp=76  76>72 → pop(5), resultado[5]=6-5=1
-              76>75 → pop(2), resultado[2]=6-2=4       pila: []
-              push(6)                                   pila: [6]
-i=7  temp=73  73<76 → push(7)                          pila: [6,7]
+| i | temp | Acción | resultado | pila |
+|---|------|--------|-----------|------|
+| 0 | 73 | push(0) | | [0] |
+| 1 | 74 | 74>73 → pop(0), resultado[0]=1 → push(1) | [1,0,0,0,0,0,0,0] | [1] |
+| 2 | 75 | 75>74 → pop(1), resultado[1]=1 → push(2) | [1,1,0,0,0,0,0,0] | [2] |
+| 3 | 71 | 71<75 → push(3) | | [2,3] |
+| 4 | 69 | 69<71 → push(4) | | [2,3,4] |
+| 5 | 72 | 72>69 → pop(4), resultado[4]=1; 72>71 → pop(3), resultado[3]=2; 72<75 → push(5) | [1,1,0,2,1,0,0,0] | [2,5] |
+| 6 | 76 | 76>72 → pop(5), resultado[5]=1; 76>75 → pop(2), resultado[2]=4 → push(6) | [1,1,4,2,1,1,0,0] | [6] |
+| 7 | 73 | 73<76 → push(7) | | [6,7] |
 
 Resultado: [1, 1, 4, 2, 1, 1, 0, 0] ✓
-```
 
 Complejidad: O(n) — cada elemento se apila y desapila como máximo una vez.
 
