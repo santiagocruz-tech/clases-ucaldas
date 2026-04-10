@@ -1,0 +1,20 @@
+.pokemon-card {
+    transition: transform 0.2s;
+}
+
+.pokemon-card:hover {
+    transform: translateY(-4px);
+}
+
+.pokemon-card img {
+    background-color: #f5f5f5;
+    padding: 1rem;
+}
+
+.pokemon-name {
+    text-transform: capitalize;
+}
+
+#loading {
+    display: none;
+}

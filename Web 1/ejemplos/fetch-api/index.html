@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fetch API - Ejemplos practicos</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+    <header>
+        <h1>Fetch API en JavaScript</h1>
+        <p>
+            Ejemplos practicos para aprender a hacer peticiones HTTP
+            con <code>fetch()</code>. Todos los ejemplos usan
+            <a href="https://jsonplaceholder.typicode.com" target="_blank" rel="noopener noreferrer">JSONPlaceholder</a>,
+            una API REST publica y gratuita.
+        </p>
+    </header>
+
+    <main>
+
+        <!-- GET basico -->
+        <section class="card">
+            <h2>1. GET &mdash; Obtener una lista</h2>
+            <p>
+                La peticion mas comun. Pedimos todos los usuarios y los
+                mostramos en pantalla. <code>fetch()</code> hace GET por defecto.
+            </p>
+            <button id="btn-get">Traer usuarios</button>
+            <div id="resultado-get" class="resultado" role="status" aria-live="polite"></div>
+        </section>
+
+        <!-- GET por ID -->
+        <section class="card">
+            <h2>2. GET por ID &mdash; Buscar uno solo</h2>
+            <p>Agregamos el ID a la URL para pedir un recurso especifico.</p>
+            <div class="input-group">
+                <label for="input-id">ID del usuario (1-10):</label>
+                <input type="number" id="input-id" min="1" max="10" value="1">
+            </div>
+            <button id="btn-get-id">Buscar</button>
+            <div id="resultado-get-id" class="resultado" role="status" aria-live="polite"></div>
+        </section>
+
+        <!-- POST -->
+        <section class="card">
+            <h2>3. POST &mdash; Crear un recurso</h2>
+            <p>
+                Enviamos datos en el body de la peticion. Hay que indicar
+                el <code>Content-Type</code> y el metodo <code>POST</code>.
+            </p>
+            <div class="form-group">
+                <label for="input-titulo">Titulo del post:</label>
+                <input type="text" id="input-titulo" placeholder="Mi primer post">
+                <label for="input-body">Contenido:</label>
+                <textarea id="input-body" rows="3" placeholder="Escribe algo aqui..."></textarea>
+            </div>
+            <button id="btn-post">Crear post</button>
+            <div id="resultado-post" class="resultado" role="status" aria-live="polite"></div>
+        </section>
+
+        <!-- Errores -->
+        <section class="card">
+            <h2>4. Manejo de errores</h2>
+            <p>
+                Ojo: <code>fetch()</code> solo rechaza la promesa si hay un
+                error de red. Un 404 o 500 NO lanza excepcion, hay que
+                revisar <code>response.ok</code> a mano.
+            </p>
+            <button id="btn-error-404">Provocar un 404</button>
+            <button id="btn-error-red">Provocar error de red</button>
+            <div id="resultado-errores" class="resultado" role="status" aria-live="polite"></div>
+        </section>
+
+        <!-- Async/Await -->
+        <section class="card">
+            <h2>5. Async/Await</h2>
+            <p>
+                Misma funcionalidad que <code>.then()</code>, pero con
+                sintaxis mas limpia. Usamos <code>try/catch</code> para
+                manejar errores.
+            </p>
+            <button id="btn-async">Traer posts (async/await)</button>
+            <div id="resultado-async" class="resultado" role="status" aria-live="polite"></div>
+        </section>
+
+    </main>
+
+    <footer>
+        <p>Datos de <a href="https://jsonplaceholder.typicode.com" target="_blank" rel="noopener noreferrer">jsonplaceholder.typicode.com</a></p>
+    </footer>
+
+    <script src="js/main.js"></script>
+</body>
+</html>
