@@ -35,6 +35,116 @@ Si ya hicieron el taller de la lista de tareas, acá vamos a profundizar en todo
 
 Esto ya lo vieron en el taller, pero vale la pena tenerlo como referencia.
 
+### Antes que nada: verificar que el SDK está bien
+
+Este es el problema más común. Abren Android Studio, crean un proyecto, le dan Run y no pasa nada, o sale un error raro. Casi siempre es porque el SDK no se instaló completo o le falta algún componente.
+
+#### Verificar desde Android Studio
+
+Ir a **File → Settings → Languages & Frameworks → Android SDK** (en macOS: **Android Studio → Settings → ...**).
+
+En la pestaña **SDK Platforms**, verificar que tengan al menos una versión instalada (el checkbox marcado). Recomendado: **Android 14.0 (API 34)**. Si no hay ninguna marcada, marcarla y darle **Apply**.
+
+En la pestaña **SDK Tools**, verificar que estén instalados estos (todos con checkbox marcado):
+
+| Componente | ¿Para qué sirve? |
+|-----------|-------------------|
+| Android SDK Build-Tools | Compila el código |
+| Android SDK Platform-Tools | Herramientas como `adb` (conectar celular) |
+| Android Emulator | El emulador (si van a usarlo) |
+| Android SDK Command-line Tools | Herramientas de terminal |
+
+Si falta alguno, marcarlo y darle **Apply**. Va a descargar lo que falte.
+
+#### Verificar desde la terminal
+
+Abrir una terminal (en Android Studio: **View → Tool Windows → Terminal**) y correr:
+
+```bash
+# Ver dónde está el SDK
+echo $ANDROID_HOME
+# o en Windows:
+echo %ANDROID_HOME%
+```
+
+Si no muestra nada, el SDK no está configurado en las variables de entorno. Pueden ver la ruta del SDK en **File → Settings → Android SDK** arriba donde dice "Android SDK Location". Normalmente es:
+- Windows: `C:\Users\TuUsuario\AppData\Local\Android\Sdk`
+- macOS: `/Users/TuUsuario/Library/Android/sdk`
+- Linux: `/home/TuUsuario/Android/Sdk`
+
+Luego verificar que las herramientas existen:
+
+```bash
+# Verificar adb (para conectar celulares)
+adb version
+# Debería mostrar algo como: Android Debug Bridge version 1.0.41
+
+# Verificar que hay plataformas instaladas
+ls $ANDROID_HOME/platforms/
+# Debería mostrar al menos una carpeta como: android-34
+```
+
+Si `adb` no se encuentra, es porque `platform-tools` no está instalado o no está en el PATH.
+
+#### Aceptar las licencias
+
+Esto es otro clásico. Gradle se niega a compilar porque no aceptaron las licencias del SDK:
+
+```bash
+# Desde la terminal de Android Studio o cualquier terminal:
+sdkmanager --licenses
+# Responder 'y' a todo lo que pregunte
+```
+
+Si `sdkmanager` no se encuentra, la ruta completa suele ser:
+```bash
+# Windows
+C:\Users\TuUsuario\AppData\Local\Android\Sdk\cmdline-tools\latest\bin\sdkmanager --licenses
+
+# Linux/macOS
+~/Android/Sdk/cmdline-tools/latest/bin/sdkmanager --licenses
+```
+
+#### "No target device found" al darle Run
+
+Esto significa que no tienen ni emulador ni celular conectado. Dos opciones:
+
+**Opción A: Crear un emulador**
+1. En Android Studio ir a **Device Manager** (icono de celular en la barra lateral derecha)
+2. Click en **Create Device**
+3. Elegir un dispositivo (Pixel 6 está bien)
+4. Seleccionar una imagen del sistema — **descargar una si no hay ninguna** (click en el ícono de descarga junto a la versión)
+5. Darle Finish y luego presionar el botón de Play del emulador
+
+Si el emulador no arranca o va muy lento, probablemente necesitan activar la virtualización en la BIOS (Intel HAXM o AMD-V). Busquen "Enable virtualization" + la marca de su computador.
+
+**Opción B: Conectar un celular físico (recomendado si tienen poca RAM)**
+1. En el celular: **Ajustes → Acerca del teléfono → Tocar 7 veces "Número de compilación"** (esto activa las opciones de desarrollador)
+2. Volver a Ajustes → **Opciones de desarrollador → Activar "Depuración USB"**
+3. Conectar por USB
+4. Aceptar la autorización que aparece en la pantalla del celular
+5. En Android Studio debería aparecer el nombre del celular arriba junto al botón de Run
+
+Si no aparece, verificar con:
+```bash
+adb devices
+```
+Si la lista está vacía, probar otro cable USB (algunos cables solo cargan, no transmiten datos) o instalar los drivers del celular.
+
+#### Resumen rápido de diagnóstico
+
+| Síntoma | Causa probable | Solución |
+|---------|---------------|----------|
+| "SDK location not found" | No se instaló el SDK | Instalar desde Settings → Android SDK |
+| "No target device found" | No hay emulador ni celular | Crear emulador o conectar celular USB |
+| "License not accepted" | No aceptaron licencias | `sdkmanager --licenses` |
+| Gradle falla al sincronizar | Falta Build-Tools o Platform | Instalar desde SDK Tools |
+| El emulador no arranca | Virtualización desactivada | Activar en BIOS (Intel HAXM / AMD-V) |
+| `adb` no encontrado | platform-tools no instalado o no en PATH | Instalar desde SDK Tools |
+| El celular no aparece | Cable malo o drivers faltantes | Probar otro cable, instalar drivers |
+
+Si después de todo esto sigue sin funcionar, revisen la sección 15 de esta guía donde se explica cómo desarrollar sin Android Studio usando VS Code y la terminal.
+
 ### Crear un proyecto
 
 **File → New → New Project → Empty Views Activity**
