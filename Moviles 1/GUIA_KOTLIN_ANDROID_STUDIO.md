@@ -27,6 +27,7 @@ Si ya hicieron el taller de la lista de tareas, acá vamos a profundizar en todo
 12. [Arquitectura MVVM](#12-arquitectura-mvvm)
 13. [Buenas prácticas](#13-buenas-prácticas)
 14. [Ejercicios](#14-ejercicios)
+15. [Desarrollo Android sin Android Studio (hardware limitado)](#15-desarrollo-android-sin-android-studio)
 
 ---
 
@@ -1955,6 +1956,248 @@ Crear una app con 3 pestañas usando Fragments:
 - Pestaña 1: Lista de contactos (RecyclerView)
 - Pestaña 2: Formulario para agregar contacto (con validación)
 - Pestaña 3: Perfil del usuario (SharedPreferences)
+
+---
+
+## 15. Desarrollo Android sin Android Studio
+
+Si su computador es viejo o tiene poca RAM (4GB o menos), Android Studio va a ser una tortura. El IDE solo consume entre 2 y 4GB, y si le suman el emulador se van a 6-8GB fácilmente. Pero eso no significa que no puedan desarrollar para Android. Acá les explico cómo montar un entorno ligero que funciona.
+
+### Para los ejercicios de Kotlin puro (secciones 1-2 del taller)
+
+No necesitan instalar nada. Usen el playground en línea:
+
+- [play.kotlinlang.org](https://play.kotlinlang.org) — corre en el navegador, escriben código y le dan Run. Sirve para todo lo que es sintaxis, funciones, clases, colecciones, etc.
+
+Con eso pueden hacer todos los ejercicios de la Parte 2 y Parte 3 del taller sin problema.
+
+### Para desarrollar apps Android: VS Code + SDK por terminal
+
+Esta es la alternativa real a Android Studio. VS Code consume mucha menos RAM (~300-500MB vs 2-4GB de Android Studio).
+
+#### Paso 1: Instalar el JDK
+
+Necesitan JDK 17 o superior. Si no lo tienen:
+
+**Windows:**
+```
+# Descargar de https://adoptium.net/ (Temurin 17)
+# Correr el instalador, marcar "Set JAVA_HOME variable"
+```
+
+**Linux (Ubuntu/Debian):**
+```bash
+sudo apt update
+sudo apt install openjdk-17-jdk
+```
+
+**macOS:**
+```bash
+brew install openjdk@17
+```
+
+Verificar que quedó bien:
+```bash
+java -version
+# Debería mostrar algo como: openjdk version "17.x.x"
+```
+
+#### Paso 2: Instalar Android SDK (sin Android Studio)
+
+Esto es lo clave. Se puede instalar solo el SDK sin el IDE completo.
+
+1. Ir a [developer.android.com/studio#command-line-tools-only](https://developer.android.com/studio#command-line-tools-only)
+2. Descargar **Command line tools only** para su sistema operativo (~150MB en vez de ~2GB)
+3. Crear una carpeta para el SDK:
+
+**Windows:**
+```
+mkdir C:\Android\sdk
+mkdir C:\Android\sdk\cmdline-tools
+```
+Extraer el zip descargado dentro de `C:\Android\sdk\cmdline-tools\` y renombrar la carpeta extraída a `latest`. Debería quedar así:
+```
+C:\Android\sdk\cmdline-tools\latest\bin\sdkmanager.bat
+```
+
+**Linux/macOS:**
+```bash
+mkdir -p ~/Android/sdk/cmdline-tools
+# Extraer el zip descargado
+unzip commandlinetools-*.zip -d ~/Android/sdk/cmdline-tools/
+mv ~/Android/sdk/cmdline-tools/cmdline-tools ~/Android/sdk/cmdline-tools/latest
+```
+
+4. Configurar las variables de entorno:
+
+**Windows** (agregar en Variables de entorno del sistema):
+```
+ANDROID_HOME = C:\Android\sdk
+PATH += C:\Android\sdk\cmdline-tools\latest\bin
+PATH += C:\Android\sdk\platform-tools
+```
+
+**Linux/macOS** (agregar al final de `~/.bashrc` o `~/.zshrc`):
+```bash
+export ANDROID_HOME=$HOME/Android/sdk
+export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin
+export PATH=$PATH:$ANDROID_HOME/platform-tools
+```
+
+5. Instalar los componentes necesarios:
+```bash
+sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0"
+```
+
+6. Aceptar las licencias:
+```bash
+sdkmanager --licenses
+# Responder 'y' a todo
+```
+
+Verificar:
+```bash
+sdkmanager --list | head -20
+```
+
+#### Paso 3: Instalar VS Code con extensiones
+
+1. Descargar VS Code de [code.visualstudio.com](https://code.visualstudio.com/) si no lo tienen
+2. Instalar estas extensiones:
+   - **Kotlin** (de mathiasfrohlich) — resaltado de sintaxis y autocompletado básico
+   - **Gradle for Java** (de Microsoft) — para manejar el build
+   - **XML** (de Red Hat) — para los layouts
+
+Eso es todo. No necesitan más extensiones.
+
+#### Paso 4: Crear un proyecto
+
+Acá viene lo diferente. Sin Android Studio no tienen el wizard de "New Project", así que hay dos opciones:
+
+**Opción A: Clonar un proyecto plantilla (recomendado)**
+
+Creé un proyecto base que pueden clonar y modificar:
+
+```bash
+# Clonar el proyecto plantilla
+git clone https://github.com/RichardBolanos/android-template-vscode.git MiApp
+cd MiApp
+
+# Verificar que compila
+./gradlew assembleDebug
+```
+
+Si el repositorio no está disponible, pueden crear el proyecto en la computadora de un compañero que tenga Android Studio y luego pasarlo por USB o subirlo a GitHub.
+
+**Opción B: Crear un proyecto en Android Studio de alguien más**
+
+1. Pedirle a un compañero que cree el proyecto en Android Studio (Empty Views Activity, Kotlin, API 24)
+2. Que lo suba a un repositorio de GitHub
+3. Clonarlo en su máquina
+4. Abrirlo con VS Code
+
+El proyecto ya viene con toda la configuración de Gradle. Solo necesitan el SDK para compilar.
+
+#### Paso 5: Compilar y correr desde la terminal
+
+Olvidarse del botón de Play. Todo se hace con Gradle desde la terminal:
+
+```bash
+# Compilar (genera el APK)
+./gradlew assembleDebug
+
+# El APK queda en:
+# app/build/outputs/apk/debug/app-debug.apk
+
+# Compilar e instalar directamente en el celular conectado
+./gradlew installDebug
+
+# Ver los logs (equivalente a Logcat)
+adb logcat | grep "com.ejemplo.miapp"
+
+# Solo ver errores
+adb logcat *:E | grep "com.ejemplo.miapp"
+```
+
+En Windows usen `gradlew.bat` en lugar de `./gradlew`.
+
+La primera compilación tarda bastante porque Gradle descarga todas las dependencias. Las siguientes son más rápidas.
+
+#### Paso 6: Conectar un celular físico
+
+Esto es obligatorio si no tienen Android Studio (porque el emulador se maneja desde ahí). Pero honestamente, un celular físico es mejor que el emulador en máquinas con poca RAM.
+
+1. En el celular: **Ajustes → Acerca del teléfono → Tocar 7 veces "Número de compilación"**
+2. Volver a Ajustes → **Opciones de desarrollador → Activar "Depuración USB"**
+3. Conectar el celular por USB
+4. Aceptar la autorización que aparece en el celular
+5. Verificar que lo detecta:
+
+```bash
+adb devices
+# Debería mostrar algo como:
+# List of devices attached
+# ABC123DEF456    device
+```
+
+Si no aparece, revisar que tengan los drivers USB del celular instalados (en Windows a veces hay que instalarlos manualmente).
+
+#### Flujo de trabajo diario
+
+Una vez que tienen todo configurado, el flujo es:
+
+1. Abrir VS Code en la carpeta del proyecto
+2. Editar los archivos `.kt` y `.xml`
+3. Abrir una terminal en VS Code (`Ctrl + ñ` o `` Ctrl + ` ``)
+4. Compilar e instalar: `./gradlew installDebug`
+5. La app se abre automáticamente en el celular
+6. Ver logs si algo falla: `adb logcat *:E`
+
+No van a tener autocompletado tan bueno como en Android Studio, ni el editor visual de layouts. Pero pueden escribir todo el código y compilar sin problema.
+
+#### Editar layouts XML sin el editor visual
+
+Sin Android Studio no tienen el editor de arrastrar y soltar para los layouts. Pero honestamente, la mayoría de desarrolladores escriben el XML a mano de todas formas. Algunos tips:
+
+- Copien los layouts de los ejemplos de esta guía y modifíquenlos
+- Usen la extensión XML de Red Hat para autocompletado de atributos
+- Para ver cómo queda el layout sin compilar, pueden usar [layoutinspector.com](https://www.layoutinspector.com/) (herramienta online, limitada pero útil)
+- O simplemente compilen y vean en el celular. Con `./gradlew installDebug` tarda unos 15-30 segundos en compilaciones incrementales
+
+### Resumen: ¿Qué necesito según mi hardware?
+
+| RAM del PC | Opción recomendada | Emulador |
+|------------|-------------------|----------|
+| 8GB+ | Android Studio normal | Sí, funciona bien |
+| 6GB | Android Studio + celular físico | Mejor no, va lento |
+| 4GB | VS Code + SDK terminal + celular físico | No, imposible |
+| 2GB | Kotlin Playground (solo sintaxis) | No |
+
+### Problemas comunes
+
+**"JAVA_HOME is not set"**
+→ Verificar que instalaron el JDK y configuraron la variable de entorno. Cerrar y abrir la terminal después de configurarla.
+
+**"SDK location not found"**
+→ Crear un archivo `local.properties` en la raíz del proyecto con:
+```
+sdk.dir=C\:\\Android\\sdk
+```
+(En Linux/macOS: `sdk.dir=/home/usuario/Android/sdk`)
+
+**"No connected devices"**
+→ Revisar que la depuración USB está activada y que aceptaron la autorización en el celular. Probar desconectar y reconectar el USB.
+
+**La compilación tarda mucho**
+→ La primera vez es normal (descarga dependencias). Si sigue lento, agregar en `gradle.properties`:
+```
+org.gradle.daemon=true
+org.gradle.parallel=true
+org.gradle.jvmargs=-Xmx1536m
+```
+
+**"Could not determine java version"**
+→ Verificar que tienen JDK 17. Algunas versiones de Gradle no funcionan con JDK 21.
 
 ---
 
