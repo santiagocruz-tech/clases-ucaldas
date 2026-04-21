@@ -33,9 +33,23 @@ Si ya hicieron el taller de la lista de tareas, acá vamos a profundizar en todo
 
 ## 0. Configuración del entorno y alternativas para hardware limitado
 
-Antes de arrancar con el contenido, lean esta sección. Si Android Studio les funciona bien, pueden saltar directo a la sección 1. Pero si su computador es viejo o tiene poca RAM (4GB o menos), acá les explico cómo trabajar sin que la máquina se les congele.
+Antes de arrancar con el contenido, lean esta sección. Si Android Studio les funciona bien, pueden saltar directo a la [sección 1](#1-repaso-rápido). Pero si su computador es viejo o tiene poca RAM (4GB o menos), acá les explico cómo trabajar sin que la máquina se les congele.
 
 Android Studio solo consume entre 2 y 4GB de RAM, y si le suman el emulador se van a 6-8GB fácilmente. Pero eso no significa que no puedan desarrollar para Android.
+
+**En esta sección:**
+- [Kotlin Playground (sin instalar nada)](#para-los-ejercicios-de-kotlin-puro-secciones-1-2-del-taller)
+- [VS Code + SDK por terminal](#para-desarrollar-apps-android-vs-code--sdk-por-terminal)
+  - [Paso 1: Instalar el JDK](#paso-1-instalar-el-jdk)
+  - [Paso 2: Instalar Android SDK](#paso-2-instalar-android-sdk-sin-android-studio)
+  - [Paso 3: VS Code con extensiones](#paso-3-instalar-vs-code-con-extensiones)
+  - [Paso 4: Crear un proyecto](#paso-4-crear-un-proyecto)
+  - [Paso 5: Compilar desde la terminal](#paso-5-compilar-y-correr-desde-la-terminal)
+  - [Paso 6: Conectar celular físico](#paso-6-conectar-un-celular-físico)
+  - [Paso 7: Genymotion (emulador alternativo)](#paso-7-genymotion-como-emulador-alternativo-si-no-tienen-celular-físico)
+- [IntelliJ IDEA Community (alternativa intermedia)](#intellij-idea-community-alternativa-intermedia)
+- [Tabla resumen según hardware](#resumen-qué-necesito-según-mi-hardware)
+- [Problemas comunes](#problemas-comunes)
 
 ### Para los ejercicios de Kotlin puro (secciones 1-2 del taller)
 
@@ -504,13 +518,63 @@ Sin Android Studio no tienen el editor de arrastrar y soltar para los layouts. P
 - Para ver cómo queda el layout sin compilar, pueden usar [layoutinspector.com](https://www.layoutinspector.com/) (herramienta online, limitada pero útil)
 - O simplemente compilen y vean en el celular. Con `./gradlew installDebug` tarda unos 15-30 segundos en compilaciones incrementales
 
+### IntelliJ IDEA Community (alternativa intermedia)
+
+Si VS Code les parece muy pelado (sin autocompletado decente, sin refactoring) pero Android Studio les pesa mucho, hay un punto medio: **IntelliJ IDEA Community Edition**.
+
+¿Por qué? Porque Android Studio es literalmente un fork de IntelliJ IDEA. Es el mismo IDE por debajo, pero Android Studio le agrega el editor visual de layouts, el Device Manager, el profiler, y otras herramientas específicas de Android que consumen recursos extra. IntelliJ IDEA Community no trae esas herramientas, pero sí trae todo lo que necesitan para escribir Kotlin con autocompletado real, refactoring, debugging, y soporte de Gradle.
+
+**Instalación:**
+
+1. Ir a [jetbrains.com/idea/download](https://www.jetbrains.com/idea/download/) y descargar la versión **Community** (es gratis, la columna de la derecha)
+2. Instalar con las opciones por defecto
+3. Al abrir por primera vez, instalar el plugin de **Kotlin** si no viene incluido (normalmente ya viene)
+
+**Configurar para Android:**
+
+IntelliJ IDEA Community no trae soporte de Android por defecto, pero pueden abrir proyectos Android y compilarlos:
+
+1. Abrir IntelliJ IDEA
+2. **File → Open** → seleccionar la carpeta raíz del proyecto Android
+3. IntelliJ va a detectar que es un proyecto Gradle y va a sincronizar
+4. Configurar el SDK: **File → Project Structure → SDKs → + → Android SDK** → seleccionar la ruta donde tienen el SDK instalado
+5. Esperar a que termine de indexar
+
+**¿Qué pueden hacer?**
+- Escribir código Kotlin con autocompletado completo (mucho mejor que VS Code)
+- Refactoring (renombrar variables, extraer funciones, etc.)
+- Navegación al código fuente de las librerías
+- Debugging con breakpoints
+- Compilar con Gradle desde la terminal integrada: `./gradlew installDebug`
+- Ver errores de compilación en tiempo real
+
+**¿Qué NO pueden hacer (que sí tiene Android Studio)?**
+- No tienen el editor visual de layouts (arrastrar y soltar). Escriben el XML a mano, igual que con VS Code
+- No tienen el Device Manager para crear emuladores (usan Genymotion o celular físico)
+- No tienen el profiler de rendimiento
+- No tienen el inspector de layouts en tiempo real
+
+**¿Cuánta RAM consume?**
+
+IntelliJ IDEA Community consume entre 1 y 2GB de RAM. Es más que VS Code (~300-500MB) pero menos que Android Studio (~2-4GB). Con 6GB de RAM total funciona bien. Con 4GB va justo pero es usable.
+
+**Flujo de trabajo:**
+
+1. Abrir el proyecto en IntelliJ IDEA
+2. Editar los archivos `.kt` y `.xml` con autocompletado
+3. Abrir la terminal integrada (**View → Tool Windows → Terminal**)
+4. Compilar e instalar: `./gradlew installDebug`
+5. Probar en celular físico o Genymotion
+
+Es básicamente lo mismo que con VS Code, pero con un editor mucho más inteligente para Kotlin.
+
 ### Resumen: ¿Qué necesito según mi hardware?
 
 | RAM del PC | IDE | Emulador | Dispositivo de prueba |
 |------------|-----|----------|----------------------|
 | 8GB+ | Android Studio | Emulador oficial o Genymotion | Emulador o celular físico |
-| 6GB | Android Studio | Genymotion (más ligero) | Genymotion o celular físico |
-| 4GB | VS Code + terminal | No usar emulador | Celular físico por USB |
+| 6GB | Android Studio o IntelliJ IDEA | Genymotion (más ligero) | Genymotion o celular físico |
+| 4-5GB | IntelliJ IDEA o VS Code + terminal | No usar emulador | Celular físico por USB |
 | 2-3GB | VS Code + terminal | No | Celular físico (si compila) |
 
 Si no tienen celular Android ni RAM para emulador, la última opción es pedirle a un compañero que les preste el celular para probar, o trabajar en parejas.
