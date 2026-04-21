@@ -2182,31 +2182,233 @@ Eso es todo. No necesitan más extensiones.
 
 #### Paso 4: Crear un proyecto
 
-Acá viene lo diferente. Sin Android Studio no tienen el wizard de "New Project", así que hay dos opciones:
+Acá viene lo diferente. Sin Android Studio no tienen el wizard de "New Project", pero hay varias formas de hacerlo.
 
-**Opción A: Clonar un proyecto plantilla (recomendado)**
+**Opción A: Crear el proyecto desde la terminal (sin depender de nadie)**
 
-Creé un proyecto base que pueden clonar y modificar:
+Se puede armar un proyecto Android completo desde cero con unos cuantos archivos. Parece mucho, pero solo hay que hacerlo una vez y después lo reutilizan como plantilla.
+
+Crear la estructura de carpetas:
 
 ```bash
-# Clonar el proyecto plantilla
-git clone https://github.com/RichardBolanos/android-template-vscode.git MiApp
+mkdir -p MiApp/app/src/main/java/com/ejemplo/miapp
+mkdir -p MiApp/app/src/main/res/layout
+mkdir -p MiApp/app/src/main/res/values
+mkdir -p MiApp/gradle/wrapper
 cd MiApp
+```
 
-# Verificar que compila
+Crear `settings.gradle.kts`:
+```bash
+cat > settings.gradle.kts << 'EOF'
+pluginManagement {
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+rootProject.name = "MiApp"
+include(":app")
+EOF
+```
+
+Crear `build.gradle.kts` (raíz del proyecto):
+```bash
+cat > build.gradle.kts << 'EOF'
+plugins {
+    id("com.android.application") version "8.2.0" apply false
+    id("org.jetbrains.kotlin.android") version "1.9.22" apply false
+}
+EOF
+```
+
+Crear `app/build.gradle.kts`:
+```bash
+cat > app/build.gradle.kts << 'EOF'
+plugins {
+    id("com.android.application")
+    id("org.jetbrains.kotlin.android")
+}
+
+android {
+    namespace = "com.ejemplo.miapp"
+    compileSdk = 34
+
+    defaultConfig {
+        applicationId = "com.ejemplo.miapp"
+        minSdk = 24
+        targetSdk = 34
+        versionCode = 1
+        versionName = "1.0"
+    }
+
+    buildFeatures {
+        viewBinding = true
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    kotlinOptions {
+        jvmTarget = "17"
+    }
+}
+
+dependencies {
+    implementation("androidx.core:core-ktx:1.12.0")
+    implementation("androidx.appcompat:appcompat:1.6.1")
+    implementation("com.google.android.material:material:1.11.0")
+    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
+}
+EOF
+```
+
+Crear `gradle.properties`:
+```bash
+cat > gradle.properties << 'EOF'
+android.useAndroidX=true
+org.gradle.jvmargs=-Xmx1536m
+org.gradle.daemon=true
+org.gradle.parallel=true
+EOF
+```
+
+Crear `local.properties` (ajustar la ruta del SDK según su sistema):
+```bash
+# Linux/macOS:
+echo "sdk.dir=$HOME/Android/sdk" > local.properties
+
+# Windows (en Git Bash):
+# echo "sdk.dir=C\:\\\\Android\\\\sdk" > local.properties
+```
+
+Crear `app/src/main/AndroidManifest.xml`:
+```bash
+cat > app/src/main/AndroidManifest.xml << 'EOF'
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application
+        android:allowBackup="true"
+        android:label="Mi App"
+        android:theme="@style/Theme.MaterialComponents.Light.NoActionBar">
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>
+EOF
+```
+
+Crear `app/src/main/res/values/strings.xml`:
+```bash
+cat > app/src/main/res/values/strings.xml << 'EOF'
+<resources>
+    <string name="app_name">Mi App</string>
+</resources>
+EOF
+```
+
+Crear `app/src/main/res/layout/activity_main.xml`:
+```bash
+cat > app/src/main/res/layout/activity_main.xml << 'EOF'
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:gravity="center">
+
+    <TextView
+        android:id="@+id/tvTitulo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Hola Mundo"
+        android:textSize="24sp" />
+</LinearLayout>
+EOF
+```
+
+Crear `app/src/main/java/com/ejemplo/miapp/MainActivity.kt`:
+```bash
+cat > app/src/main/java/com/ejemplo/miapp/MainActivity.kt << 'EOF'
+package com.ejemplo.miapp
+
+import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
+import com.ejemplo.miapp.databinding.ActivityMainBinding
+
+class MainActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityMainBinding
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+        binding.tvTitulo.text = "Funciona desde VS Code"
+    }
+}
+EOF
+```
+
+Inicializar el Gradle Wrapper (necesitan tener Gradle instalado una vez para esto):
+```bash
+# Si tienen Gradle instalado:
+gradle wrapper --gradle-version 8.2
+
+# Si NO tienen Gradle, descargar el wrapper manualmente:
+# Ir a https://gradle.org/releases/ y descargar la versión 8.2
+# O copiar los archivos gradle/wrapper/ de cualquier proyecto Android existente
+```
+
+Compilar:
+```bash
 ./gradlew assembleDebug
 ```
 
-Si el repositorio no está disponible, pueden crear el proyecto en la computadora de un compañero que tenga Android Studio y luego pasarlo por USB o subirlo a GitHub.
+La primera vez va a tardar varios minutos porque descarga Gradle, los plugins y todas las dependencias. Las siguientes compilaciones son mucho más rápidas.
 
-**Opción B: Crear un proyecto en Android Studio de alguien más**
+Si todo salió bien, el APK queda en `app/build/outputs/apk/debug/app-debug.apk`.
 
-1. Pedirle a un compañero que cree el proyecto en Android Studio (Empty Views Activity, Kotlin, API 24)
-2. Que lo suba a un repositorio de GitHub
-3. Clonarlo en su máquina
-4. Abrirlo con VS Code
+**Opción B: Usar un proyecto creado por un compañero**
+
+Si lo anterior les parece mucho, la opción más práctica:
+
+1. Un compañero que tenga Android Studio crea el proyecto (Empty Views Activity, Kotlin, API 24)
+2. Lo sube a GitHub
+3. Ustedes lo clonan y lo abren con VS Code
+4. Compilan con `./gradlew assembleDebug`
 
 El proyecto ya viene con toda la configuración de Gradle. Solo necesitan el SDK para compilar.
+
+**Opción C: Clonar un proyecto plantilla**
+
+```bash
+git clone https://github.com/RichardBolanos/android-template-vscode.git MiApp
+cd MiApp
+./gradlew assembleDebug
+```
 
 #### Paso 5: Compilar y correr desde la terminal
 
@@ -2252,6 +2454,70 @@ adb devices
 
 Si no aparece, revisar que tengan los drivers USB del celular instalados (en Windows a veces hay que instalarlos manualmente).
 
+#### Paso 7: Genymotion como emulador alternativo (si no tienen celular físico)
+
+Si no tienen un celular Android para conectar por USB, hay una alternativa al emulador de Android Studio que consume menos recursos: **Genymotion Desktop**.
+
+Genymotion es un emulador Android basado en VirtualBox. Es más rápido que el emulador oficial en máquinas con poca RAM porque usa virtualización x86 en lugar de emular ARM. Tiene una versión gratuita para uso personal que funciona bien para lo que necesitamos.
+
+**Instalación:**
+
+1. Crear una cuenta gratuita en [genymotion.com](https://www.genymotion.com/)
+2. Ir a [la página de descarga](https://www.genymotion.com/download/) y descargar **Genymotion Desktop**
+   - En Windows y Linux viene con VirtualBox incluido (elegir el instalador "with VirtualBox")
+   - En macOS necesitan instalar VirtualBox por separado primero
+3. Instalar y abrir Genymotion
+4. Cuando pregunte por la licencia, elegir **"Personal Use"** (es gratis)
+5. Crear un dispositivo virtual: click en **"+"**, elegir uno (ej: Google Pixel con Android 11 o 12), y darle **Install**
+
+**Conectar Genymotion con su proyecto:**
+
+Genymotion se conecta por ADB, igual que un celular físico. Cuando el dispositivo virtual está corriendo:
+
+```bash
+# Verificar que adb lo detecta
+adb devices
+# Debería mostrar algo como:
+# 192.168.56.101:5555    device
+
+# Instalar la app
+./gradlew installDebug
+# o manualmente:
+adb install app/build/outputs/apk/debug/app-debug.apk
+```
+
+Si `adb devices` no muestra el dispositivo de Genymotion, hay que configurar la ruta del ADB dentro de Genymotion:
+
+1. En Genymotion ir a **Settings → ADB**
+2. Seleccionar **"Use custom Android SDK tools"**
+3. Poner la ruta de su SDK:
+   - Windows: `C:\Android\sdk` (o donde lo hayan instalado)
+   - Linux: `/home/usuario/Android/sdk`
+   - macOS: `/Users/usuario/Library/Android/sdk`
+4. Reiniciar el dispositivo virtual
+
+**Si usan Android Studio (no VS Code):**
+
+Genymotion tiene un plugin para Android Studio que agrega un botón directo en la barra de herramientas:
+
+1. En Android Studio: **File → Settings → Plugins → Marketplace**
+2. Buscar **"Genymotion"** e instalar
+3. Reiniciar Android Studio
+4. Aparece un ícono de Genymotion en la barra. Click ahí para iniciar un dispositivo
+5. El dispositivo aparece en la lista de targets cuando le dan Run
+
+**¿Cuánta RAM consume?**
+
+Genymotion con un dispositivo virtual consume entre 1-2GB de RAM. Es menos que el emulador oficial (~2-4GB), pero sigue siendo bastante. Si tienen 4GB de RAM total, va a ir justo. Con 6GB funciona bien.
+
+**Limitaciones de la versión gratuita:**
+- No tiene Google Play Store (pueden instalar APKs manualmente arrastrándolos al emulador)
+- No tiene todos los sensores (GPS, acelerómetro limitados)
+- Solo para uso personal, no comercial
+- No tiene las versiones más recientes de Android
+
+Para lo que necesitamos en el curso (probar apps con UI, listas, APIs, Room), funciona perfecto.
+
 #### Flujo de trabajo diario
 
 Una vez que tienen todo configurado, el flujo es:
@@ -2276,12 +2542,14 @@ Sin Android Studio no tienen el editor de arrastrar y soltar para los layouts. P
 
 ### Resumen: ¿Qué necesito según mi hardware?
 
-| RAM del PC | Opción recomendada | Emulador |
-|------------|-------------------|----------|
-| 8GB+ | Android Studio normal | Sí, funciona bien |
-| 6GB | Android Studio + celular físico | Mejor no, va lento |
-| 4GB | VS Code + SDK terminal + celular físico | No, imposible |
-| 2GB | Kotlin Playground (solo sintaxis) | No |
+| RAM del PC | IDE | Emulador | Dispositivo de prueba |
+|------------|-----|----------|----------------------|
+| 8GB+ | Android Studio | Emulador oficial o Genymotion | Emulador o celular físico |
+| 6GB | Android Studio | Genymotion (más ligero) | Genymotion o celular físico |
+| 4GB | VS Code + terminal | No usar emulador | Celular físico por USB |
+| 2-3GB | VS Code + terminal | No | Celular físico (si compila) |
+
+Si no tienen celular Android ni RAM para emulador, la última opción es pedirle a un compañero que les preste el celular para probar, o trabajar en parejas.
 
 ### Problemas comunes
 
