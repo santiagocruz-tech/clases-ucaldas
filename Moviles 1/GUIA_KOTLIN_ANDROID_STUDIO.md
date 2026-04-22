@@ -1,7 +1,7 @@
 # Guía de Kotlin y Android Studio — Desde Cero
 ## Continuación del curso · Ingeniería de Informática
 
-**Requisitos previos:** Haber completado la guía de Flutter (readme.md) y el taller introductorio de Android Studio con Kotlin. Tener Android Studio instalado y funcionando.
+**Requisitos previos:** Haber completado la guía de Flutter (readme.md) y el taller introductorio de Android Studio con Kotlin. Tener instalado alguno de estos: Android Studio, IntelliJ IDEA Community, o VS Code con el SDK de Android (ver sección 0).
 
 ---
 
@@ -613,11 +613,13 @@ Esto ya lo vieron en el taller, pero vale la pena tenerlo como referencia.
 
 ### Antes que nada: verificar que el SDK está bien
 
-Este es el problema más común. Abren Android Studio, crean un proyecto, le dan Run y no pasa nada, o sale un error raro. Casi siempre es porque el SDK no se instaló completo o le falta algún componente.
+Este es el problema más común. Abren el IDE, crean un proyecto, le dan Run (o `./gradlew installDebug` en terminal) y no pasa nada, o sale un error raro. Casi siempre es porque el SDK no se instaló completo o le falta algún componente.
 
-#### Verificar desde Android Studio
+#### Verificar desde Android Studio o IntelliJ IDEA
 
-Ir a **File → Settings → Languages & Frameworks → Android SDK** (en macOS: **Android Studio → Settings → ...**).
+Ir a **File → Settings → Languages & Frameworks → Android SDK** (en macOS: **Android Studio → Settings → ...** o **IntelliJ IDEA → Settings → ...**).
+
+Si usan **VS Code**, no tienen esta pantalla. Salten directo a "Verificar desde la terminal".
 
 En la pestaña **SDK Platforms**, verificar que tengan al menos una versión instalada (el checkbox marcado). Recomendado: **Android 14.0 (API 34)**. Si no hay ninguna marcada, marcarla y darle **Apply**.
 
@@ -634,7 +636,7 @@ Si falta alguno, marcarlo y darle **Apply**. Va a descargar lo que falte.
 
 #### Verificar desde la terminal
 
-Abrir una terminal (en Android Studio: **View → Tool Windows → Terminal**) y correr:
+Abrir una terminal (en Android Studio o IntelliJ: **View → Tool Windows → Terminal**, en VS Code: `` Ctrl + ` ``) y correr:
 
 ```bash
 # Ver dónde está el SDK
@@ -643,7 +645,7 @@ echo $ANDROID_HOME
 echo %ANDROID_HOME%
 ```
 
-Si no muestra nada, el SDK no está configurado en las variables de entorno. Pueden ver la ruta del SDK en **File → Settings → Android SDK** arriba donde dice "Android SDK Location". Normalmente es:
+Si no muestra nada, el SDK no está configurado en las variables de entorno. Si usan Android Studio o IntelliJ, pueden ver la ruta del SDK en **File → Settings → Android SDK** arriba donde dice "Android SDK Location". Normalmente es:
 - Windows: `C:\Users\TuUsuario\AppData\Local\Android\Sdk`
 - macOS: `/Users/TuUsuario/Library/Android/sdk`
 - Linux: `/home/TuUsuario/Android/Sdk`
@@ -667,7 +669,7 @@ Si `adb` no se encuentra, es porque `platform-tools` no está instalado o no est
 Esto es otro clásico. Gradle se niega a compilar porque no aceptaron las licencias del SDK:
 
 ```bash
-# Desde la terminal de Android Studio o cualquier terminal:
+# Desde la terminal del IDE o cualquier terminal:
 sdkmanager --licenses
 # Responder 'y' a todo lo que pregunte
 ```
@@ -685,7 +687,7 @@ C:\Users\TuUsuario\AppData\Local\Android\Sdk\cmdline-tools\latest\bin\sdkmanager
 
 Esto significa que no tienen ni emulador ni celular conectado. Dos opciones:
 
-**Opción A: Crear un emulador**
+**Opción A: Crear un emulador (solo Android Studio)**
 1. En Android Studio ir a **Device Manager** (icono de celular en la barra lateral derecha)
 2. Click en **Create Device**
 3. Elegir un dispositivo (Pixel 6 está bien)
@@ -699,7 +701,7 @@ Si el emulador no arranca o va muy lento, probablemente necesitan activar la vir
 2. Volver a Ajustes → **Opciones de desarrollador → Activar "Depuración USB"**
 3. Conectar por USB
 4. Aceptar la autorización que aparece en la pantalla del celular
-5. En Android Studio debería aparecer el nombre del celular arriba junto al botón de Run
+5. En Android Studio debería aparecer el nombre del celular arriba junto al botón de Run. En IntelliJ o VS Code, verificar con `adb devices` en la terminal.
 
 Si no aparece, verificar con:
 ```bash
@@ -719,11 +721,13 @@ Si la lista está vacía, probar otro cable USB (algunos cables solo cargan, no 
 | `adb` no encontrado | platform-tools no instalado o no en PATH | Instalar desde SDK Tools |
 | El celular no aparece | Cable malo o drivers faltantes | Probar otro cable, instalar drivers |
 
-Si después de todo esto sigue sin funcionar, revisen la sección 15 de esta guía donde se explica cómo desarrollar sin Android Studio usando VS Code y la terminal.
+Si después de todo esto sigue sin funcionar, revisen la sección 0 de esta guía donde se explica cómo desarrollar con VS Code o IntelliJ IDEA como alternativa.
 
 ### Crear un proyecto
 
-**File → New → New Project → Empty Views Activity**
+**En Android Studio:** File → New → New Project → Empty Views Activity
+
+**En IntelliJ IDEA o VS Code:** Clonar un proyecto existente o crearlo desde terminal (ver sección 0, Paso 4).
 
 - Language: Kotlin
 - Minimum SDK: API 24
@@ -756,6 +760,10 @@ android {
     }
 }
 ```
+
+Después de modificar `build.gradle.kts`, hay que sincronizar Gradle:
+- **Android Studio / IntelliJ:** Click en **"Sync Now"** en la barra amarilla que aparece arriba, o **File → Sync Project with Gradle Files**
+- **VS Code / Terminal:** Correr `./gradlew build` o simplemente compilar con `./gradlew assembleDebug` (sincroniza automáticamente)
 
 Y en la Activity:
 
@@ -1193,7 +1201,7 @@ Es el layout más flexible. Posiciona las vistas con restricciones relativas (a 
 
 Las restricciones se leen así: `constraintTop_toBottomOf="@id/tvTitulo"` significa "mi borde superior va pegado al borde inferior de tvTitulo". Cuando usen `0dp` en el ancho, la vista se estira según las restricciones laterales.
 
-Android Studio tiene un editor visual para ConstraintLayout (la pestaña **Design**). Pueden arrastrar las vistas y conectarlas con el mouse, aunque a veces es más rápido escribir el XML directamente.
+Android Studio tiene un editor visual para ConstraintLayout (la pestaña **Design**) donde pueden arrastrar las vistas y conectarlas con el mouse. Si usan IntelliJ o VS Code no tienen ese editor, pero pueden escribir el XML directamente — a veces es más rápido de todas formas.
 
 ### ScrollView
 
@@ -1304,9 +1312,15 @@ En Flutter usaban `Navigator.push()` y `Navigator.pop()`. En Android se navega e
 
 ### Crear una nueva Activity
 
-Click derecho en el paquete → **New → Activity → Empty Views Activity** → Nombre: `DetalleActivity`
+**En Android Studio:** Click derecho en el paquete → **New → Activity → Empty Views Activity** → Nombre: `DetalleActivity`. Esto crea automáticamente el archivo Kotlin, el XML del layout, y la registra en el `AndroidManifest.xml`.
 
-Esto crea automáticamente el archivo Kotlin, el XML del layout, y la registra en el `AndroidManifest.xml`.
+**En IntelliJ IDEA o VS Code:** Hay que crear los archivos manualmente:
+1. Crear `DetalleActivity.kt` en la carpeta del paquete (`app/src/main/java/com/ejemplo/miapp/`)
+2. Crear `activity_detalle.xml` en `app/src/main/res/layout/`
+3. Registrar la Activity en `AndroidManifest.xml` agregando dentro de `<application>`:
+```xml
+<activity android:name=".DetalleActivity" />
+```
 
 ### Navegar a otra pantalla
 
@@ -2671,7 +2685,7 @@ Para los que vienen de la guía de Flutter, esta tabla les ayuda a mapear lo que
 | http / dio | Retrofit |
 | async / await | Coroutines (suspend / launch) |
 | pubspec.yaml | build.gradle.kts |
-| flutter run | Shift + F10 |
+| flutter run | `Shift + F10` (Android Studio/IntelliJ) o `./gradlew installDebug` (VS Code) |
 | Hot Reload | Apply Changes (más limitado) |
 
 ---
@@ -2690,7 +2704,9 @@ Para los que vienen de la guía de Flutter, esta tabla les ayuda a mapear lo que
 
 ---
 
-## Atajos de Android Studio
+## Atajos del IDE
+
+**Android Studio / IntelliJ IDEA:**
 
 | Atajo | Qué hace |
 |-------|----------|
@@ -2703,3 +2719,16 @@ Para los que vienen de la guía de Flutter, esta tabla les ayuda a mapear lo que
 | `Ctrl + D` | Duplicar línea |
 | `Ctrl + /` | Comentar/descomentar |
 | `Shift + Shift` | Buscar cualquier cosa |
+
+**VS Code:**
+
+| Atajo | Qué hace |
+|-------|----------|
+| `` Ctrl + ` `` | Abrir terminal (para `./gradlew installDebug`) |
+| `Ctrl + Shift + P` | Paleta de comandos |
+| `Ctrl + P` | Buscar archivo |
+| `Ctrl + Shift + F` | Buscar en todo el proyecto |
+| `Ctrl + Space` | Autocompletar (limitado para Kotlin) |
+| `Alt + Shift + F` | Formatear archivo |
+| `Ctrl + /` | Comentar/descomentar |
+| `Ctrl + D` | Seleccionar siguiente ocurrencia |
