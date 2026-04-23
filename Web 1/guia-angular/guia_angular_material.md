@@ -1,209 +1,72 @@
-# Angular — Guía Completa desde Cero
+# Angular — Aprende Construyendo
 
-**Enfoque:** aprender Angular de forma progresiva, asumiendo que el estudiante ya domina HTML, CSS, JavaScript y consumo de APIs con fetch.
-Este material está diseñado para que los estudiantes:
+## Proyecto: CineExplorer 🎬
 
-1. Comprendan **la arquitectura y filosofía de Angular**.
-2. Aprendan a **construir aplicaciones reales** con componentes, servicios, routing y formularios.
-3. Dominen **el consumo de APIs con HttpClient** y programación reactiva con RxJS.
-4. Apliquen **buenas prácticas** de organización, tipado y despliegue.
+Esta guía enseña Angular desde cero hasta nivel avanzado a través de **un único proyecto** que crece de forma incremental: una app de exploración de películas llamada **CineExplorer**, que consume la API pública de TMDB (The Movie Database).
 
-El curso mantiene un equilibrio aproximado de **40% teoría y 60% práctica**.
-
-Cada sección incluye explicaciones conceptuales, ejemplos de código funcionales y ejercicios progresivos.
+Cada capítulo agrega funcionalidad real al proyecto. Cada línea de código está comentada. La dificultad sube gradualmente desde "Hola Angular" hasta una app completa con arquitectura profesional, consumo de APIs, programación reactiva y tema claro/oscuro.
 
 ---
 
-# Contenido del curso
+## ¿Qué vamos a construir?
 
-## 0. Prerequisitos y entorno de desarrollo
+**CineExplorer** es una app web donde el usuario puede:
+- Explorar películas populares, mejor valoradas y próximos estrenos
+- Ver el detalle completo de cada película (sinopsis, reparto, puntuación)
+- Buscar películas en tiempo real con debounce
+- Guardar películas como favoritas (persistidas en localStorage)
+- Filtrar películas por género
+- Alternar entre tema claro y oscuro
+- Navegar entre secciones sin recargar la página (SPA)
 
-> 📄 [material/00_prerequisitos.md](material/00_prerequisitos.md)
-
-- Checklist de conocimientos previos (HTML, CSS, JS, TypeScript básico)
-- Instalación de Node.js y npm
-- Instalación de Angular CLI
-- Configuración del editor (VS Code + extensiones recomendadas)
-- Crear y ejecutar el primer proyecto Angular
-- Estructura de archivos de un proyecto Angular
-- Comandos esenciales de Angular CLI
-
----
-
-## 1. TypeScript para Angular
-
-> 📄 [material/01_typescript.md](material/01_typescript.md)
-
-- ¿Por qué TypeScript?
-- Tipos básicos: string, number, boolean, array, any, unknown
-- Interfaces y types
-- Clases con tipado
-- Enums
-- Generics básicos
-- Módulos (import/export)
-- Decoradores: qué son y por qué Angular los usa
-- Ejercicios
+Al final del curso tendrán una app funcional y desplegable que demuestra todos los conceptos fundamentales de Angular.
 
 ---
 
-## 2. Componentes
+## Índice de capítulos
 
-> 📄 [material/02_componentes.md](material/02_componentes.md)
-
-- ¿Qué es un componente en Angular?
-- Anatomía: decorator, clase, template, estilos
-- Crear componentes con Angular CLI
-- Data binding: interpolación, property binding, event binding, two-way binding
-- Directivas estructurales: @if, @for, @switch (nueva sintaxis)
-- Directivas de atributo: ngClass, ngStyle
-- Ciclo de vida de un componente (OnInit, OnDestroy, OnChanges)
-- Ejercicios
-
----
-
-## 3. Comunicación entre componentes
-
-> 📄 [material/03_comunicacion_componentes.md](material/03_comunicacion_componentes.md)
-
-- @Input(): pasar datos de padre a hijo
-- @Output() y EventEmitter: emitir eventos de hijo a padre
-- Componentes inteligentes vs. componentes de presentación
-- Proyección de contenido con ng-content
-- ViewChild para acceder a componentes hijos
-- Ejercicios
+| # | Capítulo | Qué se aprende | Qué se agrega al proyecto |
+|---|---------|----------------|--------------------------|
+| 00 | [Prerequisitos y entorno](material/00_prerequisitos.md) | Node.js, Angular CLI, VS Code, primer proyecto | Proyecto CineExplorer creado |
+| 01 | [TypeScript para Angular](material/01_typescript.md) | Tipos, interfaces, clases, enums, generics | Interfaces de Movie, Genre, Credits |
+| 02 | [Componentes](material/02_componentes.md) | Data binding, directivas, ciclo de vida | Componente MovieCard, página Home |
+| 03 | [Comunicación entre componentes](material/03_comunicacion_componentes.md) | @Input, @Output, smart vs dumb components | MovieCard recibe datos, emite favorito |
+| 04 | [Servicios e inyección de dependencias](material/04_servicios.md) | Servicios, singleton, separar lógica | TmdbService, FavoritesService |
+| 05 | [Routing y navegación](material/05_routing.md) | Rutas, parámetros, lazy loading, guards | Navbar, páginas Home, Detalle, Favoritos |
+| 06 | [Consumo de APIs con HttpClient](material/06_httpclient.md) | GET, tipado, errores, interceptores | Datos reales de TMDB en la app |
+| 07 | [Programación reactiva con RxJS](material/07_rxjs.md) | Observables, operadores, BehaviorSubject | Buscador con debounce, favoritos reactivos |
+| 08 | [Formularios](material/08_formularios.md) | Reactive forms, validación, FormArray | Formulario de reseña de película |
+| 09 | [Pipes](material/09_pipes.md) | Pipes built-in y personalizados | TruncatePipe, TmdbImagePipe, StarsPipe |
+| 10 | [Persistencia con localStorage](material/10_localstorage.md) | StorageService, BehaviorSubject, tema | Favoritos y tema persistidos |
+| 11 | [Estilos, temas y Bootstrap](material/11_estilos_bootstrap.md) | Bootstrap, variables CSS, tema oscuro, animaciones | Diseño completo con tema claro/oscuro |
+| 12 | [Arquitectura y buenas prácticas](material/12_arquitectura.md) | core/shared/features, environments, deploy | Proyecto reorganizado y desplegable |
+| 13 | [Proyecto final y evaluación](material/13_proyecto_final.md) | Integración, rúbrica, checklist | App terminada y pulida |
 
 ---
 
-## 4. Servicios e inyección de dependencias
+## Requisitos previos
 
-> 📄 [material/04_servicios.md](material/04_servicios.md)
-
-- ¿Qué es un servicio y por qué usarlos?
-- Crear servicios con Angular CLI
-- providedIn: 'root' y el patrón singleton
-- Inyección de dependencias en el constructor
-- Separar lógica de negocio de los componentes
-- Ejemplo práctico: servicio de carrito de compras
-- Ejercicios
+- HTML semántico, CSS (Flexbox, Grid, media queries)
+- JavaScript: variables, funciones, arrays, objetos, destructuring, async/await, fetch
+- Bootstrap básico (grid, componentes)
+- Git básico (clone, add, commit, push)
 
 ---
 
-## 5. Routing y navegación
+## Cómo usar esta guía
 
-> 📄 [material/05_routing.md](material/05_routing.md)
-
-- Configuración de rutas en app.routes.ts
-- RouterLink y RouterOutlet
-- Rutas con parámetros (:id)
-- Query params
-- Redirecciones y ruta wildcard (**)
-- Lazy loading de rutas
-- Guards: proteger rutas con canActivate
-- Ejercicios
+1. **Sigan el orden.** Cada capítulo depende del anterior.
+2. **Escriban el código ustedes mismos.** No copien y peguen.
+3. **Lean los comentarios.** Cada línea tiene una explicación de por qué está ahí.
+4. **Compilen después de cada cambio.** `ng serve` muestra errores en tiempo real.
+5. **Si algo falla,** lean el error completo en la terminal. Angular da mensajes claros.
 
 ---
 
-## 6. Consumo de APIs con HttpClient
+## Convenciones de esta guía
 
-> 📄 [material/06_httpclient.md](material/06_httpclient.md)
-
-- Configurar HttpClient en Angular
-- GET, POST, PUT, DELETE
-- Tipar las respuestas con interfaces
-- Manejo de errores con catchError
-- Interceptores: agregar headers, tokens, logging
-- Estados de carga y feedback al usuario
-- Comparación: fetch nativo vs. HttpClient
-- Ejercicios
-
----
-
-## 7. Programación reactiva con RxJS
-
-> 📄 [material/07_rxjs.md](material/07_rxjs.md)
-
-- ¿Qué es un Observable?
-- Observable vs. Promise
-- Operadores esenciales: map, filter, tap, switchMap, mergeMap
-- debounceTime y distinctUntilChanged para búsquedas
-- Subject y BehaviorSubject
-- Suscripciones y cómo evitar memory leaks (takeUntilDestroyed, async pipe)
-- Ejercicios
-
----
-
-## 8. Formularios
-
-> 📄 [material/08_formularios.md](material/08_formularios.md)
-
-- Template-driven forms vs. Reactive forms
-- Reactive forms: FormControl, FormGroup, FormBuilder
-- Validaciones built-in (required, minLength, pattern)
-- Validaciones personalizadas
-- Mostrar mensajes de error
-- Formularios dinámicos con FormArray
-- Ejercicios
-
----
-
-## 9. Pipes
-
-> 📄 [material/09_pipes.md](material/09_pipes.md)
-
-- Pipes built-in: date, currency, uppercase, lowercase, json, async
-- Crear pipes personalizados
-- Pipes puros vs. impuros
-- Pipe para truncar texto
-- Pipe para transformar URLs de imágenes
-- Ejercicios
-
----
-
-## 10. Persistencia con localStorage
-
-> 📄 [material/10_localstorage.md](material/10_localstorage.md)
-
-- localStorage en Angular: cuándo y cómo usarlo
-- Servicio wrapper para localStorage
-- Guardar y recuperar objetos (JSON.parse/stringify con try/catch)
-- Persistir favoritos y preferencias de usuario
-- Persistir tema claro/oscuro
-- Ejercicios
-
----
-
-## 11. Estilos, temas y Bootstrap en Angular
-
-> 📄 [material/11_estilos_bootstrap.md](material/11_estilos_bootstrap.md)
-
-- Estilos globales vs. estilos por componente (encapsulación)
-- Instalar y configurar Bootstrap en Angular
-- Variables CSS y sistema de temas (claro/oscuro)
-- Animaciones y transiciones CSS en componentes
-- @media (prefers-reduced-motion) y accesibilidad
-- Ejercicios
-
----
-
-## 12. Arquitectura y buenas prácticas
-
-> 📄 [material/12_arquitectura.md](material/12_arquitectura.md)
-
-- Organización de carpetas: core, shared, features
-- Componentes standalone vs. módulos (NgModule)
-- Barrel exports (index.ts)
-- Ambientes (environment.ts) para API keys
-- Build de producción y despliegue
-- Checklist de calidad de un proyecto Angular
-
----
-
-## 13. Proyecto integrador y evaluación
-
-> 📄 [material/13_proyecto_final.md](material/13_proyecto_final.md)
-
-- Descripción del proyecto final (CineExplorer con TMDB API)
-- Requerimientos funcionales y rúbrica de evaluación
-- Guía paso a paso para arrancar el proyecto
-- Recomendaciones y errores comunes
-- Escala de calificación
+- 📁 indica que hay que crear un archivo nuevo
+- ✏️ indica que hay que modificar un archivo existente
+- 🔧 indica configuración o dependencias
+- ▶️ indica que hay que compilar y probar
+- 💡 indica un tip o nota importante

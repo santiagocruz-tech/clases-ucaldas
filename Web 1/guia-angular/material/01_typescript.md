@@ -1,269 +1,364 @@
-# 1. TypeScript para Angular
+# Capítulo 1: TypeScript para Angular
 
-## ¿Por qué TypeScript?
+## Objetivo
+
+Aprender la sintaxis de TypeScript que necesitamos para Angular. Al final de este capítulo, habremos creado las interfaces que representan los datos de la API de TMDB para CineExplorer.
+
+---
+
+## 1.1 ¿Por qué TypeScript?
 
 Angular está escrito en TypeScript y obliga a usarlo. TypeScript es JavaScript con tipos. Las ventajas:
 
-- El editor detecta errores **antes** de ejecutar el código.
-- Autocompletado inteligente (sabés qué propiedades tiene un objeto).
-- Código más legible y mantenible en equipos.
-- Refactorización segura.
+- El editor detecta errores **antes** de ejecutar el código
+- Autocompletado inteligente (saben qué propiedades tiene un objeto)
+- Código más legible y mantenible en equipos
+- Refactorización segura
 
 TypeScript compila a JavaScript. El navegador nunca ejecuta TypeScript directamente.
 
 ---
 
-## Tipos básicos
+## 1.2 Tipos básicos
 
 ```typescript
-// Tipos primitivos
-let nombre: string = "Ana";
-let edad: number = 25;
-let activo: boolean = true;
+// Tipos primitivos — se declaran con : después del nombre
+let nombre: string = "CineExplorer";  // texto
+let anio: number = 2024;              // número (entero o decimal)
+let activo: boolean = true;           // verdadero o falso
 
-// Arrays
-let numeros: number[] = [1, 2, 3];
-let nombres: string[] = ["Ana", "Luis"];
-let mixto: Array<number> = [1, 2, 3]; // Sintaxis alternativa
+// Arrays — se declaran con tipo[]
+let generos: string[] = ["Acción", "Comedia", "Drama"];  // array de strings
+let puntuaciones: number[] = [8.5, 7.2, 9.1];           // array de números
 
-// Any — evitar siempre que sea posible
+// any — evitar siempre que sea posible
+// Desactiva el tipado, perdemos las ventajas de TypeScript
 let cualquierCosa: any = "hola";
-cualquierCosa = 42; // No da error, pero perdés el tipado
+cualquierCosa = 42;  // no da error, pero es peligroso
 
-// Unknown — más seguro que any
+// unknown — más seguro que any
+// Obliga a verificar el tipo antes de usarlo
 let dato: unknown = "hola";
-// dato.toUpperCase(); // ERROR: hay que verificar el tipo primero
+// dato.toUpperCase();  // ERROR: hay que verificar el tipo primero
 if (typeof dato === "string") {
-    dato.toUpperCase(); // OK
+  dato.toUpperCase();  // OK, TypeScript sabe que es string
 }
 
-// Void — funciones que no retornan nada
+// void — funciones que no retornan nada
 function saludar(): void {
-    console.log("Hola");
+  console.log("Hola");
+  // No tiene return
 }
-
-// Null y Undefined
-let nulo: null = null;
-let indefinido: undefined = undefined;
 ```
 
 ---
 
-## Interfaces
+## 1.3 Interfaces
 
 Las interfaces definen la forma de un objeto. Son fundamentales en Angular para tipar datos de APIs.
 
 ```typescript
-// Definir una interfaz
-interface Producto {
-    id: number;
-    nombre: string;
-    precio: number;
-    descripcion?: string;  // Propiedad opcional (?)
-    activo: boolean;
+// Definir una interfaz con la palabra clave "interface"
+// Cada propiedad tiene un nombre y un tipo
+interface Pelicula {
+  id: number;            // identificador único
+  title: string;         // título de la película
+  overview: string;      // sinopsis
+  poster_path: string;   // ruta de la imagen del póster
+  vote_average: number;  // puntuación promedio (0-10)
+  release_date: string;  // fecha de estreno como texto
+  genre_ids: number[];   // array de IDs de géneros
 }
 
-// Usar la interfaz
-const laptop: Producto = {
-    id: 1,
-    nombre: "Laptop Pro",
-    precio: 1500,
-    activo: true
-    // descripcion es opcional, no es obligatorio
+// Propiedad opcional: se agrega "?" después del nombre
+// No es obligatorio incluirla al crear el objeto
+interface PeliculaDetalle extends Pelicula {
+  // "extends" hereda todas las propiedades de Pelicula
+  runtime: number;          // duración en minutos
+  genres: Genero[];         // array de objetos Genero
+  budget: number;           // presupuesto
+  revenue: number;          // recaudación
+  tagline?: string;         // frase promocional (opcional)
+}
+
+// Interfaz para la respuesta paginada de la API
+interface PeliculaResponse {
+  page: number;              // página actual
+  results: Pelicula[];       // array de películas
+  total_pages: number;       // total de páginas disponibles
+  total_results: number;     // total de resultados
+}
+
+// Interfaz para géneros
+interface Genero {
+  id: number;      // ID del género
+  name: string;    // nombre del género ("Acción", "Comedia", etc.)
+}
+
+// Usar la interfaz para tipar una variable
+const miPelicula: Pelicula = {
+  id: 550,
+  title: "Fight Club",
+  overview: "Un oficinista insomne...",
+  poster_path: "/pB8BM7pdSp6B6Ih7QI4S2t0POoD.jpg",
+  vote_average: 8.4,
+  release_date: "1999-10-15",
+  genre_ids: [18, 53]
 };
 
-// Interfaz para respuesta de API
-interface ApiResponse {
-    results: Producto[];
-    total: number;
-    page: number;
-}
-
-// Función tipada
-function buscarProducto(id: number): Producto | undefined {
-    const productos: Producto[] = [laptop];
-    return productos.find(p => p.id === id);
+// Tipar parámetros y retorno de funciones
+function obtenerTitulo(pelicula: Pelicula): string {
+  return pelicula.title;
 }
 ```
 
 ---
 
-## Types
+## 1.4 Types
 
-Similar a interfaces pero con sintaxis diferente. Útiles para uniones y tipos complejos.
+Similar a interfaces pero con sintaxis diferente. Útiles para uniones y alias.
 
 ```typescript
-// Type alias
-type ID = number | string;
+// Type alias: un nombre corto para un tipo
+type ID = number | string;  // puede ser número o string
 
-// Unión de tipos
-type Estado = "activo" | "inactivo" | "pendiente";
-
-let estadoUsuario: Estado = "activo";
-// estadoUsuario = "eliminado"; // ERROR: no es un valor válido
+// Unión de tipos literales: solo acepta estos valores exactos
+type Tema = "light" | "dark";
+// let temaActual: Tema = "blue";  // ERROR: "blue" no es válido
 
 // Type para objetos (similar a interface)
 type Coordenada = {
-    x: number;
-    y: number;
+  x: number;
+  y: number;
 };
 ```
 
-### ¿Interface o Type?
-
-- Usar **interface** para definir la forma de objetos y datos de API.
-- Usar **type** para uniones, alias y tipos complejos.
-- En Angular, la convención es usar interfaces para modelos de datos.
+💡 **¿Interface o Type?** Usar `interface` para modelos de datos (películas, géneros, respuestas de API). Usar `type` para uniones y alias. En Angular, la convención es interfaces para modelos.
 
 ---
 
-## Clases con tipado
+## 1.5 Clases con tipado
 
 ```typescript
+// Clase con propiedades tipadas
 class Persona {
-    // Propiedades tipadas
-    nombre: string;
-    edad: number;
-    private email: string;
+  // Propiedades con tipo y visibilidad
+  nombre: string;          // pública por defecto
+  private email: string;   // solo accesible dentro de la clase
 
-    constructor(nombre: string, edad: number, email: string) {
-        this.nombre = nombre;
-        this.edad = edad;
-        this.email = email;
-    }
+  // Constructor: se ejecuta al crear una instancia con "new"
+  constructor(nombre: string, email: string) {
+    this.nombre = nombre;
+    this.email = email;
+  }
 
-    // Método tipado
-    saludar(): string {
-        return `Hola, soy ${this.nombre}`;
-    }
-
-    // Getter
-    get correo(): string {
-        return this.email;
-    }
+  // Método con tipo de retorno
+  saludar(): string {
+    return `Hola, soy ${this.nombre}`;
+  }
 }
 
-// Atajo del constructor (muy usado en Angular)
+// Atajo del constructor (muy usado en Angular para inyección de dependencias)
+// "public" y "private" en los parámetros crean las propiedades automáticamente
 class Estudiante {
-    constructor(
-        public nombre: string,
-        public edad: number,
-        private carrera: string
-    ) {}
-    // TypeScript crea las propiedades automáticamente
+  constructor(
+    public nombre: string,    // crea this.nombre automáticamente
+    public edad: number,      // crea this.edad automáticamente
+    private carrera: string   // crea this.carrera (privada) automáticamente
+  ) {}
+  // No necesitamos asignar this.nombre = nombre, TypeScript lo hace solo
 }
 
 const est = new Estudiante("Carlos", 20, "Ingeniería");
-console.log(est.nombre); // "Carlos"
+console.log(est.nombre);  // "Carlos"
+// console.log(est.carrera);  // ERROR: carrera es private
 ```
 
 ---
 
-## Enums
+## 1.6 Enums
 
 ```typescript
-enum Rol {
-    Admin = "ADMIN",
-    Usuario = "USUARIO",
-    Invitado = "INVITADO"
+// Enum: conjunto fijo de valores con nombre
+// Útil para categorías, estados, roles
+enum Categoria {
+  Accion = "ACTION",
+  Comedia = "COMEDY",
+  Drama = "DRAMA",
+  Terror = "HORROR",
+  SciFi = "SCI_FI"
 }
 
-let rolActual: Rol = Rol.Admin;
+// Uso
+let generoFavorito: Categoria = Categoria.Accion;
 
-// Uso en condicionales
-if (rolActual === Rol.Admin) {
-    console.log("Acceso total");
+// En condicionales
+if (generoFavorito === Categoria.Accion) {
+  console.log("Te gustan las películas de acción");
 }
 ```
 
 ---
 
-## Generics básicos
+## 1.7 Generics
 
 Los generics permiten crear funciones y clases que trabajan con cualquier tipo.
 
 ```typescript
-// Función genérica
+// Función genérica: <T> es un tipo que se define al llamar la función
+// Permite reutilizar la misma función con diferentes tipos
 function primero<T>(array: T[]): T | undefined {
-    return array[0];
+  return array[0];
 }
 
-const primerNumero = primero<number>([1, 2, 3]);    // number
-const primerTexto = primero<string>(["a", "b"]);     // string
+// TypeScript infiere el tipo automáticamente
+const primerNumero = primero([1, 2, 3]);        // tipo: number
+const primerTexto = primero(["a", "b", "c"]);   // tipo: string
 
 // Interface genérica (muy común para respuestas de API)
-interface Respuesta<T> {
-    data: T;
-    status: number;
-    mensaje: string;
+// T es un placeholder que se reemplaza al usar la interfaz
+interface RespuestaApi<T> {
+  data: T;          // los datos pueden ser de cualquier tipo
+  status: number;   // código HTTP
+  mensaje: string;  // mensaje descriptivo
 }
 
-// Uso
-const respuestaProductos: Respuesta<Producto[]> = {
-    data: [laptop],
-    status: 200,
-    mensaje: "OK"
+// Uso: especificar qué tipo es T
+const respuesta: RespuestaApi<Pelicula[]> = {
+  data: [miPelicula],
+  status: 200,
+  mensaje: "OK"
 };
 ```
 
 ---
 
-## Módulos (import/export)
+## 1.8 Módulos (import/export)
 
 ```typescript
-// archivo: models/producto.ts
-export interface Producto {
-    id: number;
-    nombre: string;
-    precio: number;
+// archivo: models/movie.ts
+// "export" hace que la interfaz esté disponible para otros archivos
+export interface Movie {
+  id: number;
+  title: string;
+  overview: string;
 }
 
-// archivo: services/producto.service.ts
-import { Producto } from '../models/producto';
+// archivo: services/tmdb.service.ts
+// "import" trae la interfaz desde otro archivo
+// La ruta es relativa al archivo actual
+import { Movie } from '../models/movie';
 
-export function obtenerProductos(): Producto[] {
-    return [];
+export function obtenerTitulo(movie: Movie): string {
+  return movie.title;
 }
 ```
 
 ---
 
-## Decoradores
+## 1.9 Decoradores
 
-Los decoradores son funciones que modifican clases, métodos o propiedades. Angular los usa en todo.
+Los decoradores son funciones especiales que modifican clases o propiedades. Angular los usa en todo.
 
 ```typescript
 // En Angular, los decoradores más comunes son:
-
-@Component({...})    // Marca una clase como componente
+@Component({...})    // Marca una clase como componente de UI
 @Injectable({...})   // Marca una clase como servicio inyectable
-@Input()             // Marca una propiedad como entrada de datos
-@Output()            // Marca una propiedad como salida de eventos
+@Input()             // Marca una propiedad como entrada de datos (padre → hijo)
+@Output()            // Marca una propiedad como salida de eventos (hijo → padre)
+@Pipe({...})         // Marca una clase como pipe (transformador de datos)
 
-// No necesitás crear decoradores propios.
-// Solo necesitás entender que son "etiquetas" que le dicen a Angular
-// qué rol tiene cada clase o propiedad.
+// No necesitan crear decoradores propios
+// Solo entender que son "etiquetas" que le dicen a Angular
+// qué rol tiene cada clase o propiedad
 ```
-
-No es necesario entender cómo funcionan internamente los decoradores. Solo saber que Angular los usa para configurar componentes, servicios y otras piezas.
 
 ---
 
-## Ejercicios
+## 1.10 Aplicar al proyecto: Interfaces de CineExplorer
 
-### Ejercicio 1: Interfaces para una API
-Crear las interfaces necesarias para tipar la respuesta de la PokeAPI:
-- `Pokemon` con: id, name, height, weight, sprites, types
-- `PokemonListResponse` con: count, results (array de {name, url})
+Vamos a crear las interfaces que usaremos en toda la app para tipar los datos de la API de TMDB.
 
-### Ejercicio 2: Clase con tipado
-Crear una clase `Carrito` con:
-- Propiedad privada `items: Producto[]`
-- Métodos: `agregar(producto: Producto): void`, `eliminar(id: number): void`, `total(): number`
-- Usar el atajo del constructor para alguna propiedad
+📁 Crear la carpeta `src/app/models/` y dentro el archivo `movie.ts`:
 
-### Ejercicio 3: Generics
-Crear una función genérica `filtrar<T>(array: T[], condicion: (item: T) => boolean): T[]` que filtre cualquier array según una condición.
+```typescript
+// src/app/models/movie.ts
+// Interfaces que representan los datos de la API de TMDB
+// Estas interfaces se usan en toda la app para tipar respuestas HTTP
 
-### Ejercicio 4: Enums y types
-Crear un enum `Categoria` con valores para una tienda (Electrónica, Ropa, Hogar, Deportes). Crear un type `FiltroProducto` que sea un objeto con `categoria: Categoria` y `precioMaximo: number`.
+// Película básica (lo que devuelve la lista de populares, búsqueda, etc.)
+export interface Movie {
+  id: number;               // ID único de la película en TMDB
+  title: string;            // título de la película
+  overview: string;         // sinopsis / descripción
+  poster_path: string;      // ruta relativa del póster (se concatena con base URL)
+  backdrop_path: string;    // ruta relativa de la imagen de fondo
+  vote_average: number;     // puntuación promedio (0 a 10)
+  release_date: string;     // fecha de estreno en formato "YYYY-MM-DD"
+  genre_ids: number[];      // array de IDs de géneros
+}
+
+// Respuesta paginada de la API (GET /movie/popular, GET /search/movie, etc.)
+export interface MovieResponse {
+  page: number;             // número de página actual
+  results: Movie[];         // array de películas de esta página
+  total_pages: number;      // total de páginas disponibles
+  total_results: number;    // total de resultados encontrados
+}
+
+// Detalle completo de una película (GET /movie/{id})
+export interface MovieDetail extends Movie {
+  runtime: number;          // duración en minutos
+  genres: Genre[];          // array de objetos género (no solo IDs)
+  budget: number;           // presupuesto en USD
+  revenue: number;          // recaudación en USD
+  tagline: string;          // frase promocional
+  original_language: string; // idioma original
+}
+
+// Género de película
+export interface Genre {
+  id: number;       // ID del género
+  name: string;     // nombre del género ("Action", "Comedy", etc.)
+}
+
+// Créditos de una película (GET /movie/{id}/credits)
+export interface Credits {
+  cast: CastMember[];   // actores
+  crew: CrewMember[];   // equipo técnico (director, etc.)
+}
+
+// Miembro del reparto (actor)
+export interface CastMember {
+  id: number;                  // ID del actor
+  name: string;                // nombre real
+  character: string;           // personaje que interpreta
+  profile_path: string | null; // foto del actor (puede ser null)
+}
+
+// Miembro del equipo técnico
+export interface CrewMember {
+  id: number;       // ID
+  name: string;     // nombre
+  job: string;      // rol ("Director", "Producer", etc.)
+}
+```
+
+---
+
+## Resumen de conceptos
+
+| Concepto | Para qué | Ejemplo |
+|----------|----------|---------|
+| Tipos básicos | Tipar variables | `let nombre: string = "Ana"` |
+| Interfaces | Definir forma de objetos | `interface Movie { id: number; ... }` |
+| Types | Uniones y alias | `type Tema = "light" \| "dark"` |
+| Clases | Agrupar datos y lógica | `class Persona { ... }` |
+| Enums | Conjunto fijo de valores | `enum Rol { Admin, User }` |
+| Generics | Funciones/clases reutilizables | `function primero<T>(arr: T[]): T` |
+| import/export | Compartir código entre archivos | `export interface Movie { ... }` |
+| Decoradores | Configurar clases para Angular | `@Component({...})` |
+
+---
+
+**Anterior:** [← Capítulo 0 — Prerequisitos](00_prerequisitos.md) | **Siguiente:** [Capítulo 2 — Componentes →](02_componentes.md)

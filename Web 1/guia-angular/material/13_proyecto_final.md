@@ -1,205 +1,147 @@
-# 13. Proyecto integrador y evaluación
+# Capítulo 13: Proyecto final — CineExplorer completa
 
-## Descripción del proyecto: CineExplorer
+## Objetivo
 
-Construir una aplicación web con Angular que permita explorar películas usando la API pública de TMDB (The Movie Database). La idea es aplicar todo lo visto en el curso.
+Integrar todo lo aprendido, pulir la app y tener una referencia completa del proyecto terminado.
 
-### API: TMDB
+---
+
+## 13.1 Lo que construimos
+
+A lo largo de 13 capítulos, construimos **CineExplorer** desde cero:
+
+| Funcionalidad | Capítulo | Tecnología |
+|---|---|---|
+| Proyecto base con Bootstrap | 00 | Angular CLI, Bootstrap |
+| Interfaces tipadas | 01 | TypeScript, interfaces |
+| Tarjeta de película | 02 | Componentes, data binding |
+| Datos del padre al hijo | 03 | @Input, @Output, EventEmitter |
+| Servicios de favoritos | 04 | Servicios, inyección de dependencias |
+| Navegación entre páginas | 05 | Routing, RouterLink, parámetros |
+| Datos reales de TMDB | 06 | HttpClient, interceptores |
+| Buscador con debounce | 07 | RxJS, BehaviorSubject, operadores |
+| Formulario de reseña | 08 | Reactive Forms, validación |
+| Pipes personalizados | 09 | TruncatePipe, TmdbImagePipe, StarsPipe |
+| Favoritos persistidos | 10 | localStorage, StorageService |
+| Tema claro/oscuro | 11 | Variables CSS, Bootstrap, animaciones |
+| Arquitectura profesional | 12 | core/shared/features, environments |
+
+---
+
+## 13.2 Estructura final del proyecto
+
+```
+cine-explorer/
+├── src/
+│   ├── app/
+│   │   ├── core/
+│   │   │   ├── services/
+│   │   │   │   ├── tmdb.service.ts          ← Consumo de API TMDB
+│   │   │   │   ├── favorites.service.ts     ← Favoritos con BehaviorSubject
+│   │   │   │   ├── theme.service.ts         ← Tema claro/oscuro
+│   │   │   │   └── storage.service.ts       ← Wrapper de localStorage
+│   │   │   ├── interceptors/
+│   │   │   │   └── api-key.interceptor.ts   ← Agrega API key automáticamente
+│   │   │   └── models/
+│   │   │       └── movie.ts                 ← Interfaces (Movie, Genre, Credits)
+│   │   ├── shared/
+│   │   │   ├── components/
+│   │   │   │   ├── movie-card/              ← Tarjeta de película reutilizable
+│   │   │   │   ├── navbar/                  ← Navbar con buscador y tema
+│   │   │   │   └── spinner/                 ← Indicador de carga
+│   │   │   └── pipes/
+│   │   │       ├── truncate.pipe.ts         ← Truncar texto largo
+│   │   │       ├── tmdb-image.pipe.ts       ← URLs de imágenes TMDB
+│   │   │       └── stars.pipe.ts            ← Puntuación → estrellas
+│   │   ├── features/
+│   │   │   ├── home/                        ← Página principal (populares)
+│   │   │   ├── movie-detail/                ← Detalle de película
+│   │   │   ├── search-results/              ← Resultados de búsqueda
+│   │   │   └── favorites/                   ← Películas favoritas
+│   │   ├── app.component.ts                 ← Componente raíz
+│   │   ├── app.routes.ts                    ← Definición de rutas
+│   │   └── app.config.ts                    ← Configuración (HttpClient, Router)
+│   ├── environments/
+│   │   ├── environment.ts                   ← Variables de desarrollo
+│   │   └── environment.prod.ts              ← Variables de producción
+│   ├── assets/
+│   │   └── no-image.png                     ← Imagen por defecto
+│   └── styles.scss                          ← Estilos globales y temas
+├── angular.json                             ← Configuración del proyecto
+├── package.json                             ← Dependencias
+└── tsconfig.json                            ← Configuración TypeScript
+```
+
+---
+
+## 13.3 API: TMDB
+
+### Obtener API key
 
 1. Crear cuenta en [https://www.themoviedb.org/signup](https://www.themoviedb.org/signup)
-2. Ir a Settings > API y solicitar una key (seleccionar "Developer")
+2. Ir a Settings → API y solicitar una key (seleccionar "Developer")
 3. Documentación: [https://developer.themoviedb.org/docs](https://developer.themoviedb.org/docs)
 
-### Endpoints necesarios
+### Endpoints usados
 
-| Endpoint | Para qué sirve |
+| Endpoint | Para qué |
 |---|---|
-| `GET /movie/popular` | Películas populares |
+| `GET /movie/popular` | Películas populares (Home) |
 | `GET /movie/top_rated` | Mejor valoradas |
-| `GET /movie/upcoming` | Próximos estrenos |
-| `GET /search/movie?query=...` | Buscar películas por nombre |
-| `GET /movie/{id}` | Detalle completo de una película |
+| `GET /search/movie?query=...` | Buscar películas |
+| `GET /movie/{id}` | Detalle de una película |
 | `GET /movie/{id}/credits` | Reparto (actores, director) |
-| `GET /movie/{id}/similar` | Películas parecidas |
 | `GET /genre/movie/list` | Catálogo de géneros |
 
-Las imágenes se arman concatenando `https://image.tmdb.org/t/p/w500` + el campo `poster_path` o `backdrop_path`.
+Las imágenes se arman: `https://image.tmdb.org/t/p/w500` + `poster_path`
 
 ---
 
-## Cómo arrancar
+## 13.4 Guía paso a paso para completar
 
-```bash
-ng new cine-explorer --style=scss --routing
-cd cine-explorer
-npm install bootstrap
-```
+### Semana 1: Base
+1. Crear proyecto con `ng new cine-explorer --style=scss --routing`
+2. Instalar Bootstrap y configurar en `angular.json`
+3. Crear interfaces en `models/movie.ts`
+4. Crear `TmdbService` con `obtenerPopulares()`
+5. Crear `MovieCardComponent` con @Input/@Output
+6. Crear `HomeComponent` que muestre películas reales
 
-En `angular.json`, dentro de `architect > build > options`:
-- En `styles`: `"node_modules/bootstrap/dist/css/bootstrap.min.css"` (antes de `src/styles.scss`)
-- En `scripts`: `"node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"`
+### Semana 2: Navegación y búsqueda
+1. Configurar rutas en `app.routes.ts`
+2. Crear `NavbarComponent` con RouterLink
+3. Crear `MovieDetailComponent` con parámetro `:id`
+4. Agregar buscador con debounce en el navbar
+5. Crear `SearchResultsComponent` con query params
 
-API key en `src/environments/environment.ts`:
-```typescript
-export const environment = {
-    tmdbApiKey: 'TU_KEY_ACÁ'
-};
-```
+### Semana 3: Favoritos y estilos
+1. Crear `FavoritesService` con BehaviorSubject + localStorage
+2. Crear vista `/favorites`
+3. Crear pipes: TruncatePipe, TmdbImagePipe, StarsPipe
+4. Definir variables CSS y tema oscuro
+5. Agregar animaciones y verificar responsive
 
-### Estructura sugerida
-
-```
-src/app/
-├── core/
-│   ├── services/
-│   │   ├── tmdb.service.ts
-│   │   ├── favorites.service.ts
-│   │   └── theme.service.ts
-│   ├── interceptors/
-│   │   └── auth.interceptor.ts
-│   └── models/
-│       ├── movie.ts
-│       ├── genre.ts
-│       └── credits.ts
-├── shared/
-│   ├── components/
-│   │   └── movie-card/
-│   └── pipes/
-│       ├── truncate.pipe.ts
-│       └── tmdb-image.pipe.ts
-├── features/
-│   ├── home/
-│   ├── movie-detail/
-│   ├── search-results/
-│   ├── favorites/
-│   └── genre-filter/
-├── app.component.ts
-├── app.routes.ts
-└── app.config.ts
-```
+### Semana 4: Pulir y entregar
+1. Reorganizar carpetas (core/shared/features)
+2. Configurar `environment.ts` con API key
+3. Crear interceptor para API key
+4. Verificar `ng build` sin errores
+5. Escribir README con instrucciones y capturas
+6. Desplegar en Netlify/Vercel/GitHub Pages
 
 ---
 
-## Guía paso a paso
-
-### Paso 1: Servicio HTTP (semana 1)
-1. Crear las interfaces en `core/models/`.
-2. Crear `TmdbService` con un método (`obtenerPopulares`).
-3. Hacer `console.log` de la respuesta para entender la estructura.
-4. Crear el interceptor para agregar el token.
-
-### Paso 2: Tarjeta de película (semana 1)
-1. Crear `MovieCardComponent` en `shared/components/`.
-2. Recibe `Movie` por `@Input()`.
-3. Emite evento de favorito con `@Output()`.
-4. Crear los pipes `TruncatePipe` y `TmdbImagePipe`.
-
-### Paso 3: Routing y páginas (semana 2)
-1. Configurar rutas en `app.routes.ts`.
-2. Crear `HomeComponent` con las 3 secciones (popular, top rated, upcoming).
-3. Crear `MovieDetailComponent` con parámetro `:id`.
-4. Crear navbar con `RouterLink`.
-
-### Paso 4: Búsqueda (semana 2)
-1. Agregar buscador en el navbar con `FormControl`.
-2. Implementar `debounceTime` + `switchMap`.
-3. Crear `SearchResultsComponent` con query params.
-4. Agregar paginación.
-
-### Paso 5: Favoritos y géneros (semana 3)
-1. Crear `FavoritesService` con localStorage y BehaviorSubject.
-2. Crear vista `/favorites`.
-3. Crear vista `/genre/:id` con dropdown de géneros.
-4. Badge de contador en navbar.
-
-### Paso 6: Estilos y temas (semana 3)
-1. Definir variables CSS en `:root`.
-2. Implementar tema oscuro con `ThemeService`.
-3. Agregar animaciones (fadeInUp, hover, spinner).
-4. Verificar responsive en móvil, tablet y desktop.
-5. Agregar `prefers-reduced-motion`.
-
-### Paso 7: Pulir y entregar (semana 4)
-1. Verificar que `ng build` compila sin errores.
-2. Limpiar consola de errores y warnings.
-3. Probar en Chrome y Firefox.
-4. Escribir README con instrucciones y capturas.
-5. Verificar historial de commits.
-
----
-
-## Requerimientos y rúbrica de evaluación
-
-### Resumen de puntos por sección
-
-| # | Sección | Puntos |
-|---|---|---|
-| 1 | HTML semántico | 10 |
-| 2 | CSS — Layouts (Flexbox/Grid) | 10 |
-| 3 | CSS — Responsive design | 10 |
-| 4 | CSS — Animaciones y transiciones | 5 |
-| 5 | CSS — Variables y temas | 5 |
-| 6 | Bootstrap | 10 |
-| 7 | Consumo de API (HttpClient) | 8 |
-| 8 | Servicios y arquitectura | 6 |
-| 9 | Componentes y binding | 6 |
-| 10 | localStorage | 5 |
-| 11 | Routing y navegación | 5 |
-| 12 | Funcionalidades completas | 10 |
-| 13 | Calidad general | 10 |
-| | **Total** | **100** |
-
-### Escala de calificación por elemento
-
-| Nota | Qué significa |
-|---|---|
-| 0 | No está o no hay evidencia |
-| 1 | Intento mínimo, con errores graves o muy incompleto |
-| 2 | Funciona a medias o tiene problemas importantes |
-| 3 | Cumple lo básico pero le faltan cosas o tiene detalles |
-| 4 | Bien resuelto, cumple lo pedido con detalles menores |
-| 5 | Completo, correcto y se nota que se trabajó con cuidado |
-
-### Escala de aprobación
-
-| Puntaje | Resultado |
-|---|---|
-| 90 – 100 | Sobresaliente |
-| 80 – 89 | Notable |
-| 70 – 79 | Aprobado |
-| 60 – 69 | Aprobado con observaciones |
-| < 60 | No aprobado |
-
----
-
-## Penalizaciones
-
-- **Copia o código generado por IA sin comprensión:** si no pueden explicar su propio código en una revisión, la nota de los elementos afectados baja a 0.
-- **Entrega fuera de plazo:** se restan 5 puntos por cada día de retraso.
-- **No compila:** si `ng build` falla, la nota máxima posible es 50.
-
----
-
-## Qué entregar
-
-- Repositorio en GitHub/GitLab con historial de commits.
-- README.md dentro del proyecto con instrucciones y capturas.
-- La app debe compilar sin errores con `ng build`.
-- Debe funcionar en Chrome y Firefox.
-
----
-
-## Errores comunes
+## 13.5 Errores comunes
 
 1. **No tipar las respuestas de la API.** Usar `any` en vez de interfaces hace que el editor no ayude y los errores aparezcan en runtime.
 
 2. **Poner lógica de negocio en los componentes.** Los componentes deben ser delgados. La lógica va en servicios.
 
-3. **No limpiar suscripciones.** Usar `async` pipe o `takeUntilDestroyed()`. Nunca dejar `subscribe()` sin limpieza en componentes que se destruyen.
+3. **No limpiar suscripciones.** Usar `async` pipe o `takeUntilDestroyed()`. Nunca dejar `subscribe()` sin limpieza.
 
-4. **Dejar el responsive para el final.** Trabajar mobile first desde el principio. Es mucho más fácil que "arreglar" todo al final.
+4. **Dejar el responsive para el final.** Trabajar mobile first desde el principio.
 
-5. **Commits genéricos.** "fix", "update", "cambios" no dicen nada. Escribir qué se hizo: "feat: agregar búsqueda con debounce", "fix: corregir paginación en búsqueda".
+5. **Commits genéricos.** "fix", "update" no dicen nada. Escribir qué se hizo: "feat: agregar búsqueda con debounce".
 
 6. **No manejar errores HTTP.** La app no se puede romper si la API falla. Siempre mostrar un mensaje al usuario.
 
@@ -207,8 +149,51 @@ src/app/
 
 ---
 
-## Recomendaciones
+## 13.6 Equivalencias con JavaScript puro
 
-Empiecen por el servicio HTTP. Hagan un `console.log` de lo que devuelve la API y asegúrense de que entienden la estructura de los datos antes de armar las vistas. Después construyan la tarjeta de película, porque la van a usar en todas las páginas. Configuren el routing temprano para poder ir navegando entre vistas mientras desarrollan. Hagan commits seguido — si algo se rompe, pueden volver atrás.
+| JavaScript puro | Angular |
+|---|---|
+| `fetch()` | `HttpClient.get()` |
+| `document.querySelector()` | Data binding `{{ }}`, `[prop]` |
+| `addEventListener()` | Event binding `(click)` |
+| `innerHTML` | Interpolación `{{ }}` |
+| `<script src="...">` | `import { } from '...'` |
+| Funciones sueltas | Servicios con `@Injectable` |
+| `localStorage` directamente | `StorageService` wrapper |
+| CSS global | Estilos encapsulados por componente |
+| Múltiples HTML | Routing (SPA, una sola página) |
 
-**Cualquier duda, pregunten antes de la fecha de entrega. No el día anterior.**
+---
+
+## 13.7 Referencias
+
+- Documentación de Angular: [angular.dev](https://angular.dev)
+- TypeScript: [typescriptlang.org](https://www.typescriptlang.org)
+- RxJS: [rxjs.dev](https://rxjs.dev)
+- Bootstrap: [getbootstrap.com](https://getbootstrap.com)
+- TMDB API: [developer.themoviedb.org](https://developer.themoviedb.org)
+- Angular CLI: [angular.dev/tools/cli](https://angular.dev/tools/cli)
+
+---
+
+## Felicitaciones
+
+Si llegaron hasta aquí, tienen una base sólida en desarrollo web con Angular. Construyeron una app completa con:
+
+- Componentes reutilizables con @Input/@Output
+- Servicios con inyección de dependencias
+- Navegación SPA con routing y lazy loading
+- Consumo de API REST con HttpClient
+- Programación reactiva con RxJS y BehaviorSubject
+- Formularios reactivos con validación
+- Pipes personalizados
+- Persistencia con localStorage
+- Tema claro/oscuro con variables CSS
+- Arquitectura profesional (core/shared/features)
+- Diseño responsive con Bootstrap
+
+El siguiente paso es practicar. Tomen esta app y agréguenle funcionalidades: paginación, filtro por género, lista de "ver después", compartir en redes, PWA. Cada feature nueva refuerza lo aprendido.
+
+---
+
+**Anterior:** [← Capítulo 12 — Arquitectura](12_arquitectura.md) | **Inicio:** [Guía principal →](../guia_angular_material.md)

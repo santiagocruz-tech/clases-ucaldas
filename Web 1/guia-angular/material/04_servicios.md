@@ -1,272 +1,285 @@
-# 4. Servicios e inyección de dependencias
+# Capítulo 4: Servicios e inyección de dependencias
 
-## ¿Qué es un servicio y por qué usarlos?
+## Objetivo
 
-Un servicio es una clase que contiene lógica reutilizable que no pertenece a un componente específico. Ejemplos:
+Aprender a crear servicios para separar la lógica de negocio de los componentes. Al final de este capítulo, CineExplorer tendrá un `TmdbService` y un `FavoritesService`.
 
-- Llamadas HTTP a una API.
-- Manejo de favoritos en localStorage.
-- Lógica de autenticación.
-- Preferencias del usuario (tema, idioma).
+---
+
+## 4.1 ¿Qué es un servicio y por qué usarlos?
+
+Un servicio es una clase que contiene lógica reutilizable que no pertenece a un componente específico:
+
+- Llamadas HTTP a una API
+- Manejo de favoritos
+- Preferencias del usuario (tema, idioma)
+- Lógica de autenticación
 
 **Regla de oro:** los componentes muestran datos y manejan interacción del usuario. Los servicios manejan la lógica de negocio y los datos.
 
 ---
 
-## Crear servicios con Angular CLI
+## 4.2 Crear servicios con Angular CLI
 
 ```bash
+# Crear un servicio en la carpeta services/
 ng generate service services/tmdb
 ng g s services/tmdb    # Atajo
 ```
 
-Genera:
-```
-services/
-└── tmdb.service.ts
-```
-
 ---
 
-## Estructura de un servicio
+## 4.3 Estructura de un servicio
 
 ```typescript
 // services/tmdb.service.ts
+// Importar Injectable del core de Angular
 import { Injectable } from '@angular/core';
 
+// @Injectable marca esta clase como un servicio que puede ser inyectado
 @Injectable({
-    providedIn: 'root'  // Disponible en toda la aplicación
+  // providedIn: 'root' = disponible en toda la aplicación
+  // Angular crea UNA SOLA instancia (patrón Singleton)
+  // Todos los componentes que lo inyecten comparten la misma instancia
+  providedIn: 'root'
 })
 export class TmdbService {
-
-    private apiUrl = 'https://api.themoviedb.org/3';
-
-    obtenerPopulares(): void {
-        // Lógica para obtener películas populares
-    }
+  // URL base de la API de TMDB
+  private apiUrl = 'https://api.themoviedb.org/3';
+  // API key (después la moveremos a environment.ts)
+  private apiKey = 'TU_API_KEY_AQUI';
 }
 ```
-
-### ¿Qué es `providedIn: 'root'`?
-
-Le dice a Angular que cree **una sola instancia** del servicio para toda la aplicación (patrón Singleton). Todos los componentes que inyecten este servicio comparten la misma instancia y los mismos datos.
 
 ---
 
-## Inyección de dependencias
+## 4.4 Inyección de dependencias
 
-Para usar un servicio en un componente, se inyecta en el constructor:
+Para usar un servicio en un componente, se **inyecta**. Angular lo crea y lo pasa automáticamente.
+
+### Forma clásica: en el constructor
 
 ```typescript
 import { Component, OnInit } from '@angular/core';
+// Importar el servicio
 import { TmdbService } from '../../services/tmdb.service';
 
-@Component({
-    selector: 'app-home',
-    standalone: true,
-    templateUrl: './home.component.html'
-})
+@Component({ /* ... */ })
 export class HomeComponent implements OnInit {
+  // Angular inyecta el servicio automáticamente en el constructor
+  // "private" crea la propiedad this.tmdbService
+  constructor(private tmdbService: TmdbService) {}
 
-    peliculas: Movie[] = [];
-
-    // Angular crea e inyecta el servicio automáticamente
-    constructor(private tmdbService: TmdbService) {}
-
-    ngOnInit(): void {
-        // Usar el servicio
-        this.tmdbService.obtenerPopulares().subscribe(data => {
-            this.peliculas = data.results;
-        });
-    }
+  ngOnInit(): void {
+    // Usar el servicio
+    // this.tmdbService.obtenerPopulares()...
+  }
 }
 ```
 
-### Inyección moderna con `inject()`
-
-Angular 14+ permite inyectar sin constructor:
+### Forma moderna: con inject()
 
 ```typescript
 import { Component, OnInit, inject } from '@angular/core';
 import { TmdbService } from '../../services/tmdb.service';
 
-@Component({ ... })
+@Component({ /* ... */ })
 export class HomeComponent implements OnInit {
-    private tmdbService = inject(TmdbService);
-    peliculas: Movie[] = [];
+  // inject() inyecta el servicio sin necesidad de constructor
+  // Es más conciso y funciona igual
+  private tmdbService = inject(TmdbService);
 
-    ngOnInit(): void {
-        this.tmdbService.obtenerPopulares().subscribe(data => {
-            this.peliculas = data.results;
-        });
-    }
+  ngOnInit(): void {
+    // Usar el servicio igual que antes
+  }
 }
 ```
 
-Ambas formas son válidas. `inject()` es más concisa.
+💡 Ambas formas son válidas. `inject()` es más concisa y es la tendencia moderna.
 
 ---
 
-## Separar lógica de negocio de los componentes
+## 4.5 Aplicar al proyecto: FavoritesService
 
-### ❌ Mal: lógica en el componente
+Vamos a mover la lógica de favoritos del `AppComponent` a un servicio dedicado.
 
-```typescript
-export class FavoritesComponent {
-    favoritas: Movie[] = [];
+📁 Crear el servicio:
 
-    agregar(movie: Movie): void {
-        if (!this.favoritas.find(m => m.id === movie.id)) {
-            this.favoritas.push(movie);
-            localStorage.setItem('favoritas', JSON.stringify(this.favoritas));
-        }
-    }
-
-    eliminar(id: number): void {
-        this.favoritas = this.favoritas.filter(m => m.id !== id);
-        localStorage.setItem('favoritas', JSON.stringify(this.favoritas));
-    }
-
-    cargar(): void {
-        try {
-            const data = localStorage.getItem('favoritas');
-            this.favoritas = data ? JSON.parse(data) : [];
-        } catch {
-            this.favoritas = [];
-        }
-    }
-}
+```bash
+ng g s services/favorites --skip-tests
 ```
 
-### ✅ Bien: lógica en un servicio
+✏️ `src/app/services/favorites.service.ts`:
 
 ```typescript
-// services/favorites.service.ts
+// favorites.service.ts
+// Servicio que maneja las películas favoritas del usuario
+// Al ser singleton, todos los componentes comparten los mismos favoritos
+import { Injectable } from '@angular/core';
+import { Movie } from '../models/movie';
+
 @Injectable({ providedIn: 'root' })
 export class FavoritesService {
-    private readonly STORAGE_KEY = 'favoritas';
+  // Array privado de películas favoritas
+  // "private" impide que los componentes modifiquen el array directamente
+  private favoritas: Movie[] = [];
 
-    obtenerTodas(): Movie[] {
-        try {
-            const data = localStorage.getItem(this.STORAGE_KEY);
-            return data ? JSON.parse(data) : [];
-        } catch {
-            return [];
-        }
+  // Retorna una copia del array (para evitar mutación externa)
+  // El spread operator [...] crea un nuevo array con los mismos elementos
+  obtenerTodas(): Movie[] {
+    return [...this.favoritas];
+  }
+
+  // Agrega una película a favoritos si no está ya
+  agregar(movie: Movie): void {
+    // .find() busca un elemento que cumpla la condición
+    // Si no lo encuentra, retorna undefined
+    if (!this.favoritas.find(m => m.id === movie.id)) {
+      this.favoritas.push(movie);
     }
+  }
 
-    agregar(movie: Movie): void {
-        const favoritas = this.obtenerTodas();
-        if (!favoritas.find(m => m.id === movie.id)) {
-            favoritas.push(movie);
-            this.guardar(favoritas);
-        }
+  // Elimina una película de favoritos por su ID
+  eliminar(id: number): void {
+    // .filter() crea un nuevo array sin el elemento eliminado
+    this.favoritas = this.favoritas.filter(m => m.id !== id);
+  }
+
+  // Verifica si una película es favorita
+  esFavorita(id: number): boolean {
+    // .some() retorna true si al menos un elemento cumple la condición
+    return this.favoritas.some(m => m.id === id);
+  }
+
+  // Alterna el estado de favorito (agrega si no está, quita si está)
+  toggle(movie: Movie): void {
+    if (this.esFavorita(movie.id)) {
+      this.eliminar(movie.id);
+    } else {
+      this.agregar(movie);
     }
+  }
 
-    eliminar(id: number): void {
-        const favoritas = this.obtenerTodas().filter(m => m.id !== id);
-        this.guardar(favoritas);
-    }
-
-    esFavorita(id: number): boolean {
-        return this.obtenerTodas().some(m => m.id === id);
-    }
-
-    private guardar(favoritas: Movie[]): void {
-        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(favoritas));
-    }
-}
-```
-
-```typescript
-// Componente limpio
-export class FavoritesComponent implements OnInit {
-    favoritas: Movie[] = [];
-
-    constructor(private favoritesService: FavoritesService) {}
-
-    ngOnInit(): void {
-        this.favoritas = this.favoritesService.obtenerTodas();
-    }
-
-    eliminar(id: number): void {
-        this.favoritesService.eliminar(id);
-        this.favoritas = this.favoritesService.obtenerTodas();
-    }
+  // Retorna la cantidad de favoritas
+  obtenerCantidad(): number {
+    return this.favoritas.length;
+  }
 }
 ```
 
 ---
 
-## Ejemplo práctico: servicio de carrito de compras
+## 4.6 Usar el servicio en los componentes
+
+✏️ Modificar `app.component.ts` para usar el servicio en lugar de manejar favoritos directamente:
 
 ```typescript
-// services/cart.service.ts
-import { Injectable } from '@angular/core';
+// app.component.ts
+// Componente padre que usa FavoritesService para manejar favoritos
+import { Component, inject } from '@angular/core';
+import { MovieCardComponent } from './components/movie-card/movie-card.component';
+import { Movie } from './models/movie';
+// Importar el servicio
+import { FavoritesService } from './services/favorites.service';
 
-interface CartItem {
-    id: number;
-    nombre: string;
-    precio: number;
-    cantidad: number;
-}
+@Component({
+  selector: 'app-root',
+  standalone: true,
+  imports: [MovieCardComponent],
+  templateUrl: './app.component.html',
+  styleUrl: './app.component.scss'
+})
+export class AppComponent {
+  titulo: string = 'CineExplorer';
 
-@Injectable({ providedIn: 'root' })
-export class CartService {
-    private items: CartItem[] = [];
+  // Inyectar el servicio de favoritos
+  private favoritesService = inject(FavoritesService);
 
-    obtenerItems(): CartItem[] {
-        return [...this.items]; // Retorna copia para evitar mutación externa
+  // Datos de ejemplo (después vendrán de TmdbService + HttpClient)
+  peliculas: Movie[] = [
+    {
+      id: 550, title: 'Fight Club',
+      overview: 'Un oficinista insomne y un fabricante de jabón forman un club de pelea clandestino.',
+      poster_path: '/pB8BM7pdSp6B6Ih7QI4S2t0POoD.jpg',
+      backdrop_path: '/hZkgoQYus5dXo3H8T7Uef6DNknx.jpg',
+      vote_average: 8.4, release_date: '1999-10-15', genre_ids: [18, 53]
+    },
+    {
+      id: 680, title: 'Pulp Fiction',
+      overview: 'Las vidas de dos sicarios, un boxeador y la esposa de un gángster se entrelazan.',
+      poster_path: '/d5iIlFn5s0ImszYzBPb8JPIfbXD.jpg',
+      backdrop_path: '/suaEOtk1N1sgg2MTM7oZd2cfVp3.jpg',
+      vote_average: 8.5, release_date: '1994-09-10', genre_ids: [53, 80]
+    },
+    {
+      id: 13, title: 'Forrest Gump',
+      overview: 'La historia de un hombre con un coeficiente intelectual bajo que logra cosas extraordinarias.',
+      poster_path: '/arw2vcBveWOVZr6pxd9XTd1TdQa.jpg',
+      backdrop_path: '/7c9UVPPiTPltouxRVY6N9uugaVA.jpg',
+      vote_average: 8.5, release_date: '1994-06-23', genre_ids: [35, 18, 10749]
     }
+  ];
 
-    agregar(producto: { id: number; nombre: string; precio: number }): void {
-        const existente = this.items.find(item => item.id === producto.id);
-        if (existente) {
-            existente.cantidad++;
-        } else {
-            this.items.push({ ...producto, cantidad: 1 });
-        }
-    }
+  // Ahora delega al servicio en lugar de manejar un Set local
+  esFavorita(id: number): boolean {
+    return this.favoritesService.esFavorita(id);
+  }
 
-    eliminar(id: number): void {
-        this.items = this.items.filter(item => item.id !== id);
-    }
-
-    actualizarCantidad(id: number, cantidad: number): void {
-        const item = this.items.find(i => i.id === id);
-        if (item && cantidad > 0) {
-            item.cantidad = cantidad;
-        }
-    }
-
-    obtenerTotal(): number {
-        return this.items.reduce((sum, item) => sum + item.precio * item.cantidad, 0);
-    }
-
-    obtenerCantidadTotal(): number {
-        return this.items.reduce((sum, item) => sum + item.cantidad, 0);
-    }
-
-    vaciar(): void {
-        this.items = [];
-    }
+  toggleFavorito(movie: Movie): void {
+    this.favoritesService.toggle(movie);
+  }
 }
 ```
 
-Como el servicio es singleton (`providedIn: 'root'`), el navbar puede mostrar la cantidad de items y la página del carrito puede mostrar el detalle, ambos usando la misma instancia del servicio.
+---
+
+## 4.7 Separar lógica: ❌ mal vs. ✅ bien
+
+```typescript
+// ❌ MAL: lógica de negocio en el componente
+export class FavoritesComponent {
+  favoritas: Movie[] = [];
+
+  agregar(movie: Movie): void {
+    if (!this.favoritas.find(m => m.id === movie.id)) {
+      this.favoritas.push(movie);
+      localStorage.setItem('favoritas', JSON.stringify(this.favoritas));
+    }
+  }
+}
+
+// ✅ BIEN: lógica en un servicio, componente delgado
+export class FavoritesComponent {
+  // El componente solo llama métodos del servicio
+  private favoritesService = inject(FavoritesService);
+  favoritas = this.favoritesService.obtenerTodas();
+
+  eliminar(id: number): void {
+    this.favoritesService.eliminar(id);
+    this.favoritas = this.favoritesService.obtenerTodas();
+  }
+}
+```
 
 ---
 
-## Ejercicios
+## 4.8 Compilar y probar
 
-### Ejercicio 1: ThemeService
-Crear un servicio `ThemeService` con métodos para:
-- `obtenerTema(): string` — retorna 'light' o 'dark' desde localStorage.
-- `cambiarTema(tema: string): void` — guarda en localStorage y aplica al DOM.
-- `toggle(): void` — alterna entre light y dark.
+▶️ La app debería funcionar exactamente igual que antes. La diferencia es interna: la lógica de favoritos ahora está en un servicio reutilizable. Cualquier componente futuro (navbar, página de favoritos) podrá usar el mismo servicio.
 
-### Ejercicio 2: Servicio de notas
-Crear un `NotesService` que maneje un CRUD de notas en localStorage. Inyectarlo en un componente que muestre la lista y permita agregar/eliminar.
+---
 
-### Ejercicio 3: Refactorizar
-Tomar el ejercicio de la lista de tareas del tema anterior y mover toda la lógica de datos a un `TodoService`. El componente solo debe llamar métodos del servicio.
+## Resumen de conceptos
+
+| Concepto | Para qué |
+|----------|----------|
+| `@Injectable` | Marcar una clase como servicio inyectable |
+| `providedIn: 'root'` | Singleton disponible en toda la app |
+| `inject()` | Inyectar un servicio en un componente |
+| Constructor injection | Forma clásica de inyectar servicios |
+| Singleton | Una sola instancia compartida por todos los componentes |
+| Separación de responsabilidades | Componentes = UI, Servicios = lógica |
+
+---
+
+**Anterior:** [← Capítulo 3 — Comunicación entre componentes](03_comunicacion_componentes.md) | **Siguiente:** [Capítulo 5 — Routing y navegación →](05_routing.md)

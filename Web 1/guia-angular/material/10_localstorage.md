@@ -1,288 +1,276 @@
-# 10. Persistencia con localStorage
+# Capítulo 10: Persistencia con localStorage
 
-## localStorage en Angular: cuándo y cómo usarlo
+## Objetivo
 
-localStorage permite guardar datos en el navegador que persisten después de cerrar la pestaña o el navegador.
-
-### Cuándo usarlo
-- Favoritos del usuario.
-- Preferencia de tema (claro/oscuro).
-- Datos de sesión simples.
-- Cache de datos que no cambian frecuentemente.
-
-### Cuándo NO usarlo
-- Datos sensibles (contraseñas, tokens de larga duración).
-- Grandes cantidades de datos (límite ~5MB).
-- Datos que necesitan sincronización entre dispositivos.
+Persistir datos en el navegador para que sobrevivan al cerrar la pestaña. Al final de este capítulo, los favoritos y la preferencia de tema de CineExplorer se guardarán en localStorage.
 
 ---
 
-## Servicio wrapper para localStorage
+## 10.1 ¿Cuándo usar localStorage?
+
+| ✅ Usar para | ❌ No usar para |
+|---|---|
+| Favoritos del usuario | Datos sensibles (contraseñas, tokens) |
+| Preferencia de tema (claro/oscuro) | Grandes cantidades de datos (límite ~5MB) |
+| Historial de búsqueda | Datos que necesitan sincronización entre dispositivos |
+| Cache de datos simples | Datos críticos (pueden borrarse) |
+
+---
+
+## 10.2 StorageService: wrapper para localStorage
 
 Nunca usar `localStorage` directamente en los componentes. Crear un servicio que lo encapsule.
 
+📁 Crear `src/app/services/storage.service.ts`:
+
 ```typescript
-// services/storage.service.ts
+// storage.service.ts
+// Servicio wrapper para localStorage con manejo de errores y tipado genérico
 import { Injectable } from '@angular/core';
 
 @Injectable({ providedIn: 'root' })
 export class StorageService {
 
-    get<T>(key: string, defaultValue: T): T {
-        try {
-            const data = localStorage.getItem(key);
-            return data ? JSON.parse(data) : defaultValue;
-        } catch {
-            return defaultValue;
-        }
+  // Obtener un valor de localStorage con tipado genérico
+  // T es el tipo esperado del dato (Movie[], string, boolean, etc.)
+  // key: clave con la que se guardó el dato
+  // defaultValue: valor por defecto si no existe o hay error
+  get<T>(key: string, defaultValue: T): T {
+    try {
+      // localStorage.getItem retorna string o null
+      const data = localStorage.getItem(key);
+      // Si existe, parsear el JSON. Si no, retornar el valor por defecto
+      // JSON.parse puede fallar si el dato está corrupto
+      return data ? JSON.parse(data) : defaultValue;
+    } catch {
+      // Si JSON.parse falla, retornar el valor por defecto
+      return defaultValue;
     }
+  }
 
-    set<T>(key: string, value: T): void {
-        try {
-            localStorage.setItem(key, JSON.stringify(value));
-        } catch (error) {
-            console.error('Error al guardar en localStorage:', error);
-        }
+  // Guardar un valor en localStorage
+  // JSON.stringify convierte cualquier objeto a string
+  set<T>(key: string, value: T): void {
+    try {
+      localStorage.setItem(key, JSON.stringify(value));
+    } catch (error) {
+      // Puede fallar si localStorage está lleno (~5MB)
+      console.error('Error al guardar en localStorage:', error);
     }
+  }
 
-    remove(key: string): void {
-        localStorage.removeItem(key);
-    }
+  // Eliminar un valor
+  remove(key: string): void {
+    localStorage.removeItem(key);
+  }
 
-    clear(): void {
-        localStorage.clear();
-    }
+  // Limpiar todo localStorage
+  clear(): void {
+    localStorage.clear();
+  }
 }
 ```
 
-### ¿Por qué un wrapper?
-
-1. `JSON.parse` puede fallar si el dato está corrupto → el `try/catch` lo maneja.
-2. Centraliza la lógica → si mañana cambiás a sessionStorage o IndexedDB, solo cambiás un archivo.
-3. Tipado genérico → `get<Movie[]>('favoritas', [])` retorna `Movie[]`.
+💡 **¿Por qué un wrapper?**
+1. `JSON.parse` puede fallar si el dato está corrupto → el `try/catch` lo maneja
+2. Centraliza la lógica → si mañana cambian a sessionStorage, solo cambian un archivo
+3. Tipado genérico → `get<Movie[]>('favoritas', [])` retorna `Movie[]`
 
 ---
 
-## Persistir favoritos
+## 10.3 Persistir favoritos
+
+Vamos a actualizar el `FavoritesService` que refactorizamos en el capítulo 07 (con BehaviorSubject) para que ahora también guarde los datos en localStorage. La API pública del servicio no cambia, solo se agrega persistencia interna.
+
+✏️ Modificar `favorites.service.ts` para usar StorageService:
 
 ```typescript
-// services/favorites.service.ts
+// favorites.service.ts
+// Servicio de favoritos con persistencia en localStorage
 import { Injectable, inject } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { map } from 'rxjs';
-import { StorageService } from './storage.service';
 import { Movie } from '../models/movie';
+// Importar el servicio de storage
+import { StorageService } from './storage.service';
 
 @Injectable({ providedIn: 'root' })
 export class FavoritesService {
-    private storage = inject(StorageService);
-    private readonly KEY = 'favoritas';
+  private storage = inject(StorageService);
+  // Clave para guardar en localStorage
+  private readonly KEY = 'cine-explorer-favoritas';
 
-    private favoritasSubject = new BehaviorSubject<Movie[]>(
-        this.storage.get<Movie[]>(this.KEY, [])
-    );
+  // Inicializar el BehaviorSubject con los datos guardados en localStorage
+  // Si no hay datos guardados, usa un array vacío
+  private favoritasSubject = new BehaviorSubject<Movie[]>(
+    this.storage.get<Movie[]>(this.KEY, [])
+  );
 
-    favoritas$: Observable<Movie[]> = this.favoritasSubject.asObservable();
+  // Observable público para que los componentes se suscriban
+  favoritas$: Observable<Movie[]> = this.favoritasSubject.asObservable();
 
-    cantidad$: Observable<number> = this.favoritas$.pipe(
-        map(favs => favs.length)
-    );
+  // Observable derivado: cantidad de favoritas
+  cantidad$: Observable<number> = this.favoritas$.pipe(
+    map(favs => favs.length)
+  );
 
-    agregar(movie: Movie): void {
-        const actuales = this.favoritasSubject.value;
-        if (!this.esFavorita(movie.id)) {
-            const nuevas = [...actuales, movie];
-            this.favoritasSubject.next(nuevas);
-            this.storage.set(this.KEY, nuevas);
-        }
+  agregar(movie: Movie): void {
+    const actuales = this.favoritasSubject.value;
+    if (!actuales.find(m => m.id === movie.id)) {
+      const nuevas = [...actuales, movie];
+      // Emitir el nuevo valor a todos los suscriptores
+      this.favoritasSubject.next(nuevas);
+      // Persistir en localStorage
+      this.storage.set(this.KEY, nuevas);
     }
+  }
 
-    eliminar(id: number): void {
-        const nuevas = this.favoritasSubject.value.filter(m => m.id !== id);
-        this.favoritasSubject.next(nuevas);
-        this.storage.set(this.KEY, nuevas);
+  eliminar(id: number): void {
+    const nuevas = this.favoritasSubject.value.filter(m => m.id !== id);
+    this.favoritasSubject.next(nuevas);
+    // Actualizar localStorage
+    this.storage.set(this.KEY, nuevas);
+  }
+
+  esFavorita(id: number): boolean {
+    return this.favoritasSubject.value.some(m => m.id === id);
+  }
+
+  toggle(movie: Movie): void {
+    if (this.esFavorita(movie.id)) {
+      this.eliminar(movie.id);
+    } else {
+      this.agregar(movie);
     }
+  }
 
-    esFavorita(id: number): boolean {
-        return this.favoritasSubject.value.some(m => m.id === id);
-    }
+  obtenerTodas(): Movie[] {
+    return this.favoritasSubject.value;
+  }
 
-    toggle(movie: Movie): void {
-        if (this.esFavorita(movie.id)) {
-            this.eliminar(movie.id);
-        } else {
-            this.agregar(movie);
-        }
-    }
-
-    obtenerTodas(): Movie[] {
-        return this.favoritasSubject.value;
-    }
-}
-```
-
-### Uso en componentes
-
-```typescript
-// navbar.component.ts — mostrar contador
-export class NavbarComponent {
-    private favoritesService = inject(FavoritesService);
-    cantidad$ = this.favoritesService.cantidad$;
-}
-```
-
-```html
-<!-- navbar.component.html -->
-<a routerLink="/favorites" class="nav-link">
-    Favoritos
-    @if (cantidad$ | async; as cantidad) {
-        @if (cantidad > 0) {
-            <span class="badge bg-danger">{{ cantidad }}</span>
-        }
-    }
-</a>
-```
-
-```typescript
-// movie-card.component.ts — toggle favorito
-export class MovieCardComponent {
-    @Input({ required: true }) movie!: Movie;
-    private favoritesService = inject(FavoritesService);
-
-    get esFavorita(): boolean {
-        return this.favoritesService.esFavorita(this.movie.id);
-    }
-
-    toggleFavorito(): void {
-        this.favoritesService.toggle(this.movie);
-    }
+  obtenerCantidad(): number {
+    return this.favoritasSubject.value.length;
+  }
 }
 ```
 
 ---
 
-## Persistir tema claro/oscuro
+## 10.4 Persistir tema claro/oscuro
+
+📁 Crear `src/app/services/theme.service.ts`:
 
 ```typescript
-// services/theme.service.ts
+// theme.service.ts
+// Servicio que maneja el tema visual (claro/oscuro) con persistencia
 import { Injectable, inject } from '@angular/core';
 import { StorageService } from './storage.service';
 
 @Injectable({ providedIn: 'root' })
 export class ThemeService {
-    private storage = inject(StorageService);
-    private readonly KEY = 'tema';
+  private storage = inject(StorageService);
+  private readonly KEY = 'cine-explorer-tema';
 
-    private temaActual: string;
+  // Tema actual (se inicializa en el constructor)
+  private temaActual: string;
 
-    constructor() {
-        this.temaActual = this.obtenerTemaInicial();
-        this.aplicarTema(this.temaActual);
+  constructor() {
+    // Obtener el tema inicial (guardado o preferencia del sistema)
+    this.temaActual = this.obtenerTemaInicial();
+    // Aplicar el tema al DOM
+    this.aplicarTema(this.temaActual);
+  }
+
+  // Retorna el tema actual
+  obtenerTema(): string {
+    return this.temaActual;
+  }
+
+  // Cambia el tema y lo persiste
+  cambiarTema(tema: string): void {
+    this.temaActual = tema;
+    this.aplicarTema(tema);
+    // Guardar en localStorage para que persista al recargar
+    this.storage.set(this.KEY, tema);
+  }
+
+  // Alterna entre light y dark
+  toggle(): void {
+    const nuevoTema = this.temaActual === 'light' ? 'dark' : 'light';
+    this.cambiarTema(nuevoTema);
+  }
+
+  // Determina el tema inicial
+  private obtenerTemaInicial(): string {
+    // 1. Verificar si hay tema guardado en localStorage
+    const guardado = this.storage.get<string | null>(this.KEY, null);
+    if (guardado) return guardado;
+
+    // 2. Si no hay guardado, respetar la preferencia del sistema operativo
+    // window.matchMedia detecta si el usuario tiene tema oscuro en su SO
+    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      return 'dark';
     }
 
-    obtenerTema(): string {
-        return this.temaActual;
-    }
+    // 3. Por defecto: tema claro
+    return 'light';
+  }
 
-    cambiarTema(tema: string): void {
-        this.temaActual = tema;
-        this.aplicarTema(tema);
-        this.storage.set(this.KEY, tema);
-    }
-
-    toggle(): void {
-        const nuevoTema = this.temaActual === 'light' ? 'dark' : 'light';
-        this.cambiarTema(nuevoTema);
-    }
-
-    private obtenerTemaInicial(): string {
-        // 1. Verificar si hay tema guardado
-        const guardado = this.storage.get<string | null>(this.KEY, null);
-        if (guardado) return guardado;
-
-        // 2. Si no hay, respetar preferencia del sistema
-        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-            return 'dark';
-        }
-
-        return 'light';
-    }
-
-    private aplicarTema(tema: string): void {
-        document.documentElement.setAttribute('data-theme', tema);
-    }
+  // Aplica el tema al elemento <html> del DOM
+  private aplicarTema(tema: string): void {
+    // setAttribute agrega data-theme="dark" o data-theme="light" al <html>
+    // Los estilos CSS usan este atributo para cambiar colores
+    document.documentElement.setAttribute('data-theme', tema);
+  }
 }
 ```
 
-### Uso en el navbar
-
-```typescript
-export class NavbarComponent {
-    private themeService = inject(ThemeService);
-
-    get temaActual(): string {
-        return this.themeService.obtenerTema();
-    }
-
-    toggleTema(): void {
-        this.themeService.toggle();
-    }
-}
-```
+✏️ Agregar el toggle de tema en el navbar:
 
 ```html
-<button (click)="toggleTema()" class="btn btn-outline-light btn-sm">
-    {{ temaActual === 'light' ? '🌙' : '☀️' }}
+<!-- Agregar en navbar.component.html, dentro del navbar -->
+<button (click)="toggleTema()" class="btn btn-outline-light btn-sm ms-2">
+  <!-- Mostrar emoji según el tema actual -->
+  {{ temaActual === 'light' ? '🌙' : '☀️' }}
 </button>
 ```
 
-### CSS para temas
+```typescript
+// Agregar en navbar.component.ts
+private themeService = inject(ThemeService);
 
-```css
-/* styles.scss (global) */
-:root {
-    --bg-primary: #ffffff;
-    --bg-secondary: #f8f9fa;
-    --text-primary: #212529;
-    --text-secondary: #6c757d;
-    --card-bg: #ffffff;
-    --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+get temaActual(): string {
+  return this.themeService.obtenerTema();
 }
 
-[data-theme="dark"] {
-    --bg-primary: #121212;
-    --bg-secondary: #1e1e1e;
-    --text-primary: #e0e0e0;
-    --text-secondary: #aaaaaa;
-    --card-bg: #2d2d2d;
-    --shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
-}
-
-body {
-    background-color: var(--bg-primary);
-    color: var(--text-primary);
-    transition: background-color 0.3s, color 0.3s;
-}
-
-.card {
-    background-color: var(--card-bg);
-    box-shadow: var(--shadow);
-    transition: background-color 0.3s;
+toggleTema(): void {
+  this.themeService.toggle();
 }
 ```
 
 ---
 
-## Ejercicios
+## 10.5 Compilar y probar
 
-### Ejercicio 1: StorageService genérico
-Implementar el `StorageService` y usarlo para guardar/recuperar una lista de notas. Verificar que los datos persisten al recargar la página.
+▶️ Verificar que:
+1. Marcar películas como favoritas y recargar la página → siguen marcadas
+2. Cambiar el tema a oscuro y recargar → sigue en oscuro
+3. Abrir DevTools → Application → Local Storage → ver los datos guardados
 
-### Ejercicio 2: Favoritos completos
-Implementar `FavoritesService` con BehaviorSubject. Crear una vista `/favorites` que muestre las películas favoritas y permita eliminarlas. Mostrar un badge con la cantidad en el navbar.
+---
 
-### Ejercicio 3: Tema persistente
-Implementar `ThemeService` con detección de `prefers-color-scheme`. Crear las variables CSS para ambos temas. Agregar un toggle en el navbar.
+## Resumen de conceptos
 
-### Ejercicio 4: Historial de búsqueda
-Crear un servicio que guarde las últimas 10 búsquedas del usuario en localStorage. Mostrarlas como sugerencias debajo del buscador.
+| Concepto | Para qué |
+|----------|----------|
+| `localStorage` | Guardar datos en el navegador (persisten al cerrar) |
+| `StorageService` | Wrapper con manejo de errores y tipado |
+| `JSON.parse/stringify` | Convertir objetos a/desde string |
+| `BehaviorSubject` + localStorage | Estado reactivo que persiste |
+| `ThemeService` | Manejar tema claro/oscuro con persistencia |
+| `prefers-color-scheme` | Detectar preferencia de tema del SO |
+| `data-theme` attribute | Aplicar tema con CSS |
+
+---
+
+**Anterior:** [← Capítulo 9 — Pipes](09_pipes.md) | **Siguiente:** [Capítulo 11 — Estilos y Bootstrap →](11_estilos_bootstrap.md)
