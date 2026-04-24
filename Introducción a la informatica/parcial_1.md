@@ -39,12 +39,12 @@ d) No volátil y almacena el sistema operativo de forma permanente
 
 ---
 
-### 4. ¿Cuál es el equivalente en hexadecimal del número decimal 255?
+### 4. ¿Cuál es la diferencia principal entre un ciclo "Mientras" y un ciclo "Hacer-Mientras"?
 
-a) F0  
-b) FE  
-c) FF  
-d) 1FF  
+a) El ciclo Mientras puede repetirse infinitamente, el Hacer-Mientras no  
+b) El ciclo Hacer-Mientras evalúa la condición antes de ejecutar el bloque  
+c) El ciclo Hacer-Mientras garantiza que el bloque se ejecuta al menos una vez  
+d) No hay diferencia, ambos funcionan exactamente igual  
 
 ---
 
@@ -142,7 +142,7 @@ d) Error, porque MOD no se puede usar con 15
 | 1 | c | El ciclo fundamental es Entrada → Procesamiento → Salida |
 | 2 | c | 1×8 + 1×4 + 0×2 + 1×1 = 13 |
 | 3 | c | La RAM es volátil (se borra al apagar) y sirve como memoria de trabajo |
-| 4 | c | 255 ÷ 16 = 15 (F) residuo 15 (F) → FF |
+| 4 | c | En Hacer-Mientras la condición se evalúa después, así que el bloque se ejecuta al menos una vez |
 | 5 | c | Un algoritmo debe ser finito, preciso y producir al menos un resultado |
 | 6 | c | 0+1+2+3+4 = 10 |
 | 7 | c | MOD devuelve el residuo de una división entera |
