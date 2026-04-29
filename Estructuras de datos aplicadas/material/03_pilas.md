@@ -17,9 +17,80 @@ Al final del capítulo tendrás un personaje que puede realizar acciones, deshac
 
 Una **pila** es una estructura de datos que funciona con el principio **LIFO** (Last In, First Out): el último elemento que entra es el primero que sale.
 
-Analogía: imagina una pila de platos. Solo puedes poner o quitar platos por arriba. No puedes sacar el plato del fondo sin quitar todos los de encima.
+### 🍽 Analogía: pila de platos
 
-Operaciones fundamentales:
+Imagina una pila de platos en una cocina. Solo puedes poner o quitar platos **por arriba**. No puedes sacar el plato del fondo sin quitar todos los de encima.
+
+```
+    ¿Quieres este?
+         ↓
+    ┌─────────┐
+    │ Plato 4 │  ← Solo puedes tocar ESTE (el de arriba)
+    ├─────────┤
+    │ Plato 3 │
+    ├─────────┤
+    │ Plato 2 │
+    ├─────────┤
+    │ Plato 1 │  ← Este fue el PRIMERO que pusiste
+    └─────────┘
+      ▓▓▓▓▓▓▓      (mesa)
+
+    LIFO = Last In, First Out
+    El ÚLTIMO que entró (Plato 4) es el PRIMERO que sale.
+```
+
+### 📦 Otra analogía: caja de zapatos apiladas
+
+```
+    Pones cajas una encima de otra:
+
+    Paso 1:  ┌───┐
+             │ A │
+             └───┘
+
+    Paso 2:  ┌───┐
+             │ B │  ← B se puso DESPUÉS de A
+             ├───┤
+             │ A │
+             └───┘
+
+    Paso 3:  ┌───┐
+             │ C │  ← C se puso AL FINAL
+             ├───┤
+             │ B │
+             ├───┤
+             │ A │
+             └───┘
+
+    Si quieres sacar A, primero tienes que quitar C, luego B.
+    ¡No puedes sacar una caja del medio sin que se caigan las de arriba!
+```
+
+### Operaciones fundamentales
+
+```
+    push(valor)                    pop()
+    "Poner encima"                 "Quitar de arriba"
+
+    ┌───┐                          
+    │ X │ ──→  ┌───┐              ┌───┐  ──→ sale X
+               │ X │  ← tope     │ X │
+    ┌───┐      ├───┤              ├───┤      ┌───┐
+    │ B │      │ B │              │ B │      │ B │  ← nuevo tope
+    ├───┤      ├───┤              ├───┤      ├───┤
+    │ A │      │ A │              │ A │      │ A │
+    └───┘      └───┘              └───┘      └───┘
+
+
+    peek()                         isEmpty()
+    "Mirar sin tocar"              "¿Está vacía?"
+
+    ┌───┐                          
+    │ B │ ──→ "B"  (B sigue ahí)  ┌ ─ ─ ┐
+    ├───┤                                    ──→ true (sí)
+    │ A │                          └ ─ ─ ┘
+    └───┘
+```
 
 - **push(valor):** agregar un elemento al tope
 - **pop():** quitar y retornar el elemento del tope
@@ -122,27 +193,67 @@ class PilaEnlazada<T> {
 
 ## Visualización de operaciones
 
+Veamos paso a paso qué pasa dentro de la pila con cada operación:
+
 ```
-Operación          Estado de la pila (tope arriba)
-─────────          ──────────────────────────────
-push(10)           | 10 |
+ OPERACIÓN         ¿QUÉ PASA?                    ESTADO DE LA PILA
+ ─────────         ──────────                     ─────────────────
 
-push(20)           | 20 |
-                   | 10 |
+ push(10)          10 entra por arriba            ┌────┐
+                                                  │ 10 │ ← tope
+                                                  └────┘
 
-push(30)           | 30 |  ← tope
-                   | 20 |
-                   | 10 |
+ push(20)          20 se pone ENCIMA de 10        ┌────┐
+                                                  │ 20 │ ← tope
+                                                  ├────┤
+                                                  │ 10 │
+                                                  └────┘
 
-pop() → 30         | 20 |  ← tope
-                   | 10 |
+ push(30)          30 se pone ENCIMA de 20        ┌────┐
+                                                  │ 30 │ ← tope
+                                                  ├────┤
+                                                  │ 20 │
+                                                  ├────┤
+                                                  │ 10 │
+                                                  └────┘
 
-peek() → 20        | 20 |  ← tope (no se quita)
-                   | 10 |
+ pop() → 30        Se quita 30 (el de arriba)     ┌────┐
+                   y se RETORNA el valor 30       │ 20 │ ← tope
+                                                  ├────┤
+                                                  │ 10 │
+                                                  └────┘
 
-pop() → 20         | 10 |  ← tope
+ peek() → 20       Se MIRA el 20 pero             ┌────┐
+                   NO se quita                    │ 20 │ ← tope (sigue ahí)
+                                                  ├────┤
+                                                  │ 10 │
+                                                  └────┘
 
-pop() → 10         (vacía)
+ pop() → 20        Se quita 20                     ┌────┐
+                                                  │ 10 │ ← tope
+                                                  └────┘
+
+ pop() → 10        Se quita 10                     ┌ ── ┐
+                                                  │    │  (vacía)
+                                                  └ ── ┘
+
+ pop() → ERROR!    No hay nada que quitar          💥 RuntimeException
+```
+
+### 🎯 Regla de oro
+
+```
+    ┌──────────────────────────────────────────────────┐
+    │                                                  │
+    │   Lo ÚLTIMO que ENTRA es lo PRIMERO que SALE     │
+    │                                                  │
+    │   push(A) → push(B) → push(C)                   │
+    │                                                  │
+    │   pop() → C    (no A, no B... ¡C!)               │
+    │   pop() → B                                      │
+    │   pop() → A                                      │
+    │                                                  │
+    └──────────────────────────────────────────────────┘
 ```
 
 ---
@@ -151,13 +262,55 @@ pop() → 10         (vacía)
 
 **La recursividad usa internamente una pila.** Cada llamada recursiva se apila en el call stack de Java. Por eso, todo lo que se puede hacer con recursividad se puede hacer con una pila explícita, y viceversa.
 
-Cuando ejecutamos `factorial(4)`:
+### 🧠 ¿Cómo funciona? Visualicemos factorial(4)
+
+Cuando Java ejecuta `factorial(4)`, internamente crea una pila de llamadas:
 
 ```
-| factorial(1) |  ← tope (caso base, retorna 1)
-| factorial(2) |  ← espera resultado para hacer 2 * resultado
-| factorial(3) |  ← espera resultado para hacer 3 * resultado
-| factorial(4) |  ← espera resultado para hacer 4 * resultado
+    TU CÓDIGO                          LO QUE JAVA HACE POR DENTRO
+    ─────────                          ────────────────────────────
+
+    factorial(4)                       ┌──────────────────┐
+      → llama factorial(3)             │   factorial(4)   │
+        → llama factorial(2)           │   espera...      │
+          → llama factorial(1)         └──────────────────┘
+            → retorna 1                        ↓ se apila
+
+                                       ┌──────────────────┐
+                                       │   factorial(3)   │
+                                       │   espera...      │
+                                       ├──────────────────┤
+                                       │   factorial(4)   │
+                                       └──────────────────┘
+                                               ↓ se apila
+
+                                       ┌──────────────────┐
+                                       │   factorial(2)   │
+                                       │   espera...      │
+                                       ├──────────────────┤
+                                       │   factorial(3)   │
+                                       ├──────────────────┤
+                                       │   factorial(4)   │
+                                       └──────────────────┘
+                                               ↓ se apila
+
+                                       ┌──────────────────┐
+                                       │   factorial(1)   │ ← tope
+                                       │   retorna 1      │    (caso base)
+                                       ├──────────────────┤
+                                       │   factorial(2)   │
+                                       ├──────────────────┤
+                                       │   factorial(3)   │
+                                       ├──────────────────┤
+                                       │   factorial(4)   │
+                                       └──────────────────┘
+
+    Ahora se DESENROLLA (como desapilar):
+
+    factorial(1) retorna 1             → pop
+    factorial(2) calcula 2 × 1 = 2     → pop
+    factorial(3) calcula 3 × 2 = 6     → pop
+    factorial(4) calcula 4 × 6 = 24    → pop    ← RESULTADO FINAL
 ```
 
 Si un algoritmo recursivo causa `StackOverflowError`, puedes convertirlo a iterativo usando tu propia pila.
@@ -194,6 +347,49 @@ class Personaje {
 ## 🎮 Paso 2: Sistema de acciones con Undo/Redo
 
 En muchos juegos puedes deshacer tu última acción. Esto se implementa con **dos pilas**: una para deshacer y otra para rehacer. Es el mismo patrón que usan los editores de texto (Ctrl+Z / Ctrl+Y).
+
+### 🖼 ¿Cómo funciona visualmente?
+
+```
+    EJECUTAR una acción = ponerla en la pila de HISTORIAL
+
+    Acción: "Beber poción"     Acción: "Equipar escudo"     Acción: "Golpe goblin"
+
+    HISTORIAL    REHECHO        HISTORIAL    REHECHO          HISTORIAL    REHECHO
+    ┌───────┐   ┌───────┐      ┌───────┐   ┌───────┐        ┌───────┐   ┌───────┐
+    │Poción │   │       │      │Escudo │   │       │        │ Golpe │   │       │
+    └───────┘   └───────┘      ├───────┤   └───────┘        ├───────┤   └───────┘
+                               │Poción │                    │Escudo │
+                               └───────┘                    ├───────┤
+                                                            │Poción │
+                                                            └───────┘
+
+
+    DESHACER (Ctrl+Z) = mover del HISTORIAL al REHECHO
+
+    Deshacer "Golpe"                    Deshacer "Escudo"
+
+    HISTORIAL    REHECHO                HISTORIAL    REHECHO
+    ┌───────┐   ┌───────┐              ┌───────┐   ┌───────┐
+    │Escudo │   │ Golpe │              │Poción │   │Escudo │
+    ├───────┤   └───────┘              └───────┘   ├───────┤
+    │Poción │                                      │ Golpe │
+    └───────┘                                      └───────┘
+
+    El personaje VUELVE al estado anterior. ¡Como viajar en el tiempo!
+
+
+    REHACER (Ctrl+Y) = mover del REHECHO al HISTORIAL
+
+    Rehacer "Escudo"
+
+    HISTORIAL    REHECHO
+    ┌───────┐   ┌───────┐
+    │Escudo │   │ Golpe │
+    ├───────┤   └───────┘
+    │Poción │
+    └───────┘
+```
 
 Primero definimos qué es una acción:
 
@@ -446,9 +642,57 @@ En nuestro RPG, las fórmulas de daño pueden ser complejas. Por ejemplo:
 
 > Daño = (ataque_base + bonus_arma) × multiplicador_crítico - defensa_enemigo
 
-En notación postfija esto se escribe: `ataque bonus + multiplicador * defensa -`
+### 🖼 ¿Qué es la notación postfija?
 
-La ventaja: **no necesita paréntesis** y se evalúa con una pila.
+```
+    NOTACIÓN NORMAL (infija)          NOTACIÓN POSTFIJA
+    Lo que escribimos normalmente     Lo que entiende la pila
+
+    ( 15 + 5 ) * 2 - 8               15 5 + 2 * 8 -
+
+    ¿Por qué? Porque la pila no sabe qué son los paréntesis.
+    En postfija, el ORDEN de las operaciones ya está definido.
+
+
+    ¿Cómo se lee?
+
+    "15 5 +"  significa  "suma 15 y 5"
+    "... 2 *" significa  "multiplica el resultado anterior por 2"
+    "... 8 -" significa  "resta 8 al resultado anterior"
+```
+
+### 🖼 Paso a paso visual: evaluar `15 5 + 2 * 8 -`
+
+```
+    Token: 15              Token: 5               Token: +
+    "Es número, apílalo"   "Es número, apílalo"   "Es operador: saca 2, opera, apila resultado"
+
+    ┌────┐                 ┌────┐                  ┌────┐
+    │ 15 │                 │  5 │                  │ 20 │  ← 15 + 5 = 20
+    └────┘                 ├────┤                  └────┘
+                           │ 15 │
+                           └────┘
+
+
+    Token: 2               Token: *               Token: 8
+    "Es número, apílalo"   "Saca 2, opera"        "Es número, apílalo"
+
+    ┌────┐                 ┌────┐                  ┌────┐
+    │  2 │                 │ 40 │  ← 20 * 2 = 40  │  8 │
+    ├────┤                 └────┘                  ├────┤
+    │ 20 │                                         │ 40 │
+    └────┘                                         └────┘
+
+
+    Token: -
+    "Saca 2, opera"
+
+    ┌────┐
+    │ 32 │  ← 40 - 8 = 32
+    └────┘
+
+    🎯 RESULTADO: 32 de daño
+```
 
 ```java
 class CalculadoraDaño {
@@ -508,6 +752,66 @@ Resultado: **32 de daño**
 ## 🎮 Paso 5: Verificar hechizos con paréntesis balanceados
 
 Los hechizos del juego tienen encantamientos con símbolos que deben estar balanceados. Si un mago escribe mal la fórmula, el hechizo falla.
+
+### 🖼 ¿Qué significa "balanceado"?
+
+```
+    ✔ BALANCEADO                    ✘ NO BALANCEADO
+
+    { [ ( ) ] }                     { [ ( ) ] }  }     ← sobra uno
+    ↑ ↑ ↑ ↑ ↑ ↑                    
+    │ │ │ │ │ │                     ( [ ) ]             ← cruzados
+    │ │ │ └─┘ │                     ↑ ↑ ↑ ↑
+    │ │ └─────┘                     │ │ │ │
+    │ └───────┘                     │ └─┼─┘  ← ) cierra ( pero [ sigue abierto
+    └─────────┘                     └───┘
+
+    Cada símbolo de apertura tiene su cierre correspondiente,
+    y están correctamente ANIDADOS (no cruzados).
+```
+
+### 🖼 ¿Cómo funciona con la pila?
+
+```
+    Hechizo: { [ ( ) ] }
+
+    Carácter    Acción              Pila
+    ────────    ──────              ────
+    {           Es apertura →       ┌───┐
+                push('{')           │ { │
+                                    └───┘
+
+    [           Es apertura →       ┌───┐
+                push('[')           │ [ │
+                                    ├───┤
+                                    │ { │
+                                    └───┘
+
+    (           Es apertura →       ┌───┐
+                push('(')           │ ( │
+                                    ├───┤
+                                    │ [ │
+                                    ├───┤
+                                    │ { │
+                                    └───┘
+
+    )           Es cierre →         ┌───┐
+                pop() = '('        │ [ │   ← '(' coincide con ')' ✔
+                ¿coincide? ✔       ├───┤
+                                    │ { │
+                                    └───┘
+
+    ]           Es cierre →         ┌───┐
+                pop() = '['        │ { │   ← '[' coincide con ']' ✔
+                ¿coincide? ✔       └───┘
+
+    }           Es cierre →         ┌───┐
+                pop() = '{'        │   │   ← '{' coincide con '}' ✔
+                ¿coincide? ✔       └───┘
+                                    (vacía)
+
+    Pila vacía al final → ✔ BALANCEADO
+```
 
 ```java
 class ValidadorHechizo {

@@ -66,6 +66,42 @@ class Item {
 
 El algoritmo más simple. Compara pares adyacentes y los intercambia si están desordenados. Ideal para entender el concepto.
 
+### 🖼 ¿Cómo funciona Bubble Sort?
+
+```
+    Imagina burbujas en el agua: las más grandes SUBEN.
+    En Bubble Sort, los números más grandes "burbujean" hacia la derecha.
+
+    Arreglo: [ 5 ] [ 3 ] [ 8 ] [ 1 ]
+
+    PASADA 1: comparamos pares de izquierda a derecha
+
+    [ 5 ] [ 3 ]  →  5 > 3? SÍ → intercambiar  →  [ 3 ] [ 5 ] [ 8 ] [ 1 ]
+          [ 5 ] [ 8 ]  →  5 > 8? NO → dejar     →  [ 3 ] [ 5 ] [ 8 ] [ 1 ]
+                [ 8 ] [ 1 ]  →  8 > 1? SÍ → swap →  [ 3 ] [ 5 ] [ 1 ] [ 8 ]
+                                                                          ↑
+                                                              8 ya está en su lugar ✔
+
+    PASADA 2: (ya no tocamos el último)
+
+    [ 3 ] [ 5 ]  →  3 > 5? NO                    →  [ 3 ] [ 5 ] [ 1 ] [ 8 ]
+          [ 5 ] [ 1 ]  →  5 > 1? SÍ → swap       →  [ 3 ] [ 1 ] [ 5 ] [ 8 ]
+                                                               ↑
+                                                   5 ya está en su lugar ✔
+
+    PASADA 3:
+
+    [ 3 ] [ 1 ]  →  3 > 1? SÍ → swap             →  [ 1 ] [ 3 ] [ 5 ] [ 8 ]
+                                                       ↑
+                                                   ¡TODO ORDENADO! ✔
+
+    Resumen visual:
+    Inicio:   [ 5 ][ 3 ][ 8 ][ 1 ]
+    Pasada 1: [ 3 ][ 5 ][ 1 ][ 8 ]  ← 8 llegó al final
+    Pasada 2: [ 3 ][ 1 ][ 5 ][ 8 ]  ← 5 llegó a su lugar
+    Pasada 3: [ 1 ][ 3 ][ 5 ][ 8 ]  ← todo ordenado ✔
+```
+
 ```java
 class Inventario {
 
@@ -145,6 +181,39 @@ Complejidad: **O(n²)** peor caso, **O(n)** mejor caso (ya ordenado).
 
 Encuentra el mínimo (o máximo) y lo coloca en su posición. Útil cuando queremos encontrar "el más valioso", "el más raro", etc.
 
+### 🖼 ¿Cómo funciona Selection Sort?
+
+```
+    Imagina que tienes cartas desordenadas y quieres ordenarlas.
+    Buscas la MÁS PEQUEÑA de todas y la pones en la primera posición.
+    Luego buscas la más pequeña del RESTO y la pones en la segunda. Y así.
+
+    Arreglo: [ 40 ] [ 10 ] [ 30 ] [ 20 ]
+
+    PASO 1: buscar el MÍNIMO de todo el arreglo
+            [ 40 ] [ 10 ] [ 30 ] [ 20 ]
+                     ↑
+                   mínimo = 10 (posición 1)
+            Intercambiar con posición 0:
+            [ 10 ] [ 40 ] [ 30 ] [ 20 ]
+              ✔
+
+    PASO 2: buscar el MÍNIMO desde posición 1 en adelante
+            [ 10 ] [ 40 ] [ 30 ] [ 20 ]
+                                    ↑
+                                  mínimo = 20 (posición 3)
+            Intercambiar con posición 1:
+            [ 10 ] [ 20 ] [ 30 ] [ 40 ]
+              ✔      ✔
+
+    PASO 3: buscar el MÍNIMO desde posición 2 en adelante
+            [ 10 ] [ 20 ] [ 30 ] [ 40 ]
+                            ↑
+                          mínimo = 30 (ya está en su lugar)
+            [ 10 ] [ 20 ] [ 30 ] [ 40 ]
+              ✔      ✔      ✔      ✔    ← ¡ORDENADO!
+```
+
 ```java
 // Dentro de la clase Inventario
 
@@ -178,6 +247,54 @@ Complejidad: **O(n²)** siempre.
 ## 5.3 Insertion Sort — Insertar objetos en orden
 
 Toma cada elemento y lo inserta en la posición correcta. Como cuando ordenas cartas en la mano, o cuando un nuevo ítem llega al inventario y lo colocas en su lugar.
+
+### 🖼 ¿Cómo funciona Insertion Sort?
+
+```
+    Imagina que estás jugando cartas. Recibes una carta a la vez
+    y la colocas en el lugar correcto de tu mano.
+
+    Mano:  [ 5 ]                    ← primera carta, ya está "ordenada"
+
+    Llega 3:
+           [ 5 ]  ← 3 es menor que 5, va ANTES
+    Mano:  [ 3 ][ 5 ]
+
+    Llega 8:
+                  [ 5 ]  ← 8 es mayor que 5, va DESPUÉS
+    Mano:  [ 3 ][ 5 ][ 8 ]
+
+    Llega 1:
+           [ 3 ]  ← 1 es menor que todos, va AL INICIO
+    Mano:  [ 1 ][ 3 ][ 5 ][ 8 ]
+
+    Llega 4:
+                  [ 3 ]  [ 5 ]  ← 4 va entre 3 y 5
+    Mano:  [ 1 ][ 3 ][ 4 ][ 5 ][ 8 ]
+
+
+    En el arreglo se ve así:
+
+    Inicio:   [ 5 ][ 3 ][ 8 ][ 1 ][ 4 ]
+               ─── 
+               ordenado
+
+    Paso 1:   [ 3 ][ 5 ][ 8 ][ 1 ][ 4 ]    ← 3 se insertó antes de 5
+               ─────────
+                ordenado
+
+    Paso 2:   [ 3 ][ 5 ][ 8 ][ 1 ][ 4 ]    ← 8 ya estaba en su lugar
+               ──────────────
+                  ordenado
+
+    Paso 3:   [ 1 ][ 3 ][ 5 ][ 8 ][ 4 ]    ← 1 se movió al inicio
+               ───────────────────
+                    ordenado
+
+    Paso 4:   [ 1 ][ 3 ][ 4 ][ 5 ][ 8 ]    ← 4 se insertó entre 3 y 5
+               ──────────────────────────
+                      ¡TODO ORDENADO! ✔
+```
 
 ```java
 // Dentro de la clase Inventario
@@ -241,6 +358,62 @@ public class InventarioRPG {
 ## 5.4 Merge Sort — Ordenar el historial de combates (recursivo)
 
 Cuando el historial de combates es muy largo, necesitamos un algoritmo más eficiente. **Merge Sort** divide el arreglo a la mitad, ordena cada mitad recursivamente, y luego las combina.
+
+### 🖼 ¿Cómo funciona Merge Sort?
+
+```
+    La idea: "Divide y vencerás"
+
+    Si tienes un problema GRANDE, divídelo en problemas PEQUEÑOS,
+    resuelve cada uno, y luego COMBINA las soluciones.
+
+    Paso 1: DIVIDIR hasta tener arreglos de 1 elemento (ya están ordenados)
+
+                    [ 38  27  43  3 ]
+                    ┌───────┴───────┐
+                    ↓               ↓
+               [ 38  27 ]      [ 43  3 ]
+               ┌────┴────┐    ┌────┴────┐
+               ↓         ↓    ↓         ↓
+             [ 38 ]    [ 27 ][ 43 ]    [ 3 ]
+               ↑         ↑    ↑         ↑
+               └─────────┘    └─────────┘
+               Un solo elemento = ya ordenado ✔
+
+
+    Paso 2: COMBINAR (merge) de abajo hacia arriba
+
+             [ 38 ]    [ 27 ][ 43 ]    [ 3 ]
+               └────┬────┘    └────┬────┘
+                    ↓              ↓
+               [ 27  38 ]      [ 3  43 ]      ← se combinan ordenados
+                    └──────┬──────┘
+                           ↓
+                  [ 3  27  38  43 ]            ← resultado final ✔
+
+
+    ¿Cómo se COMBINAN dos arreglos ordenados?
+
+    Izquierda: [ 27  38 ]     Derecha: [ 3  43 ]
+                 ↑                       ↑
+                 i                       j
+
+    Comparar: 27 vs 3 → 3 es menor → tomar 3
+    Resultado: [ 3 ]
+
+    Izquierda: [ 27  38 ]     Derecha: [ 3  43 ]
+                 ↑                            ↑
+                 i                            j
+
+    Comparar: 27 vs 43 → 27 es menor → tomar 27
+    Resultado: [ 3  27 ]
+
+    Comparar: 38 vs 43 → 38 es menor → tomar 38
+    Resultado: [ 3  27  38 ]
+
+    Solo queda 43 → tomar 43
+    Resultado: [ 3  27  38  43 ] ✔
+```
 
 ```java
 class RegistroCombate {
@@ -336,6 +509,53 @@ Complejidad: **O(n log n)** siempre. Usa **O(n)** de espacio extra.
 ## 5.5 Quick Sort — Ranking competitivo (recursivo)
 
 Para el ranking de héroes usamos Quick Sort: elige un **pivote**, coloca todos los menores a la izquierda y los mayores a la derecha, y ordena cada lado recursivamente.
+
+### 🖼 ¿Cómo funciona Quick Sort?
+
+```
+    La idea: elegir un PIVOTE y separar en dos grupos.
+
+    Arreglo: [ 40  10  50  30  20 ]
+                                ↑
+                              pivote = 20
+
+    Pregunta para cada elemento: ¿eres MENOR o MAYOR que el pivote (20)?
+
+    [ 40  10  50  30  20 ]
+      40 > 20 → derecha
+      10 < 20 → izquierda
+      50 > 20 → derecha
+      30 > 20 → derecha
+
+    Resultado después de particionar:
+
+    menores que 20    pivote    mayores que 20
+    ┌──────────┐    ┌──────┐   ┌──────────────┐
+    │   [ 10 ] │    │ [ 20 ]│  │ [ 40  50  30 ]│
+    └──────────┘    └──────┘   └──────────────┘
+                       ↑
+                    20 ya está en su posición FINAL ✔
+
+    Ahora repetimos el proceso con cada lado:
+
+    Izquierda: [ 10 ] → un solo elemento, ya ordenado ✔
+
+    Derecha: [ 40  50  30 ]
+                        ↑ pivote = 30
+    [ 40  50  30 ]
+      40 > 30 → derecha
+      50 > 30 → derecha
+
+    Resultado: [ ] [ 30 ] [ 40  50 ]
+                     ✔
+
+    [ 40  50 ] → pivote = 50
+    40 < 50 → izquierda
+
+    Resultado: [ 40 ] [ 50 ] → ✔
+
+    RESULTADO FINAL: [ 10  20  30  40  50 ] ✔
+```
 
 ```java
 class HeroeRanking {
@@ -454,6 +674,53 @@ Ventaja sobre Merge Sort: ordena **in-place** (no necesita arreglo auxiliar).
 ## 5.7 Búsqueda binaria — Encontrar objetos rápido
 
 Ahora que el inventario está ordenado, podemos buscar objetos eficientemente.
+
+### 🖼 ¿Cómo funciona la búsqueda binaria?
+
+```
+    Imagina un diccionario con 1000 páginas. Buscas la palabra "mango".
+
+    ❌ Búsqueda LINEAL (una por una):
+    Página 1... no. Página 2... no. Página 3... no...
+    ¡Podrías necesitar revisar las 1000 páginas!
+
+    ✔ Búsqueda BINARIA (dividir a la mitad):
+    Abres en la mitad (página 500): "perro" → M está ANTES → descarto 500-1000
+    Abres en la mitad de lo que queda (página 250): "gato" → M está DESPUÉS → descarto 1-250
+    Abres en la mitad (página 375): "luna" → M está DESPUÉS → descarto 250-375
+    Abres en la mitad (página 437): "mango" → ¡ENCONTRADO!
+
+    Solo necesitaste 4 intentos en vez de 1000. 🚀
+
+
+    Ejemplo con números — buscar 27 en un arreglo ordenado:
+
+    [ 3 ][ 9 ][ 10 ][ 27 ][ 38 ][ 43 ][ 82 ]
+      0    1     2     3     4     5     6      ← índices
+
+    Intento 1: medio = (0+6)/2 = 3
+    [ 3 ][ 9 ][ 10 ][ 27 ][ 38 ][ 43 ][ 82 ]
+                       ↑
+                    arr[3] = 27 = 27 → ¡ENCONTRADO! 🎯
+
+    Solo 1 comparación.
+
+
+    Buscar 10:
+
+    Intento 1: medio = 3 → arr[3] = 27 > 10 → buscar a la IZQUIERDA
+    [ 3 ][ 9 ][ 10 ]  ←  solo miramos esta mitad
+      0    1     2
+
+    Intento 2: medio = 1 → arr[1] = 9 < 10 → buscar a la DERECHA
+                     [ 10 ]  ←  solo queda este
+                       2
+
+    Intento 3: medio = 2 → arr[2] = 10 = 10 → ¡ENCONTRADO! 🎯
+
+    3 comparaciones en un arreglo de 7 elementos.
+    Con 1,000,000 de elementos solo necesitarías ~20 comparaciones.
+```
 
 ### Iterativa
 

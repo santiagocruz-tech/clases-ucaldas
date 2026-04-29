@@ -16,9 +16,67 @@ Ahora agregaremos al proyecto:
 
 Una **cola** es una estructura de datos que funciona con el principio **FIFO** (First In, First Out): el primer elemento que entra es el primero que sale.
 
-Analogía: una fila en un banco. La primera persona que llega es la primera en ser atendida.
+### 🏦 Analogía: fila en un banco
 
-Operaciones fundamentales:
+```
+    Imagina una fila para pagar en un banco:
+
+    ENTRADA (por atrás)                              SALIDA (por adelante)
+         ↓                                                ↓
+    ┌─────────┬─────────┬─────────┬─────────┐       ┌──────────┐
+    │ Carlos  │  María  │  Pedro  │   Ana   │ ────→ │ CAJERO   │
+    └─────────┴─────────┴─────────┴─────────┘       └──────────┘
+    (último)                        (primera)
+
+    Ana llegó PRIMERO → Ana es atendida PRIMERO
+    Carlos llegó DE ÚLTIMO → Carlos espera hasta el final
+
+    FIFO = First In, First Out
+    El PRIMERO que entró es el PRIMERO que sale.
+```
+
+### 🔄 Pila vs. Cola: la diferencia clave
+
+```
+    PILA (LIFO)                         COLA (FIFO)
+    Como platos apilados               Como fila en el banco
+
+    Entran y salen                      Entran por un lado,
+    por el MISMO lado:                  salen por el OTRO:
+
+    ┌───┐                               ENTRADA          SALIDA
+    │ C │ ← entra y sale por aquí       ↓                  ↓
+    ├───┤                               ┌───┬───┬───┐
+    │ B │                               │ C │ B │ A │ ──→ sale A
+    ├───┤                               └───┴───┴───┘
+    │ A │
+    └───┘                               Sale A (el primero)
+    Sale C (el último)
+```
+
+### Operaciones fundamentales
+
+```
+    enqueue(valor)                     dequeue()
+    "Ponerse en la fila"               "Ser atendido"
+
+    ANTES:                              ANTES:
+    frente → [ A ][ B ][ C ] ← fin     frente → [ A ][ B ][ C ] ← fin
+
+    enqueue(D):                         dequeue() → retorna A:
+    frente → [ A ][ B ][ C ][ D ] ←    frente → [ B ][ C ] ← fin
+                               fin
+    D se pone AL FINAL                  A sale del FRENTE
+
+
+    peek()                              isEmpty()
+    "¿Quién sigue?"                     "¿Hay alguien en la fila?"
+
+    frente → [ A ][ B ][ C ]           ┌ ─ ─ ─ ─ ─ ┐
+             ↑                                         → true (vacía)
+             retorna A                  └ ─ ─ ─ ─ ─ ┘
+             (A sigue en la cola)
+```
 
 - **enqueue(valor):** agregar un elemento al final de la cola
 - **dequeue():** quitar y retornar el elemento del frente
@@ -89,24 +147,43 @@ class Cola<T> {
 ### Visualización del arreglo circular
 
 ```
-Capacidad: 5
+    ¿Por qué "circular"?
 
-Después de enqueue(A), enqueue(B), enqueue(C):
+    Con un arreglo NORMAL, al sacar elementos del frente se desperdicia espacio:
 
-  [ A ] [ B ] [ C ] [   ] [   ]
-   ^frente            ^fin
+    enqueue(A,B,C):  [ A ][ B ][ C ][   ][   ]
+    dequeue() → A:   [   ][ B ][ C ][   ][   ]
+    dequeue() → B:   [   ][   ][ C ][   ][   ]
+                      ↑↑↑  ↑↑↑
+                      ¡Espacio desperdiciado! No se puede reusar.
 
-Después de dequeue() → retorna A:
+    Con un arreglo CIRCULAR, los índices "dan la vuelta":
 
-  [   ] [ B ] [ C ] [   ] [   ]
-         ^frente     ^fin
+    Paso 1: enqueue(A), enqueue(B), enqueue(C)
 
-Después de enqueue(D), enqueue(E), enqueue(F):
+        posición:  0     1     2     3     4
+                 [ A ] [ B ] [ C ] [   ] [   ]
+                   ↑                 ↑
+                 frente              fin
 
-  [ F ] [ B ] [ C ] [ D ] [ E ]
-   ^fin  ^frente
+    Paso 2: dequeue() → retorna A
 
-El índice "dio la vuelta" gracias al operador %
+        posición:  0     1     2     3     4
+                 [   ] [ B ] [ C ] [   ] [   ]
+                         ↑           ↑
+                       frente        fin
+
+    Paso 3: enqueue(D), enqueue(E), enqueue(F)
+
+        posición:  0     1     2     3     4
+                 [ F ] [ B ] [ C ] [ D ] [ E ]
+                   ↑     ↑
+                  fin  frente
+
+        ¡F se guardó en la posición 0! El índice "dio la vuelta"
+        gracias a la fórmula: fin = (fin + 1) % capacidad
+
+        Cuando fin está en 4: (4 + 1) % 5 = 0  ← ¡vuelve al inicio!
 ```
 
 ---
@@ -203,6 +280,44 @@ invertirCola([10, 20, 30])
 ## 🎮 Paso 7: Sistema de turnos de combate
 
 En un RPG por turnos, los personajes actúan en el orden en que fueron agregados. Esto es exactamente una **cola FIFO**.
+
+### 🖼 ¿Cómo funciona el sistema de turnos?
+
+```
+    Los combatientes hacen fila. El del FRENTE ataca, y luego
+    se va al FINAL de la fila para esperar su próximo turno.
+
+    TURNO 1: Aldric ataca
+    ┌────────┬────────┬────────┬────────┐
+    │ Aldric │  Luna  │ Goblin │  Orco  │
+    └────────┴────────┴────────┴────────┘
+       ↑ sale                              ↓ vuelve al final
+       │                                   │
+       └──── ataca a Goblin ───────────────┘
+
+    Después:
+    ┌────────┬────────┬────────┬────────┐
+    │  Luna  │ Goblin │  Orco  │ Aldric │
+    └────────┴────────┴────────┴────────┘
+
+    TURNO 2: Luna ataca
+    ┌────────┬────────┬────────┬────────┐
+    │  Luna  │ Goblin │  Orco  │ Aldric │
+    └────────┴────────┴────────┴────────┘
+       ↑ sale                              ↓ vuelve al final
+
+    Después:
+    ┌────────┬────────┬────────┬────────┐
+    │ Goblin │  Orco  │ Aldric │  Luna  │
+    └────────┴────────┴────────┴────────┘
+
+    Si un combatiente MUERE, no vuelve a la cola:
+
+    💀 Goblin derrotado → sale y NO regresa
+    ┌────────┬────────┬────────┐
+    │  Orco  │ Aldric │  Luna  │
+    └────────┴────────┴────────┘
+```
 
 Primero necesitamos una clase para los combatientes (reutilizamos `Personaje` del capítulo anterior y creamos `Enemigo`):
 
@@ -494,6 +609,41 @@ mazmorra.procesarTodos(heroe);
 
 No todas las misiones son iguales. Las misiones urgentes deben completarse primero. Esto es una **cola de prioridad**.
 
+### 🖼 Cola normal vs. Cola de prioridad
+
+```
+    COLA NORMAL (FIFO):
+    Sale el que llegó PRIMERO, sin importar la urgencia.
+
+    Llegan en este orden:
+    1. Recoger hierbas (baja)
+    2. Salvar la aldea (urgente)
+    3. Limpiar cueva (media)
+
+    Cola: [ Hierbas ][ Aldea ][ Cueva ]
+           ↑ sale primero
+    ¡Recoger hierbas sale antes que salvar la aldea! 😱
+
+
+    COLA DE PRIORIDAD:
+    Sale el MÁS URGENTE, sin importar cuándo llegó.
+
+    Llegan en el mismo orden, pero se organizan por prioridad:
+
+    Cola: [ 🔴 Aldea ][ 🟡 Cueva ][ 🟢 Hierbas ]
+            ↑ sale primero (es la más urgente)
+    ¡Salvar la aldea sale primero! ✔
+
+
+    Analogía: urgencias de un hospital
+    ┌──────────────────────────────────────────┐
+    │  🔴 Infarto        → se atiende primero  │
+    │  🟡 Brazo roto     → espera un poco      │
+    │  🟢 Dolor de cabeza → espera más          │
+    └──────────────────────────────────────────┘
+    No importa quién llegó primero, importa la GRAVEDAD.
+```
+
 ```java
 class Mision implements Comparable<Mision> {
 
@@ -607,6 +757,28 @@ tablero.completarSiguiente();
 ## 🎮 Paso 10: Papa caliente — Eliminación en el combate
 
 El clásico problema de Josefo aplicado al juego: los combatientes están en círculo y cada K turnos uno es eliminado. Esto se resuelve con una cola.
+
+### 🖼 ¿Cómo funciona?
+
+```
+    6 guerreros en círculo, se cuenta hasta 3 (k=3):
+
+    Ronda 1: contamos 1, 2, 3...
+                    ①        ②        ③ ← ¡ELIMINADO!
+    Cola:  [ Aldric ][ Luna ][ Goblin ][ Orco ][ Elfo ][ Enano ]
+
+    ¿Cómo lo hacemos con la cola?
+    - dequeue + enqueue (pasar al final) → cuenta 1: Aldric va al final
+    - dequeue + enqueue (pasar al final) → cuenta 2: Luna va al final
+    - dequeue (sin enqueue) → cuenta 3: Goblin ELIMINADO 💀
+
+    Antes:  frente → [Aldric][Luna][Goblin][Orco][Elfo][Enano]
+    Paso 1: frente → [Luna][Goblin][Orco][Elfo][Enano][Aldric]  (Aldric pasó al final)
+    Paso 2: frente → [Goblin][Orco][Elfo][Enano][Aldric][Luna]  (Luna pasó al final)
+    Paso 3: frente → [Orco][Elfo][Enano][Aldric][Luna]          (Goblin eliminado 💀)
+
+    Se repite hasta que quede uno solo → ¡ese es el ganador! 🏆
+```
 
 ```java
 class PapaCaliente {
