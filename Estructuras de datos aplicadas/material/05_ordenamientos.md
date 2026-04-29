@@ -1,6 +1,15 @@
 # 5. Algoritmos de ordenamiento
 
-Antes de avanzar a estructuras más complejas, es fundamental entender cómo se ordenan datos. Los algoritmos de ordenamiento son un campo donde la diferencia entre enfoque iterativo, recursivo y backtracking se hace muy evidente.
+## 🎮 Proyecto incremental: RPG por consola — Parte 3
+
+En los capítulos anteriores construimos un sistema de acciones con undo/redo (pilas) y un sistema de turnos de combate con eventos (colas).
+
+Ahora agregaremos al proyecto:
+- Un **ranking de héroes** ordenado por diferentes criterios
+- Un **inventario ordenable** por valor, peso o rareza
+- **Búsqueda eficiente** de objetos usando búsqueda binaria
+- **Merge Sort** para ordenar el historial de combates
+- **Quick Sort** para el ranking competitivo
 
 ---
 
@@ -8,102 +17,188 @@ Antes de avanzar a estructuras más complejas, es fundamental entender cómo se 
 
 - Buscar en datos ordenados es mucho más rápido (búsqueda binaria: O(log n) vs. O(n))
 - Muchos algoritmos requieren datos ordenados como precondición
-- Es uno de los problemas más estudiados en ciencias de la computación
+- En nuestro RPG: mostrar rankings, encontrar el mejor objeto, organizar el inventario
 
 ---
 
-## 5.1 Bubble Sort (iterativo)
+## 🎮 Paso 11: La clase Item para el inventario
 
-El algoritmo más simple. Compara pares adyacentes y los intercambia si están desordenados. Repite hasta que no haya intercambios.
+Antes de ordenar, necesitamos objetos que ordenar. Creemos los ítems del juego:
 
 ```java
-void bubbleSort(int[] arr){
+class Item {
 
-    int n = arr.length;
+    String nombre;
+    String tipo;       // "arma", "armadura", "pocion", "material"
+    int valor;         // precio en oro
+    int peso;          // en unidades de peso
+    int rareza;        // 1=común, 2=poco común, 3=raro, 4=épico, 5=legendario
 
-    for(int i = 0; i < n - 1; i++){
+    Item(String nombre, String tipo, int valor, int peso, int rareza) {
+        this.nombre = nombre;
+        this.tipo = tipo;
+        this.valor = valor;
+        this.peso = peso;
+        this.rareza = rareza;
+    }
 
-        boolean huboIntercambio = false;
-
-        for(int j = 0; j < n - 1 - i; j++){
-
-            if(arr[j] > arr[j + 1]){
-                int temp = arr[j];
-                arr[j] = arr[j + 1];
-                arr[j + 1] = temp;
-                huboIntercambio = true;
-            }
+    String etiquetaRareza() {
+        switch (rareza) {
+            case 1: return "⚪ Común";
+            case 2: return "🟢 Poco común";
+            case 3: return "🔵 Raro";
+            case 4: return "🟣 Épico";
+            case 5: return "🟡 Legendario";
+            default: return "???";
         }
+    }
 
-        // optimización: si no hubo intercambios, ya está ordenado
-        if(!huboIntercambio) break;
+    String toString() {
+        return etiquetaRareza() + " | " + nombre + " (" + tipo + ") - "
+            + valor + " oro, " + peso + " kg";
     }
 }
 ```
 
-Complejidad: **O(n²)** en el peor caso, **O(n)** en el mejor caso (ya ordenado, con la optimización).
-
-Traza con `[5, 3, 8, 1]`:
-
-```
-Pasada 1: [3, 5, 1, 8]  (3 intercambios)
-Pasada 2: [3, 1, 5, 8]  (1 intercambio)
-Pasada 3: [1, 3, 5, 8]  (1 intercambio)
-Pasada 4: sin intercambios → terminó
-```
-
 ---
 
-## 5.2 Selection Sort (iterativo)
+## 5.1 Bubble Sort — Ordenar el inventario básico
 
-Encuentra el mínimo del arreglo y lo coloca en la primera posición. Luego encuentra el mínimo del resto y lo coloca en la segunda posición. Y así sucesivamente.
+El algoritmo más simple. Compara pares adyacentes y los intercambia si están desordenados. Ideal para entender el concepto.
 
 ```java
-void selectionSort(int[] arr){
+class Inventario {
 
-    int n = arr.length;
+    private Item[] items;
+    private int cantidad;
 
-    for(int i = 0; i < n - 1; i++){
+    Inventario(int capacidad) {
+        items = new Item[capacidad];
+        cantidad = 0;
+    }
 
-        int indiceMin = i;
+    void agregar(Item item) {
+        if (cantidad < items.length) {
+            items[cantidad++] = item;
+            System.out.println("  + " + item.nombre + " agregado al inventario.");
+        }
+    }
 
-        for(int j = i + 1; j < n; j++){
-            if(arr[j] < arr[indiceMin]){
-                indiceMin = j;
+    void mostrar() {
+        System.out.println("\n=== Inventario (" + cantidad + " objetos) ===");
+        for (int i = 0; i < cantidad; i++) {
+            System.out.println("  " + (i + 1) + ". " + items[i].toString());
+        }
+    }
+
+    // Bubble Sort por valor (oro)
+    void ordenarPorValor() {
+        System.out.println("\n🔄 Ordenando por valor (Bubble Sort)...");
+
+        for (int i = 0; i < cantidad - 1; i++) {
+
+            boolean huboIntercambio = false;
+
+            for (int j = 0; j < cantidad - 1 - i; j++) {
+
+                if (items[j].valor > items[j + 1].valor) {
+                    Item temp = items[j];
+                    items[j] = items[j + 1];
+                    items[j + 1] = temp;
+                    huboIntercambio = true;
+                }
             }
+
+            if (!huboIntercambio) break;
         }
 
-        // intercambiar
-        int temp = arr[i];
-        arr[i] = arr[indiceMin];
-        arr[indiceMin] = temp;
+        System.out.println("✔ Inventario ordenado por valor.");
     }
 }
 ```
 
-Complejidad: **O(n²)** siempre (no tiene mejor caso).
+### Traza con inventario
+
+```
+Items: [Espada(100), Poción(15), Escudo(80), Hierba(5)]
+
+Pasada 1: compara pares adyacentes
+  Espada(100) > Poción(15) → intercambiar → [Poción, Espada, Escudo, Hierba]
+  Espada(100) > Escudo(80) → intercambiar → [Poción, Escudo, Espada, Hierba]
+  Espada(100) > Hierba(5)  → intercambiar → [Poción, Escudo, Hierba, Espada]
+
+Pasada 2:
+  Poción(15) < Escudo(80)  → no cambia
+  Escudo(80) > Hierba(5)   → intercambiar → [Poción, Hierba, Escudo, Espada]
+
+Pasada 3:
+  Poción(15) > Hierba(5)   → intercambiar → [Hierba, Poción, Escudo, Espada]
+
+Resultado: [Hierba(5), Poción(15), Escudo(80), Espada(100)] ✓
+```
+
+Complejidad: **O(n²)** peor caso, **O(n)** mejor caso (ya ordenado).
 
 ---
 
-## 5.3 Insertion Sort (iterativo)
+## 5.2 Selection Sort — Encontrar el mejor objeto
 
-Toma cada elemento y lo inserta en la posición correcta dentro de la parte ya ordenada del arreglo. Como ordenar cartas en la mano.
+Encuentra el mínimo (o máximo) y lo coloca en su posición. Útil cuando queremos encontrar "el más valioso", "el más raro", etc.
 
 ```java
-void insertionSort(int[] arr){
+// Dentro de la clase Inventario
 
-    for(int i = 1; i < arr.length; i++){
+void ordenarPorRareza() {
+    System.out.println("\n🔄 Ordenando por rareza (Selection Sort)...");
 
-        int clave = arr[i];
+    for (int i = 0; i < cantidad - 1; i++) {
+
+        int indiceMax = i;
+
+        for (int j = i + 1; j < cantidad; j++) {
+            if (items[j].rareza > items[indiceMax].rareza) {
+                indiceMax = j;
+            }
+        }
+
+        // Intercambiar
+        Item temp = items[i];
+        items[i] = items[indiceMax];
+        items[indiceMax] = temp;
+    }
+
+    System.out.println("✔ Inventario ordenado por rareza (legendario primero).");
+}
+```
+
+Complejidad: **O(n²)** siempre.
+
+---
+
+## 5.3 Insertion Sort — Insertar objetos en orden
+
+Toma cada elemento y lo inserta en la posición correcta. Como cuando ordenas cartas en la mano, o cuando un nuevo ítem llega al inventario y lo colocas en su lugar.
+
+```java
+// Dentro de la clase Inventario
+
+void ordenarPorPeso() {
+    System.out.println("\n🔄 Ordenando por peso (Insertion Sort)...");
+
+    for (int i = 1; i < cantidad; i++) {
+
+        Item clave = items[i];
         int j = i - 1;
 
-        while(j >= 0 && arr[j] > clave){
-            arr[j + 1] = arr[j];
+        while (j >= 0 && items[j].peso > clave.peso) {
+            items[j + 1] = items[j];
             j--;
         }
 
-        arr[j + 1] = clave;
+        items[j + 1] = clave;
     }
+
+    System.out.println("✔ Inventario ordenado por peso (más liviano primero).");
 }
 ```
 
@@ -111,237 +206,423 @@ Complejidad: **O(n²)** peor caso, **O(n)** mejor caso (ya ordenado).
 
 ---
 
-## 5.4 Merge Sort (recursivo — divide y vencerás)
-
-Aquí es donde la recursividad brilla en ordenamiento. **Merge Sort** divide el arreglo a la mitad, ordena cada mitad recursivamente, y luego las combina (merge).
-
-```
-Arreglo original: [38, 27, 43, 3, 9, 82, 10]
-
-Dividir:
-[38, 27, 43, 3]          [9, 82, 10]
-[38, 27]  [43, 3]        [9, 82]  [10]
-[38] [27] [43] [3]       [9] [82] [10]
-
-Combinar (merge):
-[27, 38] [3, 43]         [9, 82] [10]
-[3, 27, 38, 43]          [9, 10, 82]
-[3, 9, 10, 27, 38, 43, 82]
-```
+## 🎮 Paso 12: Probemos el inventario
 
 ```java
-void mergeSort(int[] arr, int inicio, int fin){
+public class InventarioRPG {
 
-    if(inicio >= fin){
-        return;                          // caso base: 0 o 1 elemento
+    public static void main(String[] args) {
+
+        Inventario inv = new Inventario(20);
+
+        inv.agregar(new Item("Espada de fuego", "arma", 250, 8, 4));
+        inv.agregar(new Item("Poción menor", "pocion", 15, 1, 1));
+        inv.agregar(new Item("Escudo de roble", "armadura", 80, 12, 2));
+        inv.agregar(new Item("Hierba curativa", "material", 5, 1, 1));
+        inv.agregar(new Item("Anillo del dragón", "accesorio", 1000, 1, 5));
+        inv.agregar(new Item("Cota de malla", "armadura", 150, 15, 3));
+
+        inv.mostrar();
+
+        inv.ordenarPorValor();
+        inv.mostrar();
+
+        inv.ordenarPorRareza();
+        inv.mostrar();
+
+        inv.ordenarPorPeso();
+        inv.mostrar();
+    }
+}
+```
+
+---
+
+## 5.4 Merge Sort — Ordenar el historial de combates (recursivo)
+
+Cuando el historial de combates es muy largo, necesitamos un algoritmo más eficiente. **Merge Sort** divide el arreglo a la mitad, ordena cada mitad recursivamente, y luego las combina.
+
+```java
+class RegistroCombate {
+
+    String enemigo;
+    int dañoTotal;
+    int ronda;
+
+    RegistroCombate(String enemigo, int dañoTotal, int ronda) {
+        this.enemigo = enemigo;
+        this.dañoTotal = dañoTotal;
+        this.ronda = ronda;
     }
 
-    int medio = (inicio + fin) / 2;
-
-    mergeSort(arr, inicio, medio);       // ordenar mitad izquierda
-    mergeSort(arr, medio + 1, fin);      // ordenar mitad derecha
-
-    merge(arr, inicio, medio, fin);      // combinar
+    String toString() {
+        return "Ronda " + ronda + ": vs " + enemigo + " (" + dañoTotal + " daño)";
+    }
 }
 
-void merge(int[] arr, int inicio, int medio, int fin){
+class HistorialCombates {
 
-    int[] temp = new int[fin - inicio + 1];
-    int i = inicio;
-    int j = medio + 1;
-    int k = 0;
+    static void ordenarPorDaño(RegistroCombate[] registros, int inicio, int fin) {
 
-    while(i <= medio && j <= fin){
-        if(arr[i] <= arr[j]){
-            temp[k++] = arr[i++];
-        } else {
-            temp[k++] = arr[j++];
+        if (inicio >= fin) {
+            return;  // caso base: 0 o 1 elemento
+        }
+
+        int medio = (inicio + fin) / 2;
+
+        ordenarPorDaño(registros, inicio, medio);       // ordenar mitad izquierda
+        ordenarPorDaño(registros, medio + 1, fin);      // ordenar mitad derecha
+        merge(registros, inicio, medio, fin);            // combinar
+    }
+
+    private static void merge(RegistroCombate[] arr, int inicio, int medio, int fin) {
+
+        RegistroCombate[] temp = new RegistroCombate[fin - inicio + 1];
+        int i = inicio;
+        int j = medio + 1;
+        int k = 0;
+
+        while (i <= medio && j <= fin) {
+            if (arr[i].dañoTotal >= arr[j].dañoTotal) {  // mayor daño primero
+                temp[k++] = arr[i++];
+            } else {
+                temp[k++] = arr[j++];
+            }
+        }
+
+        while (i <= medio) temp[k++] = arr[i++];
+        while (j <= fin) temp[k++] = arr[j++];
+
+        for (int m = 0; m < temp.length; m++) {
+            arr[inicio + m] = temp[m];
         }
     }
-
-    while(i <= medio){
-        temp[k++] = arr[i++];
-    }
-
-    while(j <= fin){
-        temp[k++] = arr[j++];
-    }
-
-    for(int m = 0; m < temp.length; m++){
-        arr[inicio + m] = temp[m];
-    }
 }
+```
+
+### Visualización del Merge Sort
+
+```
+Registros: [Goblin(25), Dragón(150), Orco(60), Slime(10)]
+
+Dividir:
+  [Goblin(25), Dragón(150)]    [Orco(60), Slime(10)]
+  [Goblin(25)] [Dragón(150)]   [Orco(60)] [Slime(10)]
+
+Combinar (mayor daño primero):
+  [Dragón(150), Goblin(25)]    [Orco(60), Slime(10)]
+  [Dragón(150), Orco(60), Goblin(25), Slime(10)]
+```
+
+### Ambiente recursivo
+
+```
+ordenarPorDaño([G(25), D(150), O(60), S(10)], 0, 3)
+    ordenarPorDaño([G, D, O, S], 0, 1)          ← mitad izquierda
+        ordenarPorDaño([G, D, O, S], 0, 0)      ← caso base
+        ordenarPorDaño([G, D, O, S], 1, 1)      ← caso base
+        merge → [D(150), G(25)]
+    ordenarPorDaño([G, D, O, S], 2, 3)          ← mitad derecha
+        ordenarPorDaño([G, D, O, S], 2, 2)      ← caso base
+        ordenarPorDaño([G, D, O, S], 3, 3)      ← caso base
+        merge → [O(60), S(10)]
+    merge → [D(150), O(60), G(25), S(10)]
 ```
 
 Complejidad: **O(n log n)** siempre. Usa **O(n)** de espacio extra.
 
-### Ambiente recursivo de Merge Sort
-
-Con `[38, 27, 43, 3]`:
-
-```
-mergeSort([38,27,43,3], 0, 3)
-    mergeSort([38,27,43,3], 0, 1)        ← mitad izquierda
-        mergeSort([38,27,43,3], 0, 0)    ← caso base [38]
-        mergeSort([38,27,43,3], 1, 1)    ← caso base [27]
-        merge → [27, 38]
-    mergeSort([38,27,43,3], 2, 3)        ← mitad derecha
-        mergeSort([38,27,43,3], 2, 2)    ← caso base [43]
-        mergeSort([38,27,43,3], 3, 3)    ← caso base [3]
-        merge → [3, 43]
-    merge → [3, 27, 38, 43]
-```
-
-La profundidad de la pila de llamadas es **O(log n)** porque el arreglo se divide a la mitad en cada nivel.
-
 ---
 
-## 5.5 Quick Sort (recursivo — divide y vencerás)
+## 5.5 Quick Sort — Ranking competitivo (recursivo)
 
-Elige un **pivote**, coloca todos los menores a la izquierda y los mayores a la derecha, y luego ordena cada lado recursivamente.
+Para el ranking de héroes usamos Quick Sort: elige un **pivote**, coloca todos los menores a la izquierda y los mayores a la derecha, y ordena cada lado recursivamente.
 
 ```java
-void quickSort(int[] arr, int inicio, int fin){
+class HeroeRanking {
 
-    if(inicio >= fin){
-        return;                          // caso base
+    String nombre;
+    int nivel;
+    int victorias;
+    int dañoTotal;
+
+    HeroeRanking(String nombre, int nivel, int victorias, int dañoTotal) {
+        this.nombre = nombre;
+        this.nivel = nivel;
+        this.victorias = victorias;
+        this.dañoTotal = dañoTotal;
     }
 
-    int indicePivote = particionar(arr, inicio, fin);
-
-    quickSort(arr, inicio, indicePivote - 1);   // ordenar izquierda
-    quickSort(arr, indicePivote + 1, fin);       // ordenar derecha
+    String toString() {
+        return nombre + " (Nv." + nivel + " | " + victorias + " victorias | "
+            + dañoTotal + " daño total)";
+    }
 }
 
-int particionar(int[] arr, int inicio, int fin){
+class Ranking {
 
-    int pivote = arr[fin];               // elegimos el último como pivote
-    int i = inicio - 1;
+    static void ordenarPorVictorias(HeroeRanking[] heroes, int inicio, int fin) {
 
-    for(int j = inicio; j < fin; j++){
-        if(arr[j] <= pivote){
-            i++;
-            int temp = arr[i];
-            arr[i] = arr[j];
-            arr[j] = temp;
+        if (inicio >= fin) {
+            return;
         }
+
+        int indicePivote = particionar(heroes, inicio, fin);
+
+        ordenarPorVictorias(heroes, inicio, indicePivote - 1);
+        ordenarPorVictorias(heroes, indicePivote + 1, fin);
     }
 
-    // colocar pivote en su posición final
-    int temp = arr[i + 1];
-    arr[i + 1] = arr[fin];
-    arr[fin] = temp;
+    private static int particionar(HeroeRanking[] arr, int inicio, int fin) {
 
-    return i + 1;
+        int pivote = arr[fin].victorias;
+        int i = inicio - 1;
+
+        for (int j = inicio; j < fin; j++) {
+            if (arr[j].victorias >= pivote) {  // mayor victorias primero
+                i++;
+                HeroeRanking temp = arr[i];
+                arr[i] = arr[j];
+                arr[j] = temp;
+            }
+        }
+
+        HeroeRanking temp = arr[i + 1];
+        arr[i + 1] = arr[fin];
+        arr[fin] = temp;
+
+        return i + 1;
+    }
+
+    static void mostrar(HeroeRanking[] heroes, int cantidad) {
+        System.out.println("\n🏆 === RANKING DE HÉROES ===");
+        for (int i = 0; i < cantidad; i++) {
+            String medalla;
+            switch (i) {
+                case 0: medalla = "🥇"; break;
+                case 1: medalla = "🥈"; break;
+                case 2: medalla = "🥉"; break;
+                default: medalla = "  " + (i + 1) + "."; break;
+            }
+            System.out.println(medalla + " " + heroes[i].toString());
+        }
+    }
 }
 ```
 
-Complejidad: **O(n log n)** promedio, **O(n²)** peor caso (arreglo ya ordenado con pivote malo).
+### Uso
+
+```java
+HeroeRanking[] heroes = {
+    new HeroeRanking("Aldric", 15, 42, 3200),
+    new HeroeRanking("Luna", 18, 67, 5100),
+    new HeroeRanking("Thorin", 12, 28, 1800),
+    new HeroeRanking("Elara", 20, 89, 7500),
+    new HeroeRanking("Kael", 16, 55, 4300)
+};
+
+Ranking.ordenarPorVictorias(heroes, 0, heroes.length - 1);
+Ranking.mostrar(heroes, heroes.length);
+
+// 🏆 === RANKING DE HÉROES ===
+// 🥇 Elara (Nv.20 | 89 victorias | 7500 daño total)
+// 🥈 Luna (Nv.18 | 67 victorias | 5100 daño total)
+// 🥉 Kael (Nv.16 | 55 victorias | 4300 daño total)
+//   4. Aldric (Nv.15 | 42 victorias | 3200 daño total)
+//   5. Thorin (Nv.12 | 28 victorias | 1800 daño total)
+```
+
+Complejidad: **O(n log n)** promedio, **O(n²)** peor caso.
 
 Ventaja sobre Merge Sort: ordena **in-place** (no necesita arreglo auxiliar).
 
 ---
 
-## 5.6 Comparación de algoritmos de ordenamiento
+## 5.6 Comparación de algoritmos
 
-| Algoritmo | Complejidad (peor) | Complejidad (mejor) | Espacio extra | Estable | Enfoque |
+| Algoritmo | Peor caso | Mejor caso | Espacio | Estable | Uso en el RPG |
 |---|---|---|---|---|---|
-| Bubble Sort | O(n²) | O(n) | O(1) | Sí | Iterativo |
-| Selection Sort | O(n²) | O(n²) | O(1) | No | Iterativo |
-| Insertion Sort | O(n²) | O(n) | O(1) | Sí | Iterativo |
-| Merge Sort | O(n log n) | O(n log n) | O(n) | Sí | Recursivo |
-| Quick Sort | O(n²) | O(n log n) | O(log n) | No | Recursivo |
+| Bubble Sort | O(n²) | O(n) | O(1) | Sí | Inventario pequeño |
+| Selection Sort | O(n²) | O(n²) | O(1) | No | Encontrar el mejor ítem |
+| Insertion Sort | O(n²) | O(n) | O(1) | Sí | Insertar ítems en orden |
+| Merge Sort | O(n log n) | O(n log n) | O(n) | Sí | Historial de combates |
+| Quick Sort | O(n²) | O(n log n) | O(log n) | No | Ranking competitivo |
 
 **Estable** significa que elementos iguales mantienen su orden relativo original.
 
 ---
 
-## 5.7 Búsqueda binaria (recursiva e iterativa)
+## 5.7 Búsqueda binaria — Encontrar objetos rápido
 
-Ahora que sabemos ordenar, podemos buscar eficientemente en datos ordenados.
+Ahora que el inventario está ordenado, podemos buscar objetos eficientemente.
 
-**Iterativa:**
+### Iterativa
 
 ```java
-int busquedaBinaria(int[] arr, int objetivo){
+// Dentro de la clase Inventario (asumiendo ordenado por valor)
+
+Item buscarPorValor(int valorBuscado) {
 
     int inicio = 0;
-    int fin = arr.length - 1;
+    int fin = cantidad - 1;
 
-    while(inicio <= fin){
+    while (inicio <= fin) {
 
         int medio = (inicio + fin) / 2;
 
-        if(arr[medio] == objetivo){
-            return medio;
+        if (items[medio].valor == valorBuscado) {
+            return items[medio];
         }
 
-        if(arr[medio] < objetivo){
+        if (items[medio].valor < valorBuscado) {
             inicio = medio + 1;
         } else {
             fin = medio - 1;
         }
     }
 
-    return -1;  // no encontrado
+    return null;  // no encontrado
 }
 ```
 
-**Recursiva:**
+### Recursiva
 
 ```java
-int busquedaBinariaRecursiva(int[] arr, int objetivo, int inicio, int fin){
+Item buscarPorValorRecursivo(int valorBuscado, int inicio, int fin) {
 
-    if(inicio > fin){
-        return -1;                       // caso base: no encontrado
+    if (inicio > fin) {
+        return null;  // caso base: no encontrado
     }
 
     int medio = (inicio + fin) / 2;
 
-    if(arr[medio] == objetivo){
-        return medio;                    // caso base: encontrado
+    if (items[medio].valor == valorBuscado) {
+        return items[medio];  // caso base: encontrado
     }
 
-    if(arr[medio] < objetivo){
-        return busquedaBinariaRecursiva(arr, objetivo, medio + 1, fin);
+    if (items[medio].valor < valorBuscado) {
+        return buscarPorValorRecursivo(valorBuscado, medio + 1, fin);
     }
 
-    return busquedaBinariaRecursiva(arr, objetivo, inicio, medio - 1);
+    return buscarPorValorRecursivo(valorBuscado, inicio, medio - 1);
 }
 ```
 
-Complejidad: **O(log n)** en ambos casos. La versión recursiva usa O(log n) de espacio en la pila.
-
-Traza buscando 27 en `[3, 9, 10, 27, 38, 43, 82]`:
+### Traza buscando un ítem de valor 150
 
 ```
-busqueda(arr, 27, 0, 6)
-    medio = 3, arr[3] = 27 → ¡encontrado! retorna 3
+Inventario ordenado por valor: [5, 15, 80, 150, 250, 1000]
+
+buscar(150, 0, 5)
+    medio = 2, items[2].valor = 80 < 150 → buscar derecha
+    buscar(150, 3, 5)
+        medio = 4, items[4].valor = 250 > 150 → buscar izquierda
+        buscar(150, 3, 3)
+            medio = 3, items[3].valor = 150 → ¡encontrado!
 ```
 
-Buscando 10:
+Complejidad: **O(log n)**. Con 1000 objetos, máximo 10 comparaciones.
 
-```
-busqueda(arr, 10, 0, 6)
-    medio = 3, arr[3] = 27 > 10 → buscar izquierda
-    busqueda(arr, 10, 0, 2)
-        medio = 1, arr[1] = 9 < 10 → buscar derecha
-        busqueda(arr, 10, 2, 2)
-            medio = 2, arr[2] = 10 → ¡encontrado! retorna 2
+---
+
+## 🎮 Paso 13: Juntando todo — La tienda del RPG
+
+Combinemos inventario, ordenamiento y búsqueda en una tienda del juego:
+
+```java
+class Tienda {
+
+    private Inventario stock;
+
+    Tienda() {
+        stock = new Inventario(50);
+
+        // Llenar la tienda
+        stock.agregar(new Item("Daga de sombras", "arma", 120, 3, 3));
+        stock.agregar(new Item("Poción de vida", "pocion", 25, 1, 1));
+        stock.agregar(new Item("Armadura de placas", "armadura", 300, 20, 3));
+        stock.agregar(new Item("Amuleto ancestral", "accesorio", 500, 1, 4));
+        stock.agregar(new Item("Hierba silvestre", "material", 3, 1, 1));
+        stock.agregar(new Item("Espada del alba", "arma", 800, 10, 5));
+        stock.agregar(new Item("Escudo menor", "armadura", 60, 8, 2));
+        stock.agregar(new Item("Elixir de maná", "pocion", 45, 1, 2));
+    }
+
+    void verPorPrecio() {
+        stock.ordenarPorValor();
+        stock.mostrar();
+    }
+
+    void verPorRareza() {
+        stock.ordenarPorRareza();
+        stock.mostrar();
+    }
+
+    void buscarItem(int presupuesto) {
+        stock.ordenarPorValor();
+        Item encontrado = stock.buscarPorValor(presupuesto);
+
+        if (encontrado != null) {
+            System.out.println("🔍 Encontrado: " + encontrado.toString());
+        } else {
+            System.out.println("🔍 No hay ítems con ese precio exacto.");
+        }
+    }
+}
 ```
 
 ---
 
-## Ejercicios de ordenamiento
+## 🎮 Ejercicios del proyecto
 
-1. Implementar Bubble Sort de forma recursiva (sin ciclos). Pista: cada llamada recursiva realiza una "pasada".
+### Básicos
 
-2. Implementar Merge Sort para una lista enlazada (no un arreglo). Pista: usar la técnica de dos punteros (lento/rápido) para encontrar el medio.
+1. Agrega al inventario un método `ordenarPorNombre()` usando Bubble Sort que ordene alfabéticamente. Pista: usa `nombre.compareTo(otroNombre)`.
 
-3. Implementar Quick Sort eligiendo el pivote como la mediana de tres elementos (inicio, medio, fin).
+2. Implementa un método `itemMasValioso()` que use Selection Sort para encontrar el ítem más caro sin ordenar todo el arreglo (solo necesitas una pasada).
 
-4. Contar el número de inversiones en un arreglo usando Merge Sort modificado. Una inversión es un par (i, j) donde i < j pero arr[i] > arr[j].
+3. Crea un método `filtrarPorTipo(String tipo)` que retorne un nuevo arreglo solo con los ítems de ese tipo, y luego ordénalo por valor.
 
-5. (Backtracking) Dado un arreglo desordenado, generar todas las permutaciones posibles y verificar cuál está ordenada. ¿Por qué este enfoque es terrible? Analizar la complejidad.
+### Intermedios
+
+4. Implementa Merge Sort para ordenar el inventario por **múltiples criterios**: primero por rareza (descendente), y si tienen la misma rareza, por valor (descendente). Esto se llama ordenamiento estable con criterio compuesto.
+
+5. Modifica el ranking de héroes para que se pueda ordenar por diferentes criterios (victorias, nivel, daño total) sin duplicar código. Pista: usa una interfaz `Comparator` o pasa el criterio como parámetro.
+
+6. Implementa **Bubble Sort recursivo** para el inventario: cada llamada recursiva realiza una "pasada" del bubble sort.
+
+### Avanzados
+
+7. Combina el sistema de turnos (cap. 4) con el ranking: después de cada combate, actualiza las estadísticas de los héroes y reordena el ranking automáticamente.
+
+8. (Backtracking) El héroe tiene un presupuesto limitado y quiere comprar la combinación de ítems que maximice la rareza total sin exceder el presupuesto. Implementa la solución con backtracking y muestra todas las combinaciones posibles.
+
+9. Implementa un sistema de **subastas**: varios héroes pujan por un ítem. Las pujas se procesan en orden (cola del cap. 4), y al final se ordena por monto para determinar el ganador.
 
 ---
+
+## 🎮 Resumen del proyecto completo
+
+A lo largo de los capítulos 3, 4 y 5 construimos un RPG con:
+
+```
+Capítulo 3 — Pilas
+├── Sistema de acciones con Undo/Redo (dos pilas)
+├── Historial de hechizos (pila)
+├── Calculadora de daño postfija (pila)
+├── Validador de fórmulas de hechizos (pila)
+└── Recompensas invertidas (recursividad + pila)
+
+Capítulo 4 — Colas
+├── Sistema de turnos de combate (cola FIFO)
+├── Cola de eventos de mazmorra (cola)
+├── Sistema de misiones con prioridad (cola de prioridad)
+└── Papa caliente / eliminación circular (cola)
+
+Capítulo 5 — Ordenamientos
+├── Inventario ordenable (Bubble, Selection, Insertion Sort)
+├── Historial de combates (Merge Sort)
+├── Ranking de héroes (Quick Sort)
+└── Búsqueda de ítems (búsqueda binaria)
+```
+
+Cada estructura de datos resuelve un problema real del juego. Esa es la clave: **las estructuras de datos no son abstractas, son herramientas para resolver problemas concretos**.

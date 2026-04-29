@@ -1,5 +1,18 @@
 # 3. Pilas (Stacks)
 
+## 🎮 Proyecto incremental: RPG por consola — Parte 1
+
+A lo largo de los capítulos 3, 4 y 5 vamos a construir un **juego de rol por texto (RPG)** donde aprenderás pilas, colas y ordenamientos de forma práctica. Cada capítulo agrega funcionalidad nueva al mismo proyecto.
+
+En este capítulo construiremos:
+- Un **sistema de acciones con deshacer (undo/redo)** para el jugador
+- Un **historial de hechizos lanzados** con pila
+- Un **evaluador de fórmulas de daño** usando notación postfija
+
+Al final del capítulo tendrás un personaje que puede realizar acciones, deshacerlas y lanzar hechizos con fórmulas de daño calculadas con pilas.
+
+---
+
 ## Teoría
 
 Una **pila** es una estructura de datos que funciona con el principio **LIFO** (Last In, First Out): el último elemento que entra es el primero que sale.
@@ -15,80 +28,91 @@ Operaciones fundamentales:
 
 ---
 
-## Implementación con arreglo (iterativa)
+## Implementación con arreglo
 
 ```java
-class Pila {
+class Pila<T> {
 
-    private int[] datos;
+    private Object[] datos;
     private int tope;
 
-    public Pila(int capacidad){
-        datos = new int[capacidad];
+    public Pila(int capacidad) {
+        datos = new Object[capacidad];
         tope = -1;
     }
 
-    public void push(int valor){
-        if(tope == datos.length - 1){
+    public void push(T valor) {
+        if (tope == datos.length - 1) {
             throw new RuntimeException("Pila llena");
         }
         datos[++tope] = valor;
     }
 
-    public int pop(){
-        if(tope == -1){
+    @SuppressWarnings("unchecked")
+    public T pop() {
+        if (tope == -1) {
             throw new RuntimeException("Pila vacía");
         }
-        return datos[tope--];
+        return (T) datos[tope--];
     }
 
-    public int peek(){
-        if(tope == -1){
+    @SuppressWarnings("unchecked")
+    public T peek() {
+        if (tope == -1) {
             throw new RuntimeException("Pila vacía");
         }
-        return datos[tope];
+        return (T) datos[tope];
     }
 
-    public boolean isEmpty(){
+    public boolean isEmpty() {
         return tope == -1;
+    }
+
+    public int tamaño() {
+        return tope + 1;
     }
 }
 ```
 
----
-
 ## Implementación con lista enlazada
 
-Usar una lista enlazada permite una pila sin límite fijo de capacidad. El tope de la pila es la cabeza de la lista.
-
 ```java
-class PilaEnlazada {
+class PilaEnlazada<T> {
 
-    private Nodo tope;
+    private Nodo<T> tope;
 
-    public void push(int valor){
-        Nodo nuevo = new Nodo(valor);
+    private static class Nodo<T> {
+        T valor;
+        Nodo<T> siguiente;
+
+        Nodo(T valor) {
+            this.valor = valor;
+        }
+    }
+
+    public void push(T valor) {
+        Nodo<T> nuevo = new Nodo<>(valor);
         nuevo.siguiente = tope;
         tope = nuevo;
     }
 
-    public int pop(){
-        if(tope == null){
+    public T pop() {
+        if (tope == null) {
             throw new RuntimeException("Pila vacía");
         }
-        int valor = tope.valor;
+        T valor = tope.valor;
         tope = tope.siguiente;
         return valor;
     }
 
-    public int peek(){
-        if(tope == null){
+    public T peek() {
+        if (tope == null) {
             throw new RuntimeException("Pila vacía");
         }
         return tope.valor;
     }
 
-    public boolean isEmpty(){
+    public boolean isEmpty() {
         return tope == null;
     }
 }
@@ -97,8 +121,6 @@ class PilaEnlazada {
 ---
 
 ## Visualización de operaciones
-
-Veamos cómo se ve la pila internamente paso a paso:
 
 ```
 Operación          Estado de la pila (tope arriba)
@@ -121,674 +143,504 @@ peek() → 20        | 20 |  ← tope (no se quita)
 pop() → 20         | 10 |  ← tope
 
 pop() → 10         (vacía)
-
-pop() → ERROR      RuntimeException: Pila vacía
 ```
-
----
-
-## Implementación con genéricos
-
-Las implementaciones anteriores solo almacenan `int`. En la práctica, queremos pilas que almacenen cualquier tipo de dato:
-
-```java
-class PilaGenerica<T> {
-
-    private Object[] datos;
-    private int tope;
-
-    public PilaGenerica(int capacidad){
-        datos = new Object[capacidad];
-        tope = -1;
-    }
-
-    public void push(T valor){
-        if(tope == datos.length - 1){
-            throw new RuntimeException("Pila llena");
-        }
-        datos[++tope] = valor;
-    }
-
-    @SuppressWarnings("unchecked")
-    public T pop(){
-        if(tope == -1){
-            throw new RuntimeException("Pila vacía");
-        }
-        return (T) datos[tope--];
-    }
-
-    @SuppressWarnings("unchecked")
-    public T peek(){
-        if(tope == -1){
-            throw new RuntimeException("Pila vacía");
-        }
-        return (T) datos[tope];
-    }
-
-    public boolean isEmpty(){
-        return tope == -1;
-    }
-
-    public int tamaño(){
-        return tope + 1;
-    }
-}
-```
-
-Uso:
-
-```java
-PilaGenerica<String> pilaTexto = new PilaGenerica<>(10);
-pilaTexto.push("hola");
-pilaTexto.push("mundo");
-System.out.println(pilaTexto.pop());  // "mundo"
-
-PilaGenerica<Double> pilaDecimal = new PilaGenerica<>(10);
-pilaDecimal.push(3.14);
-pilaDecimal.push(2.71);
-```
-
-Esto es exactamente lo que hace `java.util.Stack<E>` internamente.
 
 ---
 
 ## La pila y la recursividad: una conexión profunda
 
-Aquí viene algo importante: **la recursividad usa internamente una pila**. Cada llamada recursiva se apila en el call stack de Java. Por eso, **todo lo que se puede hacer con recursividad se puede hacer con una pila explícita**, y viceversa.
-
-Esto significa que si tienes un algoritmo recursivo que causa `StackOverflowError`, puedes convertirlo a iterativo usando tu propia pila.
-
-### Visualización: el call stack ES una pila
+**La recursividad usa internamente una pila.** Cada llamada recursiva se apila en el call stack de Java. Por eso, todo lo que se puede hacer con recursividad se puede hacer con una pila explícita, y viceversa.
 
 Cuando ejecutamos `factorial(4)`:
 
 ```
-factorial(4)
-    factorial(3)
-        factorial(2)
-            factorial(1)
-                retorna 1
-
-Pila de llamadas en ese momento:
-
 | factorial(1) |  ← tope (caso base, retorna 1)
 | factorial(2) |  ← espera resultado para hacer 2 * resultado
 | factorial(3) |  ← espera resultado para hacer 3 * resultado
 | factorial(4) |  ← espera resultado para hacer 4 * resultado
 ```
 
-Desenrollado:
+Si un algoritmo recursivo causa `StackOverflowError`, puedes convertirlo a iterativo usando tu propia pila.
 
-```
-factorial(1) retorna 1
-factorial(2) retorna 2 * 1 = 2
-factorial(3) retorna 3 * 2 = 6
-factorial(4) retorna 4 * 6 = 24
-```
+---
 
-### Factorial iterativo con pila explícita
+## 🎮 Paso 1: La clase Personaje
 
-Podemos simular exactamente lo mismo con nuestra propia pila:
+Empecemos creando nuestro héroe. Por ahora solo tiene nombre, vida y poder de ataque.
 
 ```java
-int factorialConPila(int n){
+class Personaje {
 
-    PilaGenerica<Integer> pila = new PilaGenerica<>(n);
+    String nombre;
+    int vida;
+    int ataque;
+    int defensa;
 
-    // apilar los valores (simula las llamadas recursivas)
-    for(int i = n; i >= 1; i--){
-        pila.push(i);
+    Personaje(String nombre, int vida, int ataque, int defensa) {
+        this.nombre = nombre;
+        this.vida = vida;
+        this.ataque = ataque;
+        this.defensa = defensa;
     }
 
-    // desapilar multiplicando (simula el desenrollado)
-    int resultado = 1;
-    while(!pila.isEmpty()){
-        resultado *= pila.pop();
+    String estado() {
+        return nombre + " [HP: " + vida + " | ATK: " + ataque + " | DEF: " + defensa + "]";
     }
-
-    return resultado;
 }
 ```
 
 ---
 
-## Ejemplo: recorrer una lista enlazada en orden inverso
+## 🎮 Paso 2: Sistema de acciones con Undo/Redo
 
-**Versión recursiva** (ya la vimos en listas):
+En muchos juegos puedes deshacer tu última acción. Esto se implementa con **dos pilas**: una para deshacer y otra para rehacer. Es el mismo patrón que usan los editores de texto (Ctrl+Z / Ctrl+Y).
 
-```java
-void imprimirInverso(Nodo nodo){
-    if(nodo == null) return;
-    imprimirInverso(nodo.siguiente);
-    System.out.println(nodo.valor);
-}
-```
-
-**Versión iterativa con pila explícita:**
+Primero definimos qué es una acción:
 
 ```java
-void imprimirInversoConPila(Nodo cabeza){
+class Accion {
 
-    PilaGenerica<Integer> pila = new PilaGenerica<>(1000);
-    Nodo actual = cabeza;
+    String descripcion;
+    int cambioVida;      // cuánto cambió la vida
+    int cambioAtaque;    // cuánto cambió el ataque
+    int cambioDefensa;   // cuánto cambió la defensa
 
-    // apilar todos los valores
-    while(actual != null){
-        pila.push(actual.valor);
-        actual = actual.siguiente;
-    }
-
-    // desapilar e imprimir
-    while(!pila.isEmpty()){
-        System.out.println(pila.pop());
+    Accion(String descripcion, int cambioVida, int cambioAtaque, int cambioDefensa) {
+        this.descripcion = descripcion;
+        this.cambioVida = cambioVida;
+        this.cambioAtaque = cambioAtaque;
+        this.cambioDefensa = cambioDefensa;
     }
 }
 ```
 
-Traza con lista `10 -> 20 -> 30`:
+Ahora el sistema de undo/redo:
 
+```java
+class SistemaAcciones {
+
+    private Pila<Accion> historial;    // para deshacer
+    private Pila<Accion> rehecho;      // para rehacer
+    private Personaje personaje;
+
+    SistemaAcciones(Personaje personaje) {
+        this.personaje = personaje;
+        historial = new Pila<>(100);
+        rehecho = new Pila<>(100);
+    }
+
+    void ejecutar(Accion accion) {
+        // Aplicar la acción al personaje
+        personaje.vida += accion.cambioVida;
+        personaje.ataque += accion.cambioAtaque;
+        personaje.defensa += accion.cambioDefensa;
+
+        // Guardar en historial
+        historial.push(accion);
+
+        // Limpiar la pila de rehacer (nueva acción invalida el futuro)
+        rehecho = new Pila<>(100);
+
+        System.out.println("✔ " + accion.descripcion);
+        System.out.println("  " + personaje.estado());
+    }
+
+    void deshacer() {
+        if (historial.isEmpty()) {
+            System.out.println("⚠ No hay acciones para deshacer.");
+            return;
+        }
+
+        Accion accion = historial.pop();
+
+        // Revertir los cambios (aplicar lo opuesto)
+        personaje.vida -= accion.cambioVida;
+        personaje.ataque -= accion.cambioAtaque;
+        personaje.defensa -= accion.cambioDefensa;
+
+        rehecho.push(accion);
+
+        System.out.println("↩ Deshecho: " + accion.descripcion);
+        System.out.println("  " + personaje.estado());
+    }
+
+    void rehacer() {
+        if (rehecho.isEmpty()) {
+            System.out.println("⚠ No hay acciones para rehacer.");
+            return;
+        }
+
+        Accion accion = rehecho.pop();
+
+        personaje.vida += accion.cambioVida;
+        personaje.ataque += accion.cambioAtaque;
+        personaje.defensa += accion.cambioDefensa;
+
+        historial.push(accion);
+
+        System.out.println("↪ Rehecho: " + accion.descripcion);
+        System.out.println("  " + personaje.estado());
+    }
+}
 ```
-Fase 1 — Apilar:
-  push(10) → | 10 |
-  push(20) → | 20 |
-             | 10 |
-  push(30) → | 30 |
-             | 20 |
-             | 10 |
 
-Fase 2 — Desapilar e imprimir:
-  pop() → imprime 30
-  pop() → imprime 20
-  pop() → imprime 10
+### Probemos el sistema
+
+```java
+public class JuegoRPG {
+
+    public static void main(String[] args) {
+
+        Personaje heroe = new Personaje("Aldric", 100, 15, 10);
+        SistemaAcciones sistema = new SistemaAcciones(heroe);
+
+        System.out.println("=== Estado inicial ===");
+        System.out.println(heroe.estado());
+        System.out.println();
+
+        // El héroe bebe una poción de fuerza
+        sistema.ejecutar(new Accion("Beber poción de fuerza", 0, 5, 0));
+
+        // El héroe equipa un escudo
+        sistema.ejecutar(new Accion("Equipar escudo de hierro", 0, 0, 8));
+
+        // El héroe recibe daño
+        sistema.ejecutar(new Accion("Recibir golpe de goblin", -20, 0, 0));
+
+        System.out.println("\n=== Deshaciendo acciones ===");
+        sistema.deshacer();  // deshace el golpe del goblin
+        sistema.deshacer();  // deshace el escudo
+
+        System.out.println("\n=== Rehaciendo ===");
+        sistema.rehacer();   // rehace el escudo
+    }
+}
 ```
 
-Ambos producen el mismo resultado. La versión con pila explícita evita el riesgo de `StackOverflowError`.
+### Traza paso a paso
+
+| Acción | vida | ataque | defensa | historial | rehecho |
+|--------|------|--------|---------|-----------|---------|
+| Inicio | 100 | 15 | 10 | [] | [] |
+| Poción de fuerza | 100 | 20 | 10 | [poción] | [] |
+| Escudo de hierro | 100 | 20 | 18 | [poción, escudo] | [] |
+| Golpe de goblin | 80 | 20 | 18 | [poción, escudo, golpe] | [] |
+| Deshacer (golpe) | 100 | 20 | 18 | [poción, escudo] | [golpe] |
+| Deshacer (escudo) | 100 | 20 | 10 | [poción] | [golpe, escudo] |
+| Rehacer (escudo) | 100 | 20 | 18 | [poción, escudo] | [golpe] |
 
 ---
 
-## DFS con pila explícita (puente hacia grafos)
+## 🎮 Paso 3: Historial de hechizos lanzados
 
-El recorrido en profundidad (DFS) que veremos en grafos y árboles se puede implementar con recursividad O con una pila. Aquí un adelanto usando una estructura simple:
+El mago del grupo tiene un libro de hechizos. Cada hechizo lanzado se apila en su historial. Podemos ver el último hechizo lanzado, o revisar todo el historial.
 
 ```java
-// Recorrer un arreglo de arreglos (como un grafo simple) usando DFS con pila
-void dfsConPila(int[][] adyacencia, int inicio){
+class Hechizo {
 
-    boolean[] visitados = new boolean[adyacencia.length];
-    PilaGenerica<Integer> pila = new PilaGenerica<>(adyacencia.length);
+    String nombre;
+    int daño;
+    String elemento;  // "fuego", "hielo", "rayo"
 
-    pila.push(inicio);
+    Hechizo(String nombre, int daño, String elemento) {
+        this.nombre = nombre;
+        this.daño = daño;
+        this.elemento = elemento;
+    }
 
-    while(!pila.isEmpty()){
+    String toString() {
+        return nombre + " (" + elemento + ", " + daño + " dmg)";
+    }
+}
 
-        int nodo = pila.pop();
+class LibroHechizos {
 
-        if(visitados[nodo]) continue;
+    private Pila<Hechizo> historial;
 
-        visitados[nodo] = true;
-        System.out.print(nodo + " ");
+    LibroHechizos() {
+        historial = new Pila<>(50);
+    }
 
-        // apilar vecinos (en orden inverso para mantener el orden natural)
-        for(int i = adyacencia[nodo].length - 1; i >= 0; i--){
-            int vecino = adyacencia[nodo][i];
-            if(!visitados[vecino]){
-                pila.push(vecino);
+    void lanzar(Hechizo hechizo) {
+        historial.push(hechizo);
+        System.out.println("🔥 Lanzaste: " + hechizo.toString());
+    }
+
+    void verUltimo() {
+        if (historial.isEmpty()) {
+            System.out.println("No has lanzado ningún hechizo.");
+            return;
+        }
+        System.out.println("Último hechizo: " + historial.peek().toString());
+    }
+
+    void verHistorial() {
+        if (historial.isEmpty()) {
+            System.out.println("Historial vacío.");
+            return;
+        }
+
+        System.out.println("=== Historial de hechizos (más reciente primero) ===");
+        Pila<Hechizo> temporal = new Pila<>(50);
+
+        while (!historial.isEmpty()) {
+            Hechizo h = historial.pop();
+            System.out.println("  - " + h.toString());
+            temporal.push(h);
+        }
+
+        // Restaurar la pila original
+        while (!temporal.isEmpty()) {
+            historial.push(temporal.pop());
+        }
+    }
+
+    // RECURSIVO: contar hechizos de un elemento específico
+    int contarPorElemento(String elemento) {
+        return contarRecursivo(elemento);
+    }
+
+    private int contarRecursivo(String elemento) {
+        if (historial.isEmpty()) {
+            return 0;
+        }
+
+        Hechizo h = historial.pop();
+        int cuenta = contarRecursivo(elemento);
+
+        if (h.elemento.equals(elemento)) {
+            cuenta++;
+        }
+
+        historial.push(h);  // restaurar
+        return cuenta;
+    }
+}
+```
+
+### Uso en el juego
+
+```java
+LibroHechizos libro = new LibroHechizos();
+
+libro.lanzar(new Hechizo("Bola de fuego", 25, "fuego"));
+libro.lanzar(new Hechizo("Rayo gélido", 18, "hielo"));
+libro.lanzar(new Hechizo("Llamarada", 30, "fuego"));
+libro.lanzar(new Hechizo("Tormenta eléctrica", 35, "rayo"));
+
+libro.verUltimo();
+// Último hechizo: Tormenta eléctrica (rayo, 35 dmg)
+
+libro.verHistorial();
+// Tormenta eléctrica, Llamarada, Rayo gélido, Bola de fuego
+
+System.out.println("Hechizos de fuego: " + libro.contarPorElemento("fuego"));
+// Hechizos de fuego: 2
+```
+
+---
+
+## 🎮 Paso 4: Calculadora de daño con notación postfija
+
+En nuestro RPG, las fórmulas de daño pueden ser complejas. Por ejemplo:
+
+> Daño = (ataque_base + bonus_arma) × multiplicador_crítico - defensa_enemigo
+
+En notación postfija esto se escribe: `ataque bonus + multiplicador * defensa -`
+
+La ventaja: **no necesita paréntesis** y se evalúa con una pila.
+
+```java
+class CalculadoraDaño {
+
+    static int evaluar(String formula) {
+
+        Pila<Integer> pila = new Pila<>(100);
+        String[] tokens = formula.split(" ");
+
+        for (String token : tokens) {
+
+            if (token.matches("-?\\d+")) {
+                pila.push(Integer.parseInt(token));
+            } else {
+                int b = pila.pop();
+                int a = pila.pop();
+
+                switch (token) {
+                    case "+": pila.push(a + b); break;
+                    case "-": pila.push(a - b); break;
+                    case "*": pila.push(a * b); break;
+                    case "/": pila.push(a / b); break;
+                }
             }
         }
+
+        return pila.pop();
     }
 }
 ```
 
-Esto demuestra que la pila es la estructura fundamental detrás de la recursividad y el DFS.
+### Ejemplo en el juego
+
+```java
+// Fórmula: (15 + 5) * 2 - 8
+// Postfija: 15 5 + 2 * 8 -
+int daño = CalculadoraDaño.evaluar("15 5 + 2 * 8 -");
+System.out.println("Daño infligido: " + daño);  // 32
+```
+
+### Traza paso a paso
+
+| Token | Acción | Pila |
+|-------|--------|------|
+| 15 | push(15) | [15] |
+| 5 | push(5) | [15, 5] |
+| + | pop 5, pop 15, push(20) | [20] |
+| 2 | push(2) | [20, 2] |
+| * | pop 2, pop 20, push(40) | [40] |
+| 8 | push(8) | [40, 8] |
+| - | pop 8, pop 40, push(32) | [32] |
+
+Resultado: **32 de daño**
 
 ---
 
-## Verificar paréntesis balanceados (aplicación clásica)
+## 🎮 Paso 5: Verificar hechizos con paréntesis balanceados
 
-Este es uno de los problemas más clásicos que se resuelven con pilas. La idea: cada símbolo de apertura se apila, y cada símbolo de cierre debe coincidir con el tope.
-
-**Iterativo con pila:**
+Los hechizos del juego tienen encantamientos con símbolos que deben estar balanceados. Si un mago escribe mal la fórmula, el hechizo falla.
 
 ```java
-boolean parentesisBalanceados(String expresion){
+class ValidadorHechizo {
 
-    PilaGenerica<Character> pila = new PilaGenerica<>(expresion.length());
+    static boolean formulaValida(String encantamiento) {
 
-    for(int i = 0; i < expresion.length(); i++){
+        Pila<Character> pila = new Pila<>(encantamiento.length());
 
-        char c = expresion.charAt(i);
+        for (int i = 0; i < encantamiento.length(); i++) {
 
-        if(c == '(' || c == '[' || c == '{'){
-            pila.push(c);
+            char c = encantamiento.charAt(i);
+
+            if (c == '(' || c == '[' || c == '{') {
+                pila.push(c);
+            } else if (c == ')' || c == ']' || c == '}') {
+
+                if (pila.isEmpty()) return false;
+
+                char abierto = pila.pop();
+                if (c == ')' && abierto != '(') return false;
+                if (c == ']' && abierto != '[') return false;
+                if (c == '}' && abierto != '{') return false;
+            }
         }
-        else if(c == ')' || c == ']' || c == '}'){
 
-            if(pila.isEmpty()) return false;
-
-            char abierto = pila.pop();
-
-            if(c == ')' && abierto != '(') return false;
-            if(c == ']' && abierto != '[') return false;
-            if(c == '}' && abierto != '{') return false;
-        }
-    }
-
-    return pila.isEmpty();
-}
-```
-
-Traza con `"{[()]}"`
-
-| Carácter | Acción | Estado de la pila |
-|----------|--------|-------------------|
-| `{` | push('{') | { |
-| `[` | push('[') | [, { |
-| `(` | push('(') | (, [, { |
-| `)` | pop() → '(' coincide con ')' | [, { |
-| `]` | pop() → '[' coincide con ']' | { |
-| `}` | pop() → '{' coincide con '}' | (vacía) |
-
-Pila vacía al final → BALANCEADO ✓
-
-Traza con `"([)]"`:
-
-| Carácter | Acción | Estado de la pila |
-|----------|--------|-------------------|
-| `(` | push('(') | ( |
-| `[` | push('[') | [, ( |
-| `)` | pop() → '[' NO coincide con ')' | NO BALANCEADO ✗ |
-
-**Recursivo:**
-
-```java
-boolean verificarRecursivo(String expr, int indice, PilaGenerica<Character> pila){
-
-    // caso base: recorrimos toda la expresión
-    if(indice == expr.length()){
         return pila.isEmpty();
     }
-
-    char c = expr.charAt(indice);
-
-    if(c == '(' || c == '[' || c == '{'){
-        pila.push(c);
-        return verificarRecursivo(expr, indice + 1, pila);
-    }
-
-    if(c == ')' || c == ']' || c == '}'){
-        if(pila.isEmpty()) return false;
-        char abierto = pila.pop();
-        if(c == ')' && abierto != '(') return false;
-        if(c == ']' && abierto != '[') return false;
-        if(c == '}' && abierto != '{') return false;
-        return verificarRecursivo(expr, indice + 1, pila);
-    }
-
-    // carácter que no es paréntesis, ignorar
-    return verificarRecursivo(expr, indice + 1, pila);
 }
-
-// Uso: verificarRecursivo("{[()]}", 0, new PilaGenerica<>(100))
 ```
 
-Ambiente recursivo con `"([])"`:
+### Uso en el juego
 
-```
-verificarRecursivo("([])", 0, {})
-    push('('), pila = {(}
-    verificarRecursivo("([])", 1, {(})
-        push('['), pila = {(, [}
-        verificarRecursivo("([])", 2, {(, [})
-            pop() → '[', coincide con ']', pila = {(}
-            verificarRecursivo("([])", 3, {(})
-                pop() → '(', coincide con ')', pila = {}
-                verificarRecursivo("([])", 4, {})
-                    indice == length, pila vacía → true
+```java
+String hechizo1 = "{fuego[rayo(explosión)]}";
+String hechizo2 = "{fuego[rayo(explosión]}";
+
+System.out.println("Hechizo 1: " +
+    (ValidadorHechizo.formulaValida(hechizo1) ? "✔ Válido" : "✘ Inválido"));
+// ✔ Válido
+
+System.out.println("Hechizo 2: " +
+    (ValidadorHechizo.formulaValida(hechizo2) ? "✔ Válido" : "✘ Inválido"));
+// ✘ Inválido
 ```
 
 ---
 
-## Evaluar expresión postfija con pila
+## 🎮 Paso 6: Invertir pila de recompensas (recursivo)
 
-Una expresión postfija (notación polaca inversa) como `3 4 + 2 *` equivale a `(3 + 4) * 2 = 14`.
-
-La ventaja de la notación postfija es que **no necesita paréntesis** y se evalúa de izquierda a derecha con una pila.
+Al completar una mazmorra, el héroe recibe recompensas apiladas. Pero las quiere en orden inverso (la primera recompensa obtenida primero).
 
 ```java
-int evaluarPostfija(String expresion){
+class Recompensas {
 
-    PilaGenerica<Integer> pila = new PilaGenerica<>(100);
-    String[] tokens = expresion.split(" ");
-
-    for(String token : tokens){
-
-        if(token.matches("\\d+")){
-            pila.push(Integer.parseInt(token));
-        } else {
-            int b = pila.pop();  // segundo operando (sale primero)
-            int a = pila.pop();  // primer operando
-
-            switch(token){
-                case "+": pila.push(a + b); break;
-                case "-": pila.push(a - b); break;
-                case "*": pila.push(a * b); break;
-                case "/": pila.push(a / b); break;
-            }
-        }
-    }
-
-    return pila.pop();
-}
-```
-
-Traza con `"3 4 + 2 *"`:
-
-| Token | Acción | Estado de la pila |
-|-------|--------|-------------------|
-| 3 | push(3) | 3 |
-| 4 | push(4) | 4, 3 |
-| + | pop 4, pop 3, push(3+4=7) | 7 |
-| 2 | push(2) | 2, 7 |
-| * | pop 2, pop 7, push(7*2=14) | 14 |
-
-Resultado: 14
-
-Traza con `"5 1 2 + 4 * + 3 -"` que equivale a `5 + (1 + 2) * 4 - 3 = 14`:
-
-| Token | Pila después | Nota |
-|-------|-------------|------|
-| 5 | 5 | |
-| 1 | 1, 5 | |
-| 2 | 2, 1, 5 | |
-| + | 3, 5 | 1+2=3 |
-| 4 | 4, 3, 5 | |
-| * | 12, 5 | 3*4=12 |
-| + | 17 | 5+12=17 |
-| 3 | 3, 17 | |
-| - | 14 | 17-3=14 |
-
-Resultado: 14
-
----
-
-## Invertir una pila usando recursividad (ejercicio resuelto)
-
-Este es un ejercicio clásico que demuestra el poder de la recursividad con pilas. La restricción: solo puedes usar operaciones `push`, `pop`, `isEmpty`.
-
-La idea requiere dos funciones recursivas:
-
-1. `invertir`: saca todos los elementos recursivamente
-2. `insertarAlFondo`: inserta un elemento en el fondo de la pila
-
-```java
-void insertarAlFondo(PilaGenerica<Integer> pila, int valor){
-
-    if(pila.isEmpty()){
-        pila.push(valor);    // caso base: pila vacía, insertar aquí
-        return;
-    }
-
-    int temp = pila.pop();               // sacar el tope
-    insertarAlFondo(pila, valor);        // insertar al fondo recursivamente
-    pila.push(temp);                     // restaurar el tope
-}
-
-void invertirPila(PilaGenerica<Integer> pila){
-
-    if(pila.isEmpty()){
-        return;                          // caso base
-    }
-
-    int temp = pila.pop();              // sacar el tope
-    invertirPila(pila);                 // invertir el resto
-    insertarAlFondo(pila, temp);        // insertar al fondo
-}
-```
-
-Traza con pila `| 3 | 2 | 1 |` (3 en el tope):
-
-```
-invertirPila(| 3 | 2 | 1 |)
-    pop 3, invertirPila(| 2 | 1 |)
-        pop 2, invertirPila(| 1 |)
-            pop 1, invertirPila(vacía)
-                caso base → retorna
-            insertarAlFondo(vacía, 1) → | 1 |
-        insertarAlFondo(| 1 |, 2) → | 1 | 2 |
-    insertarAlFondo(| 1 | 2 |, 3) → | 1 | 2 | 3 |
-
-Resultado: | 1 | 2 | 3 |  (1 en el tope, invertida)
-```
-
-Complejidad: O(n²) — cada inserción al fondo recorre toda la pila.
-
----
-
-## Historial de navegación con dos pilas (ejercicio resuelto)
-
-Los botones "atrás" y "adelante" del navegador se implementan con dos pilas:
-
-```java
-class Navegador {
-
-    private PilaGenerica<String> atras;
-    private PilaGenerica<String> adelante;
-    private String paginaActual;
-
-    public Navegador(){
-        atras = new PilaGenerica<>(100);
-        adelante = new PilaGenerica<>(100);
-        paginaActual = null;
-    }
-
-    public void visitar(String url){
-        if(paginaActual != null){
-            atras.push(paginaActual);
-        }
-        paginaActual = url;
-        adelante = new PilaGenerica<>(100);  // limpiar historial adelante
-        System.out.println("Visitando: " + url);
-    }
-
-    public void irAtras(){
-        if(atras.isEmpty()){
-            System.out.println("No hay páginas atrás");
+    static void insertarAlFondo(Pila<String> pila, String valor) {
+        if (pila.isEmpty()) {
+            pila.push(valor);
             return;
         }
-        adelante.push(paginaActual);
-        paginaActual = atras.pop();
-        System.out.println("Atrás → " + paginaActual);
+
+        String temp = pila.pop();
+        insertarAlFondo(pila, valor);
+        pila.push(temp);
     }
 
-    public void irAdelante(){
-        if(adelante.isEmpty()){
-            System.out.println("No hay páginas adelante");
+    static void invertir(Pila<String> pila) {
+        if (pila.isEmpty()) {
             return;
         }
-        atras.push(paginaActual);
-        paginaActual = adelante.pop();
-        System.out.println("Adelante → " + paginaActual);
+
+        String temp = pila.pop();
+        invertir(pila);
+        insertarAlFondo(pila, temp);
     }
 }
 ```
 
-Traza:
-
-| Acción | actual | atrás | adelante |
-|--------|--------|-------|----------|
-| visitar("google.com") | google.com | [] | [] |
-| visitar("youtube.com") | youtube.com | [google.com] | [] |
-| visitar("github.com") | github.com | [youtube.com, google.com] | [] |
-| irAtras() | youtube.com | [google.com] | [github.com] |
-| irAtras() | google.com | [] | [youtube.com, github.com] |
-| irAdelante() | youtube.com | [google.com] | [github.com] |
-| visitar("reddit.com") | reddit.com | [youtube.com, google.com] | [] (limpiado) |
-
----
-
-## Temperaturas: días de espera (ejercicio resuelto)
-
-Dado un arreglo de temperaturas diarias, para cada día encontrar cuántos días hay que esperar para una temperatura más alta.
-
-Ejemplo: `[73, 74, 75, 71, 69, 72, 76, 73]` → `[1, 1, 4, 2, 1, 1, 0, 0]`
+### Uso
 
 ```java
-int[] diasDeEspera(int[] temperaturas){
+Pila<String> cofre = new Pila<>(10);
+cofre.push("Espada oxidada");
+cofre.push("Poción menor");
+cofre.push("Anillo de poder");
+cofre.push("Armadura de dragón");
 
-    int n = temperaturas.length;
-    int[] resultado = new int[n];
-    PilaGenerica<Integer> pila = new PilaGenerica<>(n);  // almacena índices
+System.out.println("Tope antes: " + cofre.peek());
+// Armadura de dragón
 
-    for(int i = 0; i < n; i++){
+Recompensas.invertir(cofre);
 
-        // mientras la temperatura actual sea mayor que la del tope
-        while(!pila.isEmpty() && temperaturas[i] > temperaturas[pila.peek()]){
-            int indice = pila.pop();
-            resultado[indice] = i - indice;
-        }
-
-        pila.push(i);
-    }
-
-    // los que quedan en la pila no tienen día más cálido → ya son 0
-    return resultado;
-}
+System.out.println("Tope después: " + cofre.peek());
+// Espada oxidada
 ```
 
-Traza:
+### Traza recursiva
 
-| i | temp | Acción | resultado | pila |
-|---|------|--------|-----------|------|
-| 0 | 73 | push(0) | | [0] |
-| 1 | 74 | 74>73 → pop(0), resultado[0]=1 → push(1) | [1,0,0,0,0,0,0,0] | [1] |
-| 2 | 75 | 75>74 → pop(1), resultado[1]=1 → push(2) | [1,1,0,0,0,0,0,0] | [2] |
-| 3 | 71 | 71<75 → push(3) | | [2,3] |
-| 4 | 69 | 69<71 → push(4) | | [2,3,4] |
-| 5 | 72 | 72>69 → pop(4), resultado[4]=1; 72>71 → pop(3), resultado[3]=2; 72<75 → push(5) | [1,1,0,2,1,0,0,0] | [2,5] |
-| 6 | 76 | 76>72 → pop(5), resultado[5]=1; 76>75 → pop(2), resultado[2]=4 → push(6) | [1,1,4,2,1,1,0,0] | [6] |
-| 7 | 73 | 73<76 → push(7) | | [6,7] |
-
-Resultado: [1, 1, 4, 2, 1, 1, 0, 0] ✓
-
-Complejidad: O(n) — cada elemento se apila y desapila como máximo una vez.
+```
+invertir(| Armadura | Anillo | Poción | Espada |)
+    pop Armadura → invertir(| Anillo | Poción | Espada |)
+        pop Anillo → invertir(| Poción | Espada |)
+            pop Poción → invertir(| Espada |)
+                pop Espada → invertir(vacía)
+                    caso base
+                insertarAlFondo(vacía, Espada) → | Espada |
+            insertarAlFondo(| Espada |, Poción) → | Espada | Poción |
+        insertarAlFondo(| Espada | Poción |, Anillo) → | Espada | Poción | Anillo |
+    insertarAlFondo(| Espada | Poción | Anillo |, Armadura) → | Espada | Poción | Anillo | Armadura |
+```
 
 ---
 
-## Backtracking con pilas: generar todas las secuencias válidas de paréntesis
-
-Dado un número n, generar todas las combinaciones de n pares de paréntesis bien formados.
-
-```java
-void generarParentesis(int n, int abiertos, int cerrados,
-                       String actual, PilaGenerica<String> resultados){
-
-    // caso base: usamos todos los paréntesis
-    if(actual.length() == 2 * n){
-        resultados.push(actual);
-        System.out.println(actual);
-        return;
-    }
-
-    // opción 1: agregar '(' si aún quedan
-    if(abiertos < n){
-        generarParentesis(n, abiertos + 1, cerrados, actual + "(", resultados);
-    }
-
-    // opción 2: agregar ')' si hay '(' sin cerrar (backtrack implícito)
-    if(cerrados < abiertos){
-        generarParentesis(n, abiertos, cerrados + 1, actual + ")", resultados);
-    }
-}
-
-// Uso: generarParentesis(3, 0, 0, "", new PilaGenerica<>(100));
-```
-
-Salida para n=3:
-
-```
-((()))
-(()())
-(())()
-()(())
-()()()
-```
-
-Este es un problema de backtracking porque en cada paso decidimos si poner `(` o `)`, y las restricciones (no más de n abiertos, no cerrar sin abrir) podan el árbol de decisiones.
-
----
-
-## Ventajas y desventajas: Pila con arreglo vs. Pila con lista enlazada
+## Ventajas y desventajas: Pila con arreglo vs. lista enlazada
 
 | Criterio | Arreglo | Lista enlazada |
 |---|---|---|
-| Capacidad | Fija (o con redimensionamiento) | Ilimitada (hasta memoria disponible) |
-| Memoria | Puede desperdiciar espacio si no se llena | Usa exactamente lo necesario + overhead por nodos |
-| Velocidad | Ligeramente más rápida (acceso directo) | Ligeramente más lenta (indirección por punteros) |
-| Implementación | Más simple | Requiere clase Nodo |
-| Cache-friendly | Sí (datos contiguos en memoria) | No (nodos dispersos en memoria) |
+| Capacidad | Fija (o con redimensionamiento) | Ilimitada |
+| Memoria | Puede desperdiciar espacio | Usa lo necesario + overhead por nodos |
+| Velocidad | Ligeramente más rápida | Ligeramente más lenta |
+| Cache-friendly | Sí (datos contiguos) | No (nodos dispersos) |
 
----
-
-## Ejercicios de pilas
-
-### Ejercicios básicos
-
-1. Implementar el método `tamaño()` y `imprimir()` en la clase Pila con arreglo.
-
-2. Implementar una pila con redimensionamiento automático (cuando se llena, duplicar la capacidad).
-
-3. Implementar el método `minimo()` que retorne el valor mínimo de la pila en O(1). Pista: usar una segunda pila auxiliar que almacene los mínimos.
-
-### Ejercicios de aplicación
-
-4. Convertir una expresión infija `(3 + 4) * 2` a postfija `3 4 + 2 *` usando una pila (algoritmo Shunting Yard). Investigar las reglas de precedencia de operadores.
-
-5. Implementar una calculadora que evalúe expresiones como `"3 + 4 * 2"` respetando precedencia. Pista: convertir a postfija y luego evaluar.
-
-6. Dado un String con etiquetas HTML como `"<div><p></p></div>"`, verificar que estén correctamente anidadas usando una pila.
-
-### Ejercicios recursivos
-
-7. Implementar `ordenarPila(Pila pila)` que ordene una pila de menor (fondo) a mayor (tope) usando solo recursividad y operaciones de pila. Pista: similar a invertir, pero insertando en la posición correcta.
-
-8. Implementar la función de Fibonacci usando una pila explícita en lugar de recursividad. Comparar con la versión recursiva.
-
-### Ejercicios de backtracking
-
-9. Dado un arreglo de enteros y un valor objetivo, usar una pila para almacenar las decisiones del backtracking y encontrar todos los subconjuntos que sumen el objetivo. Imprimir el contenido de la pila cada vez que se encuentre una solución.
-
-10. (Desafío) Implementar un solucionador de expresiones matemáticas con paréntesis usando backtracking: dado un resultado objetivo y un conjunto de números, encontrar cómo combinarlos con +, -, *, / para obtener el resultado.
-
----
-
-## Complejidad de operaciones en pilas
+## Complejidad de operaciones
 
 | Operación | Arreglo | Lista enlazada |
 |---|---|---|
 | push | O(1) amortizado | O(1) |
 | pop | O(1) | O(1) |
 | peek | O(1) | O(1) |
-| buscar un elemento | O(n) | O(n) |
-| tamaño | O(1) | O(1) si se mantiene contador |
+| buscar | O(n) | O(n) |
 
 ---
 
 ## Conexión con la biblioteca estándar de Java
-
-Después de entender la implementación interna, puedes usar:
-
-```java
-import java.util.Stack;
-
-Stack<Integer> pila = new Stack<>();
-pila.push(10);
-pila.push(20);
-System.out.println(pila.pop());    // 20
-System.out.println(pila.peek());   // 10
-System.out.println(pila.isEmpty()); // false
-```
-
-O mejor aún, usar `Deque` (recomendado por Java desde Java 6):
 
 ```java
 import java.util.ArrayDeque;
@@ -800,6 +652,39 @@ pila.push(20);
 System.out.println(pila.pop());    // 20
 ```
 
-`ArrayDeque` es más rápida que `Stack` porque `Stack` hereda de `Vector` (sincronizado, más lento).
+`ArrayDeque` es más rápida que `java.util.Stack` porque `Stack` hereda de `Vector` (sincronizado, más lento).
 
 ---
+
+## 🎮 Ejercicios del proyecto
+
+### Básicos
+
+1. Agrega un método `verHistorialAcciones()` al `SistemaAcciones` que imprima todas las acciones realizadas sin destruir la pila.
+
+2. Implementa un método `deshacerTodo()` que revierta todas las acciones de una sola vez.
+
+3. Agrega al `LibroHechizos` un método `hechizoMasPoderoso()` que recorra la pila recursivamente y retorne el hechizo con mayor daño.
+
+### Intermedios
+
+4. Crea una clase `Mochila` que funcione como pila: el héroe solo puede acceder al último objeto que guardó. Implementa `guardar(item)`, `sacar()`, `verContenido()`.
+
+5. Implementa una fórmula de daño más compleja que considere resistencias elementales. Por ejemplo: `"ataque bonus + defensa - resistencia - 2 *"` donde el resultado final se multiplica por 2 si el enemigo es débil al elemento.
+
+6. Crea un sistema de **mazmorras anidadas**: el héroe entra a una mazmorra (push), puede entrar a una sub-mazmorra dentro de ella (push), y al salir (pop) vuelve a la anterior. Muestra el nivel de profundidad actual.
+
+### Avanzados
+
+7. Implementa un sistema de **combos de hechizos**: si el mago lanza 3 hechizos del mismo elemento seguidos, se activa un combo especial. Usa la pila para verificar los últimos 3 hechizos.
+
+8. (Backtracking) El héroe tiene N pociones con diferentes efectos. Encuentra todas las combinaciones de pociones que sumen exactamente un valor objetivo de curación. Usa una pila para almacenar las decisiones.
+
+---
+
+## 🔜 Siguiente capítulo
+
+En el **capítulo 4 (Colas)** agregaremos al proyecto:
+- Un **sistema de turnos de combate** donde héroes y enemigos esperan su turno
+- Una **cola de eventos** del juego (aparecen enemigos, se encuentran cofres, etc.)
+- Un **sistema de misiones** con cola de prioridad
