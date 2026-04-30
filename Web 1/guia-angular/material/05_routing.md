@@ -368,7 +368,8 @@ export class FavoritesComponent {
 ```html
 <!-- Reemplazar el botón de "Ver detalle" -->
 <!-- [routerLink] con array: el primer elemento es la ruta, el segundo el parámetro -->
-<a [routerLink]="['/movie', movie.id]"
+<!-- movie() con paréntesis porque es un signal (input) -->
+<a [routerLink]="['/movie', movie().id]"
    class="btn btn-outline-primary flex-grow-1">
   Ver detalle
 </a>

@@ -51,6 +51,8 @@ ng version
 # Debe mostrar la versión de Angular CLI (17 o superior)
 ```
 
+💡 Se recomienda Angular 19 o superior para aprovechar todas las características modernas que cubre esta guía (signals, input/output funcional, sintaxis de control de flujo @for/@if).
+
 ---
 
 ## 0.4 Configuración del editor (VS Code)

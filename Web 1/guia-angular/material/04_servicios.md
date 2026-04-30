@@ -261,6 +261,8 @@ export class FavoritesComponent {
 }
 ```
 
+💡 **Nota:** en el capítulo anterior aprendimos `input()` y `output()` para comunicación padre-hijo. Los servicios son para comunicación entre componentes que no tienen relación directa padre-hijo, o para lógica compartida.
+
 ---
 
 ## 4.8 Compilar y probar

@@ -30,7 +30,7 @@ Al final del curso tendrán una app funcional y desplegable que demuestra todos 
 | 00 | [Prerequisitos y entorno](material/00_prerequisitos.md) | Node.js, Angular CLI, VS Code, primer proyecto | Proyecto CineExplorer creado |
 | 01 | [TypeScript para Angular](material/01_typescript.md) | Tipos, interfaces, clases, enums, generics | Interfaces de Movie, Genre, Credits |
 | 02 | [Componentes](material/02_componentes.md) | Data binding, directivas, ciclo de vida | Componente MovieCard, página Home |
-| 03 | [Comunicación entre componentes](material/03_comunicacion_componentes.md) | @Input, @Output, smart vs dumb components | MovieCard recibe datos, emite favorito |
+| 03 | [Comunicación entre componentes](material/03_comunicacion_componentes.md) | input(), output(), signals, smart vs dumb components | MovieCard recibe datos, emite favorito |
 | 04 | [Servicios e inyección de dependencias](material/04_servicios.md) | Servicios, singleton, separar lógica | TmdbService, FavoritesService |
 | 05 | [Routing y navegación](material/05_routing.md) | Rutas, parámetros, lazy loading, guards | Navbar, páginas Home, Detalle, Favoritos |
 | 06 | [Consumo de APIs con HttpClient](material/06_httpclient.md) | GET, tipado, errores, interceptores | Datos reales de TMDB en la app |

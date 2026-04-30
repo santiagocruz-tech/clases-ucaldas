@@ -190,9 +190,8 @@ Vamos a refactorizar el template de `MovieCardComponent` para usar los pipes que
 
 ```typescript
 // movie-card.component.ts
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { NgClass } from '@angular/common';
 import { Movie } from '../../models/movie';
 // Importar los pipes personalizados
 import { TruncatePipe } from '../../pipes/truncate.pipe';
@@ -203,17 +202,17 @@ import { StarsPipe } from '../../pipes/stars.pipe';
   selector: 'app-movie-card',
   standalone: true,
   // Agregar los pipes a imports para usarlos en el template
-  imports: [RouterLink, NgClass, TruncatePipe, TmdbImagePipe, StarsPipe],
+  imports: [RouterLink, TruncatePipe, TmdbImagePipe, StarsPipe],
   templateUrl: './movie-card.component.html',
   styleUrls: ['./movie-card.component.scss']
 })
 export class MovieCardComponent {
-  @Input({ required: true }) movie!: Movie;
-  @Input() esFavorita: boolean = false;
-  @Output() toggleFavorito = new EventEmitter<Movie>();
+  movie = input.required<Movie>();
+  esFavorita = input<boolean>(false);
+  toggleFavorito = output<Movie>();
 
   onToggleFavorito(): void {
-    this.toggleFavorito.emit(this.movie);
+    this.toggleFavorito.emit(this.movie());
   }
 }
 ```
@@ -226,32 +225,34 @@ export class MovieCardComponent {
 <div class="card shadow-sm h-100">
   <!-- tmdbImage pipe construye la URL completa de la imagen -->
   <!-- En lugar de concatenar manualmente, usamos el pipe -->
-  <img [src]="movie.poster_path | tmdbImage:'w500'"
-       [alt]="movie.title"
+  <!-- movie() con paréntesis porque es un signal -->
+  <img [src]="movie().poster_path | tmdbImage:'w500'"
+       [alt]="movie().title"
        class="card-img-top">
 
   <div class="card-body d-flex flex-column">
-    <h5 class="card-title">{{ movie.title }}</h5>
+    <h5 class="card-title">{{ movie().title }}</h5>
 
     <!-- stars pipe convierte 8.4 → "★★★★☆" -->
-    <p class="mb-1">{{ movie.vote_average | stars }}</p>
-    <small class="text-muted mb-2">{{ movie.vote_average }} / 10</small>
+    <p class="mb-1">{{ movie().vote_average | stars }}</p>
+    <small class="text-muted mb-2">{{ movie().vote_average }} / 10</small>
 
     <!-- truncate pipe corta el texto a 120 caracteres -->
     <!-- Más limpio que hacer el slice en el template -->
     <p class="card-text flex-grow-1">
-      {{ movie.overview | truncate:120 }}
+      {{ movie().overview | truncate:120 }}
     </p>
 
     <div class="d-flex gap-2 mt-auto">
-      <a [routerLink]="['/movie', movie.id]"
+      <a [routerLink]="['/movie', movie().id]"
          class="btn btn-outline-primary flex-grow-1">
         Ver detalle
       </a>
       <button class="btn"
-              [ngClass]="esFavorita ? 'btn-danger' : 'btn-outline-danger'"
+              [class.btn-danger]="esFavorita()"
+              [class.btn-outline-danger]="!esFavorita()"
               (click)="onToggleFavorito()">
-        {{ esFavorita ? '❤️' : '🤍' }}
+        {{ esFavorita() ? '❤️' : '🤍' }}
       </button>
     </div>
   </div>

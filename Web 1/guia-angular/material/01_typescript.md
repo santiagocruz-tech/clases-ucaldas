@@ -264,9 +264,13 @@ Los decoradores son funciones especiales que modifican clases o propiedades. Ang
 // En Angular, los decoradores más comunes son:
 @Component({...})    // Marca una clase como componente de UI
 @Injectable({...})   // Marca una clase como servicio inyectable
-@Input()             // Marca una propiedad como entrada de datos (padre → hijo)
-@Output()            // Marca una propiedad como salida de eventos (hijo → padre)
 @Pipe({...})         // Marca una clase como pipe (transformador de datos)
+
+// Angular moderno (17+) reemplaza algunos decoradores por funciones:
+// input()   → define una entrada de datos (padre → hijo) — reemplaza @Input()
+// output()  → define una salida de eventos (hijo → padre) — reemplaza @Output()
+// signal()  → estado reactivo que notifica cambios automáticamente
+// computed() → valor derivado que se recalcula cuando sus dependencias cambian
 
 // No necesitan crear decoradores propios
 // Solo entender que son "etiquetas" que le dicen a Angular

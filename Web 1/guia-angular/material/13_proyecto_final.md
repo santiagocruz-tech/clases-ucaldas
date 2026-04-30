@@ -15,7 +15,7 @@ A lo largo de 13 capítulos, construimos **CineExplorer** desde cero:
 | Proyecto base con Bootstrap | 00 | Angular CLI, Bootstrap |
 | Interfaces tipadas | 01 | TypeScript, interfaces |
 | Tarjeta de película | 02 | Componentes, data binding |
-| Datos del padre al hijo | 03 | @Input, @Output, EventEmitter |
+| Datos del padre al hijo | 03 | input(), output(), signals |
 | Servicios de favoritos | 04 | Servicios, inyección de dependencias |
 | Navegación entre páginas | 05 | Routing, RouterLink, parámetros |
 | Datos reales de TMDB | 06 | HttpClient, interceptores |
@@ -104,7 +104,7 @@ Las imágenes se arman: `https://image.tmdb.org/t/p/w500` + `poster_path`
 2. Instalar Bootstrap y configurar en `angular.json`
 3. Crear interfaces en `models/movie.ts`
 4. Crear `TmdbService` con `obtenerPopulares()`
-5. Crear `MovieCardComponent` con @Input/@Output
+5. Crear `MovieCardComponent` con input()/output()
 6. Crear `HomeComponent` que muestre películas reales
 
 ### Semana 2: Navegación y búsqueda
@@ -147,6 +147,10 @@ Las imágenes se arman: `https://image.tmdb.org/t/p/w500` + `poster_path`
 
 7. **Hardcodear la API key en el servicio.** Usar `environment.ts`.
 
+8. **Usar `@Input()` y `@Output()` decoradores en vez de `input()` y `output()`.** La API de signals es la forma moderna y recomendada en Angular 17+. Los decoradores siguen funcionando pero no se recomiendan para proyectos nuevos.
+
+9. **Olvidar los paréntesis al leer signals en el template.** `{{ movie.title }}` no funciona con `input()`, debe ser `{{ movie().title }}`.
+
 ---
 
 ## 13.6 Equivalencias con JavaScript puro
@@ -180,7 +184,7 @@ Las imágenes se arman: `https://image.tmdb.org/t/p/w500` + `poster_path`
 
 Si llegaron hasta aquí, tienen una base sólida en desarrollo web con Angular. Construyeron una app completa con:
 
-- Componentes reutilizables con @Input/@Output
+- Componentes reutilizables con input()/output() (signals)
 - Servicios con inyección de dependencias
 - Navegación SPA con routing y lazy loading
 - Consumo de API REST con HttpClient
@@ -191,6 +195,7 @@ Si llegaron hasta aquí, tienen una base sólida en desarrollo web con Angular. 
 - Tema claro/oscuro con variables CSS
 - Arquitectura profesional (core/shared/features)
 - Diseño responsive con Bootstrap
+- Sintaxis moderna de templates (@for, @if, @switch)
 
 El siguiente paso es practicar. Tomen esta app y agréguenle funcionalidades: paginación, filtro por género, lista de "ver después", compartir en redes, PWA. Cada feature nueva refuerza lo aprendido.
 

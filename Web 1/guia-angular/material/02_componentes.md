@@ -317,7 +317,9 @@ export class MiComponente implements OnInit, OnDestroy {
 |---|---|---|
 | `ngOnInit` | Después de crear el componente | Cargar datos, inicializar |
 | `ngOnDestroy` | Antes de destruir el componente | Limpiar suscripciones |
-| `ngOnChanges` | Cuando cambia un @Input() | Reaccionar a cambios de datos del padre |
+| `ngOnChanges` | Cuando cambia un input() | Reaccionar a cambios de datos del padre |
+
+💡 **Con signals**, muchos usos de `ngOnChanges` se reemplazan por `effect()` o `computed()`, que reaccionan automáticamente cuando un signal cambia. Lo veremos en el próximo capítulo.
 
 ---
 
@@ -505,7 +507,7 @@ export class AppComponent {
 - Tres tarjetas de película idénticas (Fight Club) con póster, título, puntuación y sinopsis
 - Efecto hover al pasar el mouse sobre las tarjetas
 
-💡 Las tres tarjetas muestran la misma película porque los datos están hardcodeados. En el próximo capítulo aprenderemos a pasar datos diferentes a cada tarjeta con `@Input()`.
+💡 Las tres tarjetas muestran la misma película porque los datos están hardcodeados. En el próximo capítulo aprenderemos a pasar datos diferentes a cada tarjeta con `input()` (signals).
 
 ---
 
