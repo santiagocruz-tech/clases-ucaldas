@@ -127,7 +127,7 @@ export class TruncatePipe implements PipeTransform {
 ```typescript
 // tmdb-image.pipe.ts
 // Pipe que construye la URL completa de una imagen de TMDB
-// TMDB devuelve rutas relativas como "/pB8BM7pdSp6B6Ih7QI4S2t0POoD.jpg"
+// TMDB devuelve rutas relativas como "/jSziioSwPVrOy9Yow3XhWIBDjq1.jpg"
 // Este pipe las convierte en URLs completas
 import { Pipe, PipeTransform } from '@angular/core';
 

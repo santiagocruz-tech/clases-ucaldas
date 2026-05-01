@@ -100,7 +100,7 @@ const miPelicula: Pelicula = {
   id: 550,
   title: "Fight Club",
   overview: "Un oficinista insomne...",
-  poster_path: "/pB8BM7pdSp6B6Ih7QI4S2t0POoD.jpg",
+  poster_path: "/jSziioSwPVrOy9Yow3XhWIBDjq1.jpg",
   vote_average: 8.4,
   release_date: "1999-10-15",
   genre_ids: [18, 53]

@@ -356,7 +356,7 @@ export class MovieCardComponent {
     id: 550,
     title: 'Fight Club',
     overview: 'Un oficinista insomne y un fabricante de jabón forman un club de pelea clandestino que evoluciona hacia algo mucho más peligroso.',
-    poster_path: '/pB8BM7pdSp6B6Ih7QI4S2t0POoD.jpg',
+    poster_path: '/jSziioSwPVrOy9Yow3XhWIBDjq1.jpg',
     backdrop_path: '/hZkgoQYus5dXo3H8T7Uef6DNknx.jpg',
     vote_average: 8.4,
     release_date: '1999-10-15',
