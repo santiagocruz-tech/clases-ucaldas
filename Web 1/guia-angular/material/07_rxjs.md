@@ -113,7 +113,7 @@ Este es el patrón más importante para buscadores eficientes. Evita hacer una p
 ng g c features/search-results --skip-tests
 ```
 
-✏️ Agregar un input de búsqueda en `navbar.component.html`:
+✏️ Agregar un input de búsqueda en `navbar.html`:
 
 ```html
 <!-- Agregar dentro del navbar, después de los links -->
@@ -128,10 +128,10 @@ ng g c features/search-results --skip-tests
 </form>
 ```
 
-✏️ Modificar `navbar.component.ts`:
+✏️ Modificar `navbar.ts`:
 
 ```typescript
-// navbar.component.ts
+// navbar.ts
 // Navbar con buscador reactivo que usa debounce
 import { Component, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive, Router } from '@angular/router';
@@ -146,10 +146,10 @@ import { FavoritesService } from '../../services/favorites.service';
   standalone: true,
   // ReactiveFormsModule es necesario para usar [formControl]
   imports: [RouterLink, RouterLinkActive, ReactiveFormsModule],
-  templateUrl: './navbar.component.html',
-  styleUrls: ['./navbar.component.scss']
+  templateUrl: './navbar.html',
+  styleUrls: ['./navbar.scss']
 })
-export class NavbarComponent {
+export class Navbar {
   private favoritesService = inject(FavoritesService);
   private router = inject(Router);
 
@@ -280,7 +280,7 @@ El `async` pipe se suscribe y desuscribe automáticamente:
 
 ```typescript
 // En el componente: exponer el Observable directamente
-export class HomeComponent {
+export class Home {
   // No llamamos subscribe(), exponemos el Observable
   peliculas$ = this.tmdbService.obtenerPopulares().pipe(
     map(response => response.results)
@@ -308,7 +308,7 @@ export class HomeComponent {
 ```typescript
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-export class HomeComponent {
+export class Home {
   peliculas: Movie[] = [];
 
   constructor(private tmdbService: TmdbService) {

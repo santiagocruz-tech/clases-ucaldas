@@ -58,7 +58,7 @@ cine-explorer/
 │   │   │   ├── movie-detail/                ← Detalle de película
 │   │   │   ├── search-results/              ← Resultados de búsqueda
 │   │   │   └── favorites/                   ← Películas favoritas
-│   │   ├── app.component.ts                 ← Componente raíz
+│   │   ├── app.ts                 ← Componente raíz
 │   │   ├── app.routes.ts                    ← Definición de rutas
 │   │   └── app.config.ts                    ← Configuración (HttpClient, Router)
 │   ├── environments/
@@ -104,15 +104,15 @@ Las imágenes se arman: `https://image.tmdb.org/t/p/w500` + `poster_path`
 2. Instalar Bootstrap y configurar en `angular.json`
 3. Crear interfaces en `models/movie.ts`
 4. Crear `TmdbService` con `obtenerPopulares()`
-5. Crear `MovieCardComponent` con input()/output()
-6. Crear `HomeComponent` que muestre películas reales
+5. Crear `MovieCard` con input()/output()
+6. Crear `Home` que muestre películas reales
 
 ### Semana 2: Navegación y búsqueda
 1. Configurar rutas en `app.routes.ts`
-2. Crear `NavbarComponent` con RouterLink
-3. Crear `MovieDetailComponent` con parámetro `:id`
+2. Crear `Navbar` con RouterLink
+3. Crear `MovieDetail` con parámetro `:id`
 4. Agregar buscador con debounce en el navbar
-5. Crear `SearchResultsComponent` con query params
+5. Crear `SearchResults` con query params
 
 ### Semana 3: Favoritos y estilos
 1. Crear `FavoritesService` con BehaviorSubject + localStorage

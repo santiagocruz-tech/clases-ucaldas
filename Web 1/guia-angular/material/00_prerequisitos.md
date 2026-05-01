@@ -65,7 +65,7 @@ ng version
 | Prettier | Formateo automático de código al guardar |
 | ESLint | Detección de errores y malas prácticas |
 | Auto Rename Tag | Renombra etiquetas HTML de cierre automáticamente |
-| Material Icon Theme | Íconos para archivos Angular (.component, .service, etc.) |
+| Material Icon Theme | Íconos para archivos Angular (.service, .pipe, etc.) |
 
 ---
 
@@ -100,10 +100,10 @@ ng serve
 cine-explorer/
 ├── src/
 │   ├── app/
-│   │   ├── app.component.ts        ← Componente raíz (la "cáscara" de la app)
-│   │   ├── app.component.html      ← Template HTML del componente raíz
-│   │   ├── app.component.scss      ← Estilos del componente raíz
-│   │   ├── app.component.spec.ts   ← Tests del componente raíz
+│   │   ├── app.ts        ← Componente raíz (la "cáscara" de la app)
+│   │   ├── app.html      ← Template HTML del componente raíz
+│   │   ├── app.scss      ← Estilos del componente raíz
+│   │   ├── app.spec.ts   ← Tests del componente raíz
 │   │   ├── app.config.ts           ← Configuración global de la app
 │   │   └── app.routes.ts           ← Definición de rutas (navegación)
 │   ├── assets/                     ← Imágenes, fuentes, archivos estáticos
@@ -131,10 +131,10 @@ cine-explorer/
 
 ## 0.7 Primer cambio: personalizar la app
 
-✏️ Abrir `src/app/app.component.html`, borrar todo el contenido y reemplazar con:
+✏️ Abrir `src/app/app.html`, borrar todo el contenido y reemplazar con:
 
 ```html
-<!-- app.component.html -->
+<!-- app.html -->
 <!-- Este es el template del componente raíz -->
 <!-- Todo lo que pongamos aquí se muestra en la pantalla -->
 <h1>🎬 CineExplorer</h1>
@@ -143,10 +143,10 @@ cine-explorer/
 
 ▶️ Guardar y verificar que el navegador muestra el nuevo contenido automáticamente.
 
-✏️ Abrir `src/app/app.component.ts` y verificar que se ve así:
+✏️ Abrir `src/app/app.ts` y verificar que se ve así:
 
 ```typescript
-// app.component.ts
+// app.ts
 // Este es el componente raíz de la aplicación
 // Todos los demás componentes se renderizan dentro de este
 
@@ -165,12 +165,12 @@ import { Component } from '@angular/core';
   // imports: otros componentes o módulos que este componente necesita
   imports: [],
   // templateUrl: ruta al archivo HTML del componente
-  templateUrl: './app.component.html',
+  templateUrl: './app.html',
   // styleUrl: ruta al archivo de estilos del componente
-  styleUrl: './app.component.scss'
+  styleUrl: './app.scss'
 })
 // La clase contiene la lógica del componente (propiedades y métodos)
-export class AppComponent {
+export class App {
   // Propiedad que se puede usar en el template con {{ titulo }}
   titulo: string = 'CineExplorer';
 }
@@ -242,10 +242,10 @@ npm install bootstrap
 
 ▶️ Reiniciar `ng serve` (Ctrl+C y volver a ejecutar) para que tome los cambios de `angular.json`.
 
-✏️ Verificar que Bootstrap funciona modificando `app.component.html`:
+✏️ Verificar que Bootstrap funciona modificando `app.html`:
 
 ```html
-<!-- app.component.html -->
+<!-- app.html -->
 <!-- Verificamos que Bootstrap está funcionando con clases de utilidad -->
 <div class="container text-center mt-5">
   <!-- container: centra el contenido con márgenes laterales -->

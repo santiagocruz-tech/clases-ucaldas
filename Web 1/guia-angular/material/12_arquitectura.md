@@ -34,7 +34,7 @@ src/app/
 │   ├── movie-detail/
 │   ├── search-results/
 │   └── favorites/
-├── app.component.ts
+├── app.ts
 ├── app.routes.ts
 └── app.config.ts
 ```
@@ -149,10 +149,10 @@ Cada componente declara sus propias dependencias:
   selector: 'app-home',
   standalone: true,
   // Cada componente importa lo que necesita
-  imports: [MovieCardComponent, SpinnerComponent, AsyncPipe, RouterLink],
-  templateUrl: './home.component.html'
+  imports: [MovieCard, Spinner, AsyncPipe, RouterLink],
+  templateUrl: './home.html'
 })
-export class HomeComponent {}
+export class Home {}
 ```
 
 ### NgModule (forma antigua)
@@ -160,9 +160,9 @@ export class HomeComponent {}
 ```typescript
 // No usar en proyectos nuevos
 @NgModule({
-  declarations: [HomeComponent, MovieCardComponent],
+  declarations: [Home, MovieCard],
   imports: [CommonModule, RouterModule],
-  exports: [HomeComponent]
+  exports: [Home]
 })
 export class HomeModule {}
 ```

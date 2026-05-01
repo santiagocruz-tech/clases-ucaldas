@@ -11,10 +11,10 @@ Configurar la navegación de CineExplorer para que tenga múltiples páginas sin
 Angular usa un sistema de rutas para navegar entre vistas sin recargar la página. Cada ruta mapea una URL a un componente.
 
 ```
-/                → HomeComponent
-/movie/550       → MovieDetailComponent (con parámetro id=550)
-/search?q=batman → SearchResultsComponent (con query param)
-/favorites       → FavoritesComponent
+/                → Home
+/movie/550       → MovieDetail (con parámetro id=550)
+/search?q=batman → SearchResults (con query param)
+/favorites       → Favorites
 ```
 
 ---
@@ -29,38 +29,38 @@ Angular usa un sistema de rutas para navegar entre vistas sin recargar la págin
 import { Routes } from '@angular/router';
 
 // Importar los componentes de cada página
-import { HomeComponent } from './features/home/home.component';
+import { Home } from './features/home/home';
 
 // Routes es un array de objetos que mapean URLs a componentes
 export const routes: Routes = [
-  // Ruta raíz: muestra HomeComponent cuando la URL es "/"
-  { path: '', component: HomeComponent },
+  // Ruta raíz: muestra Home cuando la URL es "/"
+  { path: '', component: Home },
 
   // Ruta con parámetro dinámico: :id se reemplaza por el ID real
-  // /movie/550 → MovieDetailComponent con params['id'] = '550'
+  // /movie/550 → MovieDetail con params['id'] = '550'
   {
     path: 'movie/:id',
     // loadComponent: lazy loading — solo carga el código cuando se visita la ruta
     // Mejora el tiempo de carga inicial de la app
     loadComponent: () =>
-      import('./features/movie-detail/movie-detail.component')
-        .then(m => m.MovieDetailComponent)
+      import('./features/movie-detail/movie-detail')
+        .then(m => m.MovieDetail)
   },
 
   // Ruta de búsqueda (usa query params: /search?q=batman)
   {
     path: 'search',
     loadComponent: () =>
-      import('./features/search-results/search-results.component')
-        .then(m => m.SearchResultsComponent)
+      import('./features/search-results/search-results')
+        .then(m => m.SearchResults)
   },
 
   // Ruta de favoritos
   {
     path: 'favorites',
     loadComponent: () =>
-      import('./features/favorites/favorites.component')
-        .then(m => m.FavoritesComponent)
+      import('./features/favorites/favorites')
+        .then(m => m.Favorites)
   },
 
   // Ruta wildcard: cualquier URL no definida redirige al inicio
@@ -75,12 +75,12 @@ export const routes: Routes = [
 
 ### RouterOutlet: dónde se renderizan las páginas
 
-💡 **Cambio importante:** hasta ahora, `AppComponent` mostraba las películas directamente. A partir de este capítulo, `AppComponent` se convierte en un "contenedor" que solo tiene el navbar y el `<router-outlet>`. La lógica de mostrar películas se mueve a `HomeComponent` (una página dentro del router).
+💡 **Cambio importante:** hasta ahora, `App` mostraba las películas directamente. A partir de este capítulo, `App` se convierte en un "contenedor" que solo tiene el navbar y el `<router-outlet>`. La lógica de mostrar películas se mueve a `Home` (una página dentro del router).
 
-✏️ Modificar `app.component.html`:
+✏️ Modificar `app.html`:
 
 ```html
-<!-- app.component.html -->
+<!-- app.html -->
 <!-- Layout principal de la app -->
 
 <!-- Navbar (siempre visible) -->
@@ -93,26 +93,26 @@ export const routes: Routes = [
 </main>
 ```
 
-✏️ Modificar `app.component.ts`:
+✏️ Modificar `app.ts`:
 
 ```typescript
-// app.component.ts
+// app.ts
 // Componente raíz: contiene el navbar y el router-outlet
 import { Component } from '@angular/core';
 // RouterOutlet es necesario para que <router-outlet> funcione
 import { RouterOutlet } from '@angular/router';
 // Importar el navbar
-import { NavbarComponent } from './components/navbar/navbar.component';
+import { Navbar } from './components/navbar/navbar';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  // Importar RouterOutlet y NavbarComponent
-  imports: [RouterOutlet, NavbarComponent],
-  templateUrl: './app.component.html',
-  styleUrl: './app.component.scss'
+  // Importar RouterOutlet y Navbar
+  imports: [RouterOutlet, Navbar],
+  templateUrl: './app.html',
+  styleUrl: './app.scss'
 })
-export class AppComponent {}
+export class App {}
 ```
 
 ### Crear el Navbar
@@ -121,10 +121,10 @@ export class AppComponent {}
 ng g c components/navbar --skip-tests
 ```
 
-✏️ `navbar.component.ts`:
+✏️ `navbar.ts`:
 
 ```typescript
-// navbar.component.ts
+// navbar.ts
 // Navbar con links de navegación
 import { Component, inject } from '@angular/core';
 // RouterLink reemplaza href para navegación sin recarga
@@ -137,10 +137,10 @@ import { FavoritesService } from '../../services/favorites.service';
   standalone: true,
   // Importar RouterLink y RouterLinkActive para usarlos en el template
   imports: [RouterLink, RouterLinkActive],
-  templateUrl: './navbar.component.html',
-  styleUrls: ['./navbar.component.scss']
+  templateUrl: './navbar.html',
+  styleUrls: ['./navbar.scss']
 })
-export class NavbarComponent {
+export class Navbar {
   // Inyectar el servicio de favoritos para mostrar el contador
   private favoritesService = inject(FavoritesService);
 
@@ -151,10 +151,10 @@ export class NavbarComponent {
 }
 ```
 
-✏️ `navbar.component.html`:
+✏️ `navbar.html`:
 
 ```html
-<!-- navbar.component.html -->
+<!-- navbar.html -->
 <!-- Navbar responsive de Bootstrap -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
   <!-- navbar-dark: texto blanco -->
@@ -208,29 +208,29 @@ export class NavbarComponent {
 
 ## 5.4 Crear las páginas (features)
 
-### HomeComponent
+### Home
 
 ```bash
 ng g c features/home --skip-tests
 ```
 
-✏️ `home.component.ts`:
+✏️ `home.ts`:
 
 ```typescript
-// home.component.ts
+// home.ts
 // Página principal que muestra películas populares
 import { Component, inject } from '@angular/core';
-import { MovieCardComponent } from '../../components/movie-card/movie-card.component';
+import { MovieCard } from '../../components/movie-card/movie-card';
 import { FavoritesService } from '../../services/favorites.service';
 import { Movie } from '../../models/movie';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [MovieCardComponent],
-  templateUrl: './home.component.html'
+  imports: [MovieCard],
+  templateUrl: './home.html'
 })
-export class HomeComponent {
+export class Home {
   private favoritesService = inject(FavoritesService);
 
   // Datos de ejemplo (en el capítulo 6 vendrán de la API)
@@ -268,10 +268,10 @@ export class HomeComponent {
 }
 ```
 
-✏️ `home.component.html`:
+✏️ `home.html`:
 
 ```html
-<!-- home.component.html -->
+<!-- home.html -->
 <!-- Página principal con grid de películas -->
 <h2 class="mb-4">🔥 Películas populares</h2>
 
@@ -289,29 +289,29 @@ export class HomeComponent {
 </div>
 ```
 
-### FavoritesComponent
+### Favorites
 
 ```bash
 ng g c features/favorites --skip-tests
 ```
 
-✏️ `favorites.component.ts`:
+✏️ `favorites.ts`:
 
 ```typescript
-// favorites.component.ts
+// favorites.ts
 // Página que muestra las películas marcadas como favoritas
 import { Component, inject } from '@angular/core';
-import { MovieCardComponent } from '../../components/movie-card/movie-card.component';
+import { MovieCard } from '../../components/movie-card/movie-card';
 import { FavoritesService } from '../../services/favorites.service';
 import { Movie } from '../../models/movie';
 
 @Component({
   selector: 'app-favorites',
   standalone: true,
-  imports: [MovieCardComponent],
-  templateUrl: './favorites.component.html'
+  imports: [MovieCard],
+  templateUrl: './favorites.html'
 })
-export class FavoritesComponent {
+export class Favorites {
   private favoritesService = inject(FavoritesService);
 
   // Obtener las películas favoritas del servicio
@@ -326,10 +326,10 @@ export class FavoritesComponent {
 }
 ```
 
-✏️ `favorites.component.html`:
+✏️ `favorites.html`:
 
 ```html
-<!-- favorites.component.html -->
+<!-- favorites.html -->
 <h2 class="mb-4">❤️ Mis favoritas</h2>
 
 @if (favoritas.length > 0) {
@@ -363,7 +363,7 @@ export class FavoritesComponent {
 
 ### Navegar a una ruta con parámetro
 
-✏️ Actualizar el botón "Ver detalle" en `movie-card.component.html`:
+✏️ Actualizar el botón "Ver detalle" en `movie-card.html`:
 
 ```html
 <!-- Reemplazar el botón de "Ver detalle" -->
@@ -375,7 +375,7 @@ export class FavoritesComponent {
 </a>
 ```
 
-💡 Agregar `RouterLink` a los imports del `MovieCardComponent`.
+💡 Agregar `RouterLink` a los imports del `MovieCard`.
 
 ### Leer el parámetro en el componente destino
 
@@ -383,10 +383,10 @@ export class FavoritesComponent {
 ng g c features/movie-detail --skip-tests
 ```
 
-✏️ `movie-detail.component.ts`:
+✏️ `movie-detail.ts`:
 
 ```typescript
-// movie-detail.component.ts
+// movie-detail.ts
 // Página de detalle que lee el parámetro :id de la URL
 import { Component, OnInit, inject } from '@angular/core';
 // ActivatedRoute da acceso a los parámetros de la ruta actual
@@ -396,9 +396,9 @@ import { ActivatedRoute } from '@angular/router';
   selector: 'app-movie-detail',
   standalone: true,
   imports: [],
-  templateUrl: './movie-detail.component.html'
+  templateUrl: './movie-detail.html'
 })
-export class MovieDetailComponent implements OnInit {
+export class MovieDetail implements OnInit {
   // ActivatedRoute contiene información de la ruta actual
   private route = inject(ActivatedRoute);
 
@@ -416,10 +416,10 @@ export class MovieDetailComponent implements OnInit {
 }
 ```
 
-✏️ `movie-detail.component.html`:
+✏️ `movie-detail.html`:
 
 ```html
-<!-- movie-detail.component.html -->
+<!-- movie-detail.html -->
 <!-- Por ahora solo mostramos el ID. En el capítulo 6 cargaremos datos reales -->
 <div class="text-center py-5">
   <h2>Detalle de película #{{ movieId }}</h2>
@@ -499,7 +499,7 @@ export const hasFavoritesGuard: CanActivateFn = () => {
 
 ```typescript
 // Aplicar el guard a una ruta en app.routes.ts
-{ path: 'favorites', component: FavoritesComponent, canActivate: [hasFavoritesGuard] }
+{ path: 'favorites', component: Favorites, canActivate: [hasFavoritesGuard] }
 ```
 
 ---

@@ -142,15 +142,15 @@ export class TmdbService {
 
 ---
 
-## 6.3 Usar el servicio en HomeComponent
+## 6.3 Usar el servicio en Home
 
-✏️ Modificar `home.component.ts`:
+✏️ Modificar `home.ts`:
 
 ```typescript
-// home.component.ts
+// home.ts
 // Página principal que carga películas reales de la API
 import { Component, OnInit, inject } from '@angular/core';
-import { MovieCardComponent } from '../../components/movie-card/movie-card.component';
+import { MovieCard } from '../../components/movie-card/movie-card';
 import { TmdbService } from '../../services/tmdb.service';
 import { FavoritesService } from '../../services/favorites.service';
 import { Movie } from '../../models/movie';
@@ -158,10 +158,10 @@ import { Movie } from '../../models/movie';
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [MovieCardComponent],
-  templateUrl: './home.component.html'
+  imports: [MovieCard],
+  templateUrl: './home.html'
 })
-export class HomeComponent implements OnInit {
+export class Home implements OnInit {
   // Inyectar los servicios
   private tmdbService = inject(TmdbService);
   private favoritesService = inject(FavoritesService);
@@ -208,10 +208,10 @@ export class HomeComponent implements OnInit {
 }
 ```
 
-✏️ Modificar `home.component.html`:
+✏️ Modificar `home.html`:
 
 ```html
-<!-- home.component.html -->
+<!-- home.html -->
 <!-- Manejo de 3 estados: cargando, error, datos -->
 <h2 class="mb-4">🔥 Películas populares</h2>
 
@@ -256,14 +256,14 @@ export class HomeComponent implements OnInit {
 
 ---
 
-## 6.4 Completar MovieDetailComponent
+## 6.4 Completar MovieDetail
 
 En el capítulo 05 creamos un esqueleto. Ahora que tenemos HttpClient, lo completamos con datos reales.
 
-✏️ Modificar `movie-detail.component.ts`:
+✏️ Modificar `movie-detail.ts`:
 
 ```typescript
-// movie-detail.component.ts
+// movie-detail.ts
 // Página de detalle que carga datos reales de la API
 import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
@@ -275,9 +275,9 @@ import { MovieDetail, Credits } from '../../models/movie';
   selector: 'app-movie-detail',
   standalone: true,
   imports: [RouterLink],
-  templateUrl: './movie-detail.component.html'
+  templateUrl: './movie-detail.html'
 })
-export class MovieDetailComponent implements OnInit {
+export class MovieDetail implements OnInit {
   private route = inject(ActivatedRoute);
   private tmdbService = inject(TmdbService);
   private favoritesService = inject(FavoritesService);
@@ -330,10 +330,10 @@ export class MovieDetailComponent implements OnInit {
 }
 ```
 
-✏️ Modificar `movie-detail.component.html`:
+✏️ Modificar `movie-detail.html`:
 
 ```html
-<!-- movie-detail.component.html -->
+<!-- movie-detail.html -->
 <!-- Página de detalle con datos reales de la API -->
 
 <!-- Estado: cargando -->
@@ -445,27 +445,27 @@ export class MovieDetailComponent implements OnInit {
 
 ---
 
-## 6.5 Completar SearchResultsComponent
+## 6.5 Completar SearchResults
 
-✏️ Modificar `search-results.component.ts`:
+✏️ Modificar `search-results.ts`:
 
 ```typescript
-// search-results.component.ts
+// search-results.ts
 // Página que muestra resultados de búsqueda leyendo el query param "q"
 import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { TmdbService } from '../../services/tmdb.service';
 import { FavoritesService } from '../../services/favorites.service';
-import { MovieCardComponent } from '../../components/movie-card/movie-card.component';
+import { MovieCard } from '../../components/movie-card/movie-card';
 import { Movie } from '../../models/movie';
 
 @Component({
   selector: 'app-search-results',
   standalone: true,
-  imports: [MovieCardComponent],
-  templateUrl: './search-results.component.html'
+  imports: [MovieCard],
+  templateUrl: './search-results.html'
 })
-export class SearchResultsComponent implements OnInit {
+export class SearchResults implements OnInit {
   private route = inject(ActivatedRoute);
   private tmdbService = inject(TmdbService);
   private favoritesService = inject(FavoritesService);
@@ -508,10 +508,10 @@ export class SearchResultsComponent implements OnInit {
 }
 ```
 
-✏️ `search-results.component.html`:
+✏️ `search-results.html`:
 
 ```html
-<!-- search-results.component.html -->
+<!-- search-results.html -->
 <h2 class="mb-4">🔍 Resultados para "{{ termino }}"</h2>
 
 @if (cargando) {

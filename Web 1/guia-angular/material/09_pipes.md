@@ -182,14 +182,14 @@ export class StarsPipe implements PipeTransform {
 
 ---
 
-## 9.4 Usar pipes en MovieCardComponent
+## 9.4 Usar pipes en MovieCard
 
-Vamos a refactorizar el template de `MovieCardComponent` para usar los pipes que acabamos de crear. Esto reemplaza la concatenación manual de URLs y el truncado con `.slice()` que teníamos antes.
+Vamos a refactorizar el template de `MovieCard` para usar los pipes que acabamos de crear. Esto reemplaza la concatenación manual de URLs y el truncado con `.slice()` que teníamos antes.
 
-✏️ Modificar `movie-card.component.ts` para importar los pipes:
+✏️ Modificar `movie-card.ts` para importar los pipes:
 
 ```typescript
-// movie-card.component.ts
+// movie-card.ts
 import { Component, input, output } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Movie } from '../../models/movie';
@@ -203,10 +203,10 @@ import { StarsPipe } from '../../pipes/stars.pipe';
   standalone: true,
   // Agregar los pipes a imports para usarlos en el template
   imports: [RouterLink, TruncatePipe, TmdbImagePipe, StarsPipe],
-  templateUrl: './movie-card.component.html',
-  styleUrls: ['./movie-card.component.scss']
+  templateUrl: './movie-card.html',
+  styleUrls: ['./movie-card.scss']
 })
-export class MovieCardComponent {
+export class MovieCard {
   movie = input.required<Movie>();
   esFavorita = input<boolean>(false);
   toggleFavorito = output<Movie>();
@@ -217,10 +217,10 @@ export class MovieCardComponent {
 }
 ```
 
-✏️ Modificar `movie-card.component.html` para usar los pipes:
+✏️ Modificar `movie-card.html` para usar los pipes:
 
 ```html
-<!-- movie-card.component.html -->
+<!-- movie-card.html -->
 <!-- Tarjeta usando pipes personalizados -->
 <div class="card shadow-sm h-100">
   <!-- tmdbImage pipe construye la URL completa de la imagen -->

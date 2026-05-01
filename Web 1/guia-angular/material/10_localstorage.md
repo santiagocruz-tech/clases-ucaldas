@@ -228,7 +228,7 @@ export class ThemeService {
 ✏️ Agregar el toggle de tema en el navbar:
 
 ```html
-<!-- Agregar en navbar.component.html, dentro del navbar -->
+<!-- Agregar en navbar.html, dentro del navbar -->
 <button (click)="toggleTema()" class="btn btn-outline-light btn-sm ms-2">
   <!-- Mostrar emoji según el tema actual -->
   {{ temaActual === 'light' ? '🌙' : '☀️' }}
@@ -236,7 +236,7 @@ export class ThemeService {
 ```
 
 ```typescript
-// Agregar en navbar.component.ts
+// Agregar en navbar.ts
 private themeService = inject(ThemeService);
 
 get temaActual(): string {

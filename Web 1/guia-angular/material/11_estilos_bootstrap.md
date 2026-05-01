@@ -17,7 +17,7 @@ Afectan a toda la aplicación. Ideal para: variables CSS, reset, temas, fuentes.
 Cada componente tiene sus propios estilos que NO afectan a otros componentes. Angular logra esto con View Encapsulation: agrega un atributo único a cada componente y sus estilos.
 
 ```scss
-// movie-card.component.scss
+// movie-card.scss
 // Estos estilos SOLO afectan a este componente
 .card {
   transition: transform 0.2s;
@@ -120,10 +120,10 @@ body {
 
 ## 11.3 Animaciones en componentes
 
-✏️ Agregar animación de entrada en `movie-card.component.scss`:
+✏️ Agregar animación de entrada en `movie-card.scss`:
 
 ```scss
-// movie-card.component.scss
+// movie-card.scss
 // Animación de entrada: las tarjetas aparecen desde abajo con fade
 @keyframes fadeInUp {
   from {
@@ -161,10 +161,10 @@ body {
 
 ### Spinner de carga animado
 
-📁 Crear `src/app/components/spinner/spinner.component.ts`:
+📁 Crear `src/app/components/spinner/spinner.ts`:
 
 ```typescript
-// spinner.component.ts
+// spinner.ts
 // Componente reutilizable de spinner de carga
 import { Component } from '@angular/core';
 
@@ -183,7 +183,7 @@ import { Component } from '@angular/core';
     </div>
   `
 })
-export class SpinnerComponent {}
+export class Spinner {}
 ```
 
 ---

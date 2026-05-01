@@ -2,7 +2,7 @@
 
 ## Objetivo
 
-Aprender a pasar datos entre componentes padre e hijo. Al final de este capítulo, el `MovieCardComponent` recibirá datos del padre con `input()` y emitirá eventos de favorito con `output()`.
+Aprender a pasar datos entre componentes padre e hijo. Al final de este capítulo, el `MovieCard` recibirá datos del padre con `input()` y emitirá eventos de favorito con `output()`.
 
 ---
 
@@ -48,10 +48,10 @@ effect(() => {
 
 ### Componente hijo (recibe datos)
 
-✏️ Modificar `movie-card.component.ts`:
+✏️ Modificar `movie-card.ts`:
 
 ```typescript
-// movie-card.component.ts
+// movie-card.ts
 // Componente de tarjeta que RECIBE una película del padre
 import { Component, input } from '@angular/core';
 // input se importa del core de Angular (función, no decorador)
@@ -61,10 +61,10 @@ import { Movie } from '../../models/movie';
   selector: 'app-movie-card',
   standalone: true,
   imports: [],
-  templateUrl: './movie-card.component.html',
-  styleUrls: ['./movie-card.component.scss']
+  templateUrl: './movie-card.html',
+  styleUrls: ['./movie-card.scss']
 })
-export class MovieCardComponent {
+export class MovieCard {
   // input.required<Movie>() define una entrada obligatoria de tipo Movie
   // El padre DEBE pasar un valor con [movie]="valor"
   // Es un signal: en el template se lee como movie() (con paréntesis)
@@ -75,10 +75,10 @@ export class MovieCardComponent {
 }
 ```
 
-El template `movie-card.component.html` ahora usa `movie()` con paréntesis (porque es un signal):
+El template `movie-card.html` ahora usa `movie()` con paréntesis (porque es un signal):
 
 ```html
-<!-- movie-card.component.html -->
+<!-- movie-card.html -->
 <!-- Tarjeta que muestra los datos recibidos por input() -->
 <!-- IMPORTANTE: los inputs se leen con () porque son signals -->
 <div class="card shadow-sm h-100">
@@ -117,24 +117,24 @@ El template `movie-card.component.html` ahora usa `movie()` con paréntesis (por
 
 ### Componente padre (envía datos)
 
-✏️ Modificar `app.component.ts`:
+✏️ Modificar `app.ts`:
 
 ```typescript
-// app.component.ts
+// app.ts
 // Componente padre que pasa datos a los hijos MovieCard
 import { Component } from '@angular/core';
-import { MovieCardComponent } from './components/movie-card/movie-card.component';
+import { MovieCard } from './components/movie-card/movie-card';
 // Importar la interfaz Movie para tipar el array
 import { Movie } from './models/movie';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [MovieCardComponent],
-  templateUrl: './app.component.html',
-  styleUrl: './app.component.scss'
+  imports: [MovieCard],
+  templateUrl: './app.html',
+  styleUrl: './app.scss'
 })
-export class AppComponent {
+export class App {
   titulo: string = 'CineExplorer';
 
   // Array de películas de ejemplo (después vendrán de la API)
@@ -190,10 +190,10 @@ export class AppComponent {
 }
 ```
 
-✏️ Modificar `app.component.html`:
+✏️ Modificar `app.html`:
 
 ```html
-<!-- app.component.html -->
+<!-- app.html -->
 <!-- Página principal que pasa datos a cada MovieCard -->
 <div class="container py-4">
   <h1 class="display-5 mb-1">🎬 {{ titulo }}</h1>
@@ -227,10 +227,10 @@ export class AppComponent {
 
 `output()` permite que un componente hijo notifique al padre cuando algo pasa (como hacer click en favorito). Reemplaza a `@Output()` + `EventEmitter`.
 
-✏️ Modificar `movie-card.component.ts` para agregar el output:
+✏️ Modificar `movie-card.ts` para agregar el output:
 
 ```typescript
-// movie-card.component.ts
+// movie-card.ts
 // Componente con input() (recibe datos) y output() (emite eventos)
 import { Component, input, output } from '@angular/core';
 // output se importa del core de Angular (función, no decorador)
@@ -240,10 +240,10 @@ import { Movie } from '../../models/movie';
   selector: 'app-movie-card',
   standalone: true,
   imports: [],
-  templateUrl: './movie-card.component.html',
-  styleUrls: ['./movie-card.component.scss']
+  templateUrl: './movie-card.html',
+  styleUrls: ['./movie-card.scss']
 })
-export class MovieCardComponent {
+export class MovieCard {
   // Entrada: datos que recibe del padre (signals)
   movie = input.required<Movie>();
   esFavorita = input<boolean>(false);
@@ -262,7 +262,7 @@ export class MovieCardComponent {
 }
 ```
 
-✏️ Actualizar el botón de favorito en `movie-card.component.html`:
+✏️ Actualizar el botón de favorito en `movie-card.html`:
 
 ```html
 <!-- Reemplazar el botón de favorito por este -->
@@ -299,18 +299,18 @@ Este patrón es clave para código mantenible:
 
 | Tipo | Responsabilidad | Ejemplo |
 |------|----------------|---------|
-| **Inteligente** (smart) | Obtiene datos, maneja lógica | `HomeComponent`, `SearchComponent` |
-| **Presentación** (dumb) | Solo muestra datos, emite eventos | `MovieCardComponent`, `SpinnerComponent` |
+| **Inteligente** (smart) | Obtiene datos, maneja lógica | `Home`, `Search` |
+| **Presentación** (dumb) | Solo muestra datos, emite eventos | `MovieCard`, `Spinner` |
 
 ```
-HomeComponent (inteligente)
+Home (inteligente)
 ├── Inyecta TmdbService
 ├── Llama a la API
 ├── Maneja favoritos
 └── Pasa datos a:
-    ├── MovieCardComponent (presentación) ← solo muestra y emite
-    ├── MovieCardComponent (presentación)
-    └── MovieCardComponent (presentación)
+    ├── MovieCard (presentación) ← solo muestra y emite
+    ├── MovieCard (presentación)
+    └── MovieCard (presentación)
 ```
 
 💡 **Regla:** los componentes de presentación no conocen servicios ni lógica de negocio. Solo reciben datos por `input()` y emiten eventos por `output()`.
@@ -322,7 +322,7 @@ HomeComponent (inteligente)
 `ng-content` permite que un componente padre inserte HTML dentro de un componente hijo. Es como los "slots" de Vue o los "children" de React.
 
 ```typescript
-// card-layout.component.ts
+// card-layout.ts
 // Componente contenedor reutilizable con slots para contenido
 @Component({
   selector: 'app-card-layout',
@@ -345,7 +345,7 @@ HomeComponent (inteligente)
     </div>
   `
 })
-export class CardLayoutComponent {}
+export class CardLayout {}
 ```
 
 ```html

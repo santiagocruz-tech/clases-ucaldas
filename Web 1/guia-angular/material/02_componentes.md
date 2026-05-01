@@ -2,7 +2,7 @@
 
 ## Objetivo
 
-Entender qué es un componente en Angular, cómo funciona el data binding y las directivas. Al final de este capítulo, CineExplorer tendrá un componente `MovieCardComponent` y una página Home que muestra películas con datos de ejemplo.
+Entender qué es un componente en Angular, cómo funciona el data binding y las directivas. Al final de este capítulo, CineExplorer tendrá un componente `MovieCard` y una página Home que muestra películas con datos de ejemplo.
 
 ---
 
@@ -13,13 +13,13 @@ Un componente es una pieza reutilizable de la interfaz. Cada componente controla
 Una aplicación Angular es un árbol de componentes:
 
 ```
-AppComponent
-├── NavbarComponent
-├── HomeComponent
-│   ├── MovieCardComponent
-│   ├── MovieCardComponent
-│   └── MovieCardComponent
-└── FooterComponent
+App
+├── Navbar
+├── Home
+│   ├── MovieCard
+│   ├── MovieCard
+│   └── MovieCard
+└── Footer
 ```
 
 ---
@@ -29,7 +29,7 @@ AppComponent
 Un componente tiene 4 partes:
 
 ```typescript
-// movie-card.component.ts
+// movie-card.ts
 // Importar Component del core de Angular
 import { Component } from '@angular/core';
 
@@ -44,12 +44,12 @@ import { Component } from '@angular/core';
   // imports: otros componentes/módulos que este componente necesita
   imports: [],
   // templateUrl: ruta al archivo HTML del componente
-  templateUrl: './movie-card.component.html',
+  templateUrl: './movie-card.html',
   // styleUrls: ruta al archivo de estilos (solo afecta a este componente)
-  styleUrls: ['./movie-card.component.scss']
+  styleUrls: ['./movie-card.scss']
 })
 // La clase contiene la lógica: propiedades y métodos
-export class MovieCardComponent {
+export class MovieCard {
   // Propiedades que se pueden usar en el template
   titulo: string = 'Película de ejemplo';
   puntuacion: number = 8.5;
@@ -75,10 +75,10 @@ ng g c components/saludo --inline-template --inline-style
 Archivos generados:
 ```
 components/movie-card/
-├── movie-card.component.ts       ← Lógica del componente
-├── movie-card.component.html     ← Template HTML
-├── movie-card.component.scss     ← Estilos (solo afectan a este componente)
-└── movie-card.component.spec.ts  ← Tests (opcional)
+├── movie-card.ts       ← Lógica del componente
+├── movie-card.html     ← Template HTML
+├── movie-card.scss     ← Estilos (solo afectan a este componente)
+└── movie-card.spec.ts  ← Tests (opcional)
 ```
 
 ---
@@ -92,8 +92,8 @@ El data binding conecta los datos de la clase TypeScript con el template HTML.
 Muestra valores de la clase en el HTML:
 
 ```typescript
-// perfil.component.ts
-export class PerfilComponent {
+// perfil.ts
+export class Perfil {
   nombre: string = 'Ana García';   // propiedad de la clase
   edad: number = 28;
   activo: boolean = true;
@@ -101,7 +101,7 @@ export class PerfilComponent {
 ```
 
 ```html
-<!-- perfil.component.html -->
+<!-- perfil.html -->
 <!-- {{ }} inserta el valor de la propiedad en el HTML -->
 <h1>{{ nombre }}</h1>
 <p>Edad: {{ edad }}</p>
@@ -115,8 +115,8 @@ export class PerfilComponent {
 Vincula una propiedad del DOM a un valor de la clase:
 
 ```typescript
-// imagen.component.ts
-export class ImagenComponent {
+// imagen.ts
+export class Imagen {
   urlImagen: string = 'https://image.tmdb.org/t/p/w500/poster.jpg';
   altTexto: string = 'Póster de película';
   deshabilitado: boolean = true;
@@ -139,8 +139,8 @@ export class ImagenComponent {
 Escucha eventos del DOM y ejecuta métodos de la clase:
 
 ```typescript
-// contador.component.ts
-export class ContadorComponent {
+// contador.ts
+export class Contador {
   contador: number = 0;
 
   // Método que se ejecuta al hacer click
@@ -175,7 +175,7 @@ export class ContadorComponent {
 Vinculación bidireccional: el dato se actualiza en ambas direcciones (clase ↔ template):
 
 ```typescript
-// buscador.component.ts
+// buscador.ts
 // FormsModule es necesario para usar ngModel
 import { FormsModule } from '@angular/forms';
 
@@ -184,7 +184,7 @@ import { FormsModule } from '@angular/forms';
   // Importar FormsModule para habilitar ngModel
   imports: [FormsModule]
 })
-export class BuscadorComponent {
+export class Buscador {
   termino: string = '';  // se sincroniza con el input
 }
 ```
@@ -333,10 +333,10 @@ Vamos a crear el componente de tarjeta de película y la página principal de Ci
 ng g c components/movie-card --skip-tests
 ```
 
-✏️ `src/app/components/movie-card/movie-card.component.ts`:
+✏️ `src/app/components/movie-card/movie-card.ts`:
 
 ```typescript
-// movie-card.component.ts
+// movie-card.ts
 // Componente que muestra una tarjeta con la información de una película
 import { Component } from '@angular/core';
 // Importar la interfaz Movie que creamos en el capítulo 1
@@ -346,10 +346,10 @@ import { Movie } from '../../models/movie';
   selector: 'app-movie-card',
   standalone: true,
   imports: [],
-  templateUrl: './movie-card.component.html',
-  styleUrls: ['./movie-card.component.scss']
+  templateUrl: './movie-card.html',
+  styleUrls: ['./movie-card.scss']
 })
-export class MovieCardComponent {
+export class MovieCard {
   // Por ahora usamos datos de ejemplo hardcodeados
   // En el próximo capítulo recibiremos los datos del componente padre con @Input
   pelicula: Movie = {
@@ -365,10 +365,10 @@ export class MovieCardComponent {
 }
 ```
 
-✏️ `src/app/components/movie-card/movie-card.component.html`:
+✏️ `src/app/components/movie-card/movie-card.html`:
 
 ```html
-<!-- movie-card.component.html -->
+<!-- movie-card.html -->
 <!-- Tarjeta de película usando clases de Bootstrap -->
 <div class="card shadow-sm h-100">
   <!-- shadow-sm: sombra suave -->
@@ -414,10 +414,10 @@ export class MovieCardComponent {
 </div>
 ```
 
-✏️ `src/app/components/movie-card/movie-card.component.scss`:
+✏️ `src/app/components/movie-card/movie-card.scss`:
 
 ```scss
-// movie-card.component.scss
+// movie-card.scss
 // Estilos que SOLO afectan a este componente (encapsulación de Angular)
 
 // Efecto hover en la tarjeta
@@ -445,10 +445,10 @@ export class MovieCardComponent {
 
 Ahora creamos la página Home que muestra varias tarjetas:
 
-✏️ Modificar `src/app/app.component.html`:
+✏️ Modificar `src/app/app.html`:
 
 ```html
-<!-- app.component.html -->
+<!-- app.html -->
 <!-- Página principal de CineExplorer con tarjetas de ejemplo -->
 <div class="container py-4">
   <!-- container: centra el contenido con márgenes -->
@@ -477,23 +477,23 @@ Ahora creamos la página Home que muestra varias tarjetas:
 </div>
 ```
 
-✏️ Modificar `src/app/app.component.ts` para importar MovieCardComponent:
+✏️ Modificar `src/app/app.ts` para importar MovieCard:
 
 ```typescript
-// app.component.ts
+// app.ts
 import { Component } from '@angular/core';
 // Importar el componente de tarjeta para poder usarlo en el template
-import { MovieCardComponent } from './components/movie-card/movie-card.component';
+import { MovieCard } from './components/movie-card/movie-card';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  // Agregar MovieCardComponent a imports para que esté disponible en el template
-  imports: [MovieCardComponent],
-  templateUrl: './app.component.html',
-  styleUrl: './app.component.scss'
+  // Agregar MovieCard a imports para que esté disponible en el template
+  imports: [MovieCard],
+  templateUrl: './app.html',
+  styleUrl: './app.scss'
 })
-export class AppComponent {
+export class App {
   titulo: string = 'CineExplorer';
 }
 ```

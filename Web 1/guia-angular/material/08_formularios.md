@@ -31,7 +31,7 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
   // ReactiveFormsModule es necesario para usar [formControl]
   imports: [ReactiveFormsModule]
 })
-export class BuscadorComponent {
+export class Buscador {
   // FormControl con valor inicial vacío
   searchControl = new FormControl('');
 
@@ -61,7 +61,7 @@ import { FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angula
 @Component({
   imports: [ReactiveFormsModule]
 })
-export class ReviewFormComponent {
+export class ReviewForm {
   // FormGroup con varios campos, cada uno con sus validaciones
   formulario = new FormGroup({
     // Validators.required: campo obligatorio
@@ -177,7 +177,7 @@ import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 @Component({
   imports: [ReactiveFormsModule]
 })
-export class ReviewFormComponent {
+export class ReviewForm {
   // Inyectar FormBuilder
   private fb = inject(FormBuilder);
 

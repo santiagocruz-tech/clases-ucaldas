@@ -65,7 +65,7 @@ import { Component, OnInit } from '@angular/core';
 import { TmdbService } from '../../services/tmdb.service';
 
 @Component({ /* ... */ })
-export class HomeComponent implements OnInit {
+export class Home implements OnInit {
   // Angular inyecta el servicio automáticamente en el constructor
   // "private" crea la propiedad this.tmdbService
   constructor(private tmdbService: TmdbService) {}
@@ -84,7 +84,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { TmdbService } from '../../services/tmdb.service';
 
 @Component({ /* ... */ })
-export class HomeComponent implements OnInit {
+export class Home implements OnInit {
   // inject() inyecta el servicio sin necesidad de constructor
   // Es más conciso y funciona igual
   private tmdbService = inject(TmdbService);
@@ -101,7 +101,7 @@ export class HomeComponent implements OnInit {
 
 ## 4.5 Aplicar al proyecto: FavoritesService
 
-Vamos a mover la lógica de favoritos del `AppComponent` a un servicio dedicado.
+Vamos a mover la lógica de favoritos del `App` a un servicio dedicado.
 
 📁 Crear el servicio:
 
@@ -171,13 +171,13 @@ export class FavoritesService {
 
 ## 4.6 Usar el servicio en los componentes
 
-✏️ Modificar `app.component.ts` para usar el servicio en lugar de manejar favoritos directamente:
+✏️ Modificar `app.ts` para usar el servicio en lugar de manejar favoritos directamente:
 
 ```typescript
-// app.component.ts
+// app.ts
 // Componente padre que usa FavoritesService para manejar favoritos
 import { Component, inject } from '@angular/core';
-import { MovieCardComponent } from './components/movie-card/movie-card.component';
+import { MovieCard } from './components/movie-card/movie-card';
 import { Movie } from './models/movie';
 // Importar el servicio
 import { FavoritesService } from './services/favorites.service';
@@ -185,11 +185,11 @@ import { FavoritesService } from './services/favorites.service';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [MovieCardComponent],
-  templateUrl: './app.component.html',
-  styleUrl: './app.component.scss'
+  imports: [MovieCard],
+  templateUrl: './app.html',
+  styleUrl: './app.scss'
 })
-export class AppComponent {
+export class App {
   titulo: string = 'CineExplorer';
 
   // Inyectar el servicio de favoritos
@@ -237,7 +237,7 @@ export class AppComponent {
 
 ```typescript
 // ❌ MAL: lógica de negocio en el componente
-export class FavoritesComponent {
+export class Favorites {
   favoritas: Movie[] = [];
 
   agregar(movie: Movie): void {
@@ -249,7 +249,7 @@ export class FavoritesComponent {
 }
 
 // ✅ BIEN: lógica en un servicio, componente delgado
-export class FavoritesComponent {
+export class Favorites {
   // El componente solo llama métodos del servicio
   private favoritesService = inject(FavoritesService);
   favoritas = this.favoritesService.obtenerTodas();
