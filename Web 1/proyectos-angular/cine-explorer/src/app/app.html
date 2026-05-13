@@ -1,0 +1,24 @@
+<!-- app.html -->
+<!-- Página principal que pasa datos a cada MovieCard -->
+<div class="container py-4">
+  <h1 class="display-5 mb-1">🎬 {{ titulo }}</h1>
+  <p class="lead text-muted mb-4">Explora las mejores películas del mundo</p>
+
+  <!-- @for recorre el array de películas -->
+  <!-- track movie.id: Angular usa el ID para optimizar el renderizado -->
+  <div class="row g-4">
+    @for (movie of peliculas; track movie.id) {
+      <div class="col-sm-6 col-md-4">
+        <!-- [movie] pasa la película al hijo (@Input) -->
+        <!-- [esFavorita] pasa si esta película está en favoritos -->
+        <!-- (toggleFavorito) escucha el evento emitido por el hijo (@Output) -->
+        <app-movie-card
+          [movie]="movie"
+          [esFavorita]="esFavorita(movie.id)"
+          (toggleFavorito)="toggleFavorito($event)" />
+      </div>
+    } @empty {
+      <p class="text-muted">No hay películas para mostrar</p>
+    }
+  </div>
+</div>

@@ -121,7 +121,7 @@ class ContadorActivity : AppCompatActivity() {
 
 El ViewModel es un componente que **sobrevive a rotaciones de pantalla**. Vive más tiempo que la Activity: se crea cuando la Activity se crea por primera vez y se destruye solo cuando la Activity se destruye definitivamente (no por rotación).
 
-🔧 Agregar la dependencia en `app/build.gradle.kts`:
+🔧 Agregar las dependencias en `app/build.gradle.kts`:
 
 ```kotlin
 dependencies {

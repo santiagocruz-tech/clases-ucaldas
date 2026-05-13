@@ -129,6 +129,8 @@ android {
 }
 ```
 
+💡 **Nota sobre AGP 9.x y Kotlin built-in:** A partir de Android Gradle Plugin 9.x, Kotlin viene integrado directamente en el plugin de Android. No necesitan agregar el plugin `org.jetbrains.kotlin.android` por separado. Si ven errores como `The 'kotlin-kapt' plugin is not compatible with built-in Kotlin`, es porque están usando un plugin de Kotlin que ya no es necesario.
+
 Después de modificar `build.gradle.kts`:
 - **Android Studio / IntelliJ:** Click en **"Sync Now"** en la barra amarilla
 - **VS Code / Terminal:** Ejecutar `./gradlew build`

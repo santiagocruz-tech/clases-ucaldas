@@ -25,15 +25,27 @@ Room tiene tres componentes:
 
 ## 8.2 Configurar las dependencias
 
-🔧 Modificar `app/build.gradle.kts`:
+🔧 Primero, agregar el plugin KSP en el `build.gradle.kts` **raíz del proyecto** (el que está fuera de la carpeta `app/`):
+
+```kotlin
+// build.gradle.kts (raíz del proyecto)
+plugins {
+    id("com.android.application") version "9.2.0" apply false
+    // KSP (Kotlin Symbol Processing) — reemplaza a kapt para procesamiento de anotaciones
+    // La versión debe coincidir con la versión de Kotlin del proyecto
+    id("com.google.devtools.ksp") version "2.2.10-2.0.2" apply false
+}
+```
+
+💡 **¿Por qué KSP y no kapt?** A partir de AGP 9.x con Kotlin integrado (built-in Kotlin), el plugin `kapt` ya no es compatible. KSP es su reemplazo oficial: es más rápido y compatible con las versiones modernas de Kotlin.
+
+🔧 Luego, modificar `app/build.gradle.kts`:
 
 ```kotlin
 plugins {
     id("com.android.application")
-    id("org.jetbrains.kotlin.android")
-    // kapt es el procesador de anotaciones de Kotlin
-    // Room lo necesita para generar código a partir de las anotaciones
-    id("kotlin-kapt")
+    // KSP para que Room genere código a partir de las anotaciones
+    id("com.google.devtools.ksp")
 }
 
 dependencies {
@@ -41,15 +53,31 @@ dependencies {
 
     // Room: base de datos local
     // room-runtime: el motor de Room
-    implementation("androidx.room:room-runtime:2.6.1")
+    implementation("androidx.room:room-runtime:2.7.1")
     // room-ktx: extensiones de Kotlin para Room (soporte de coroutines)
-    implementation("androidx.room:room-ktx:2.6.1")
+    implementation("androidx.room:room-ktx:2.7.1")
     // room-compiler: genera código a partir de las anotaciones (solo en compilación)
-    kapt("androidx.room:room-compiler:2.6.1")
+    ksp("androidx.room:room-compiler:2.7.1")
 }
 ```
 
+🔧 Agregar en `gradle.properties` la siguiente línea (necesaria para que KSP funcione con AGP 9.x):
+
+```properties
+# Permitir que KSP agregue source sets de Kotlin con AGP 9.x built-in Kotlin
+android.disallowKotlinSourceSets=false
+```
+
 Sincronizar Gradle después de agregar las dependencias.
+
+⚠️ **Problemas comunes en este paso:**
+
+| Problema | Solución |
+|----------|----------|
+| `The 'kotlin-kapt' plugin is not compatible with built-in Kotlin` | Usar `ksp` en lugar de `kapt` (como se muestra arriba) |
+| `unexpected jvm signature V` con Room 2.6.1 | Actualizar Room a 2.7.1 que es compatible con Kotlin 2.2.x |
+| `Using kotlin.sourceSets DSL is not allowed` | Agregar `android.disallowKotlinSourceSets=false` en `gradle.properties` |
+| `The specified initialization script does not exist` | Cerrar Android Studio, borrar la carpeta `.gradle` del proyecto, y reabrir |
 
 ---
 
@@ -271,7 +299,8 @@ abstract class AppDatabase : RoomDatabase() {
                 )
                 // fallbackToDestructiveMigration: si la versión cambia, borra y recrea
                 // En producción se usarían migraciones, pero para aprender es más simple así
-                .fallbackToDestructiveMigration()
+                // El parámetro true indica que se borran todas las tablas
+                .fallbackToDestructiveMigration(true)
                 .build()
 
                 // Guardar la instancia para reutilizarla
@@ -607,6 +636,14 @@ class MainActivity : AppCompatActivity() {
 4. Volver a abrir la app
 5. **Los datos siguen ahí** porque están guardados en la base de datos
 
+⚠️ **Si al sincronizar Gradle aparece `The specified initialization script does not exist`:**
+1. Cerrar Android Studio completamente
+2. Borrar la carpeta `.gradle` que está en la raíz del proyecto (NO la de tu carpeta home)
+3. Reabrir Android Studio y dejar que sincronice desde cero
+
+⚠️ **Si aparece `Reload All from Disk`:**
+Después de modificar archivos de configuración de Gradle, a veces Android Studio no detecta los cambios. Ir a **File → Reload All from Disk** y luego sincronizar Gradle de nuevo.
+
 ---
 
 ## 8.10 ¿Qué cambió respecto al capítulo anterior?
@@ -635,6 +672,8 @@ class MainActivity : AppCompatActivity() {
 | `viewModelScope.launch` | Ejecutar operaciones suspend en una coroutine |
 | `AndroidViewModel` | ViewModel que recibe Application como contexto |
 | Patrón Singleton | Garantizar una sola instancia de la base de datos |
+| `ksp` | Procesador de anotaciones moderno (reemplaza a kapt) |
+| `android.disallowKotlinSourceSets=false` | Necesario para KSP con AGP 9.x |
 
 ---
 

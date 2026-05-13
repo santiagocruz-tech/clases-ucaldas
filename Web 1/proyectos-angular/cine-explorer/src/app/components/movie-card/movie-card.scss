@@ -1,0 +1,19 @@
+// movie-card.scss
+// Estilos que SOLO afectan a este componente (encapsulación de Angular)
+
+// Efecto hover en la tarjeta
+.card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+  }
+}
+
+// Limitar la altura de la imagen para consistencia
+.card-img-top {
+  height: 400px;
+  object-fit: cover;
+}
